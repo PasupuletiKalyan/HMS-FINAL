@@ -1,0 +1,202 @@
+/* Importing the 'Poppins' font from Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+
+:root {
+  --primary-color: #d32f2f; /* Red */
+  --secondary-color: #ffffff; /* White */
+  --text-color: #000000; /* Black */
+  --background-color: #f5f5f5; /* Light gray for subtle contrast */
+  --font-family: "Poppins", sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+}
+
+/* Top Navigation Bar */
+.dashboard-top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 98%;
+  z-index: 100;
+}
+
+.profile-section-top {
+  display: flex;
+  align-items: center;
+}
+
+.college-logo-top {
+  height: 80px; /* Increased size */
+  margin-right: 15px;
+}
+
+.profile-image-top {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  border: 2px solid var(--secondary-color);
+}
+
+.user-name-top {
+  font-weight: 600;
+  color: ;
+}
+
+/* Navigation Menu */
+/* Navigation Menu */
+.top-menu {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+  margin: 0;
+  padding: 0;
+}
+
+.top-menu li {
+  position: relative; /* Ensure the parent <li> is the positioning context */
+  cursor: pointer;
+  font-weight: 600;
+  color: ;
+  transition: color 0.3s;
+}
+
+.top-menu li:hover {
+  color: #d32f2f;
+}
+
+.dropdown-bullets-top {
+  position: absolute;
+  background: #d32f2f; /* Changed background to black */
+  color: white; /* Text color changed to white */
+  list-style: none;
+  padding: 5px 0;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  margin-top: 5px;
+}
+
+.top-menu li:hover .dropdown-bullets-top {
+  display: block; /* Show dropdown on hover */
+}
+
+.dropdown-bullets-top li {
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.dropdown-bullets-top li:hover {
+  background: #8b2626; /* Slightly lighter black on hover */
+}
+
+/* Active Menu Item */
+.active {
+  border-bottom: 2px solid var(--secondary-color);
+}
+
+/* Dashboard Content */
+.dashboard-content {
+  padding: 90px 30px; /* Slightly more horizontal padding */
+  background-color: var(--secondary-color);
+  margin: 10px 0px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  /* Make content section visually larger */
+  min-height: 600px; /* Add minimum height */
+}
+
+.dashboard-content h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.dashboard-content p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Footer */
+.footer {
+  background-color: var(--text-color);
+  color: var(--secondary-color);
+  text-align: center;
+  padding: 15px 20px;
+  margin-top: 20px;
+}
+
+.footer a {
+  color: var(--secondary-color);
+  text-decoration: none;
+  margin: 0 10px;
+  transition: color 0.3s;
+}
+
+.footer a:hover {
+  color: var(--primary-color);
+}
+/* Personal Details Form */
+
+.personal-details-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 600px;
+  margin: auto;
+  background: var(--secondary-color);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.personal-details-form label {
+  font-weight: 600;
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.personal-details-form input,
+.personal-details-form select,
+.personal-details-form textarea {
+  padding: 8px;
+  border: 1px solid var(--primary-color);
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.personal-details-form .form-signatures {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.personal-details-form button {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.personal-details-form button:hover {
+  background-color: #b71c1c;
+}
