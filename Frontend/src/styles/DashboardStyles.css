@@ -17,18 +17,18 @@ body {
   padding: 0;
 }
 
-/* Top Navigation Bar */
+/* 🔹 Top Navigation Bar */
 .dashboard-top-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
   background-color: white;
-  padding: 10px 20px;
+  padding: 0.8rem 1.5rem; /* Reduced padding */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: fixed;
   top: 0;
   left: 0;
-  width: 98%;
+  width: 100%;
   z-index: 100;
 }
 
@@ -38,159 +38,155 @@ body {
 }
 
 .college-logo-top {
-  height: 80px; /* Increased size */
-  margin-right: 15px;
+  height: 4.5rem; /* Reduced size */
+  margin-right: 1rem;
 }
 
 .profile-image-top {
-  height: 40px;
-  width: 40px;
+  height: 2.5rem;
+  width: 2.5rem;
   border-radius: 50%;
-  margin-right: 10px;
+  margin-right: 0.8rem;
   border: 2px solid var(--secondary-color);
 }
 
 .user-name-top {
   font-weight: 600;
-  color: ;
+  font-size: 1rem; /* Reduced text size */
 }
 
-/* Navigation Menu */
-/* Navigation Menu */
+/* 🔹 Navigation Menu */
 .top-menu {
   list-style: none;
   display: flex;
-  gap: 30px;
+  gap: 1.5rem; /* Reduced gap */
   margin: 0;
   padding: 0;
+  font-size: 1rem; /* Slightly smaller */
 }
 
 .top-menu li {
-  position: relative; /* Ensure the parent <li> is the positioning context */
+  position: relative;
   cursor: pointer;
   font-weight: 600;
-  color: ;
   transition: color 0.3s;
 }
 
 .top-menu li:hover {
-  color: #d32f2f;
+  color: var(--primary-color);
 }
 
+/* 🔹 Dropdown */
 .dropdown-bullets-top {
   position: absolute;
-  background: #d32f2f; /* Changed background to black */
-  color: white; /* Text color changed to white */
+  background: var(--primary-color);
+  color: white;
   list-style: none;
-  padding: 5px 0;
+  padding: 0.4rem 0;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 10;
-  margin-top: 5px;
+  margin-top: 4px;
+  font-size: 0.9rem; /* Reduced dropdown font size */
 }
 
 .top-menu li:hover .dropdown-bullets-top {
-  display: block; /* Show dropdown on hover */
+  display: block;
 }
 
 .dropdown-bullets-top li {
-  padding: 8px 15px;
+  padding: 0.6rem 1rem;
   cursor: pointer;
   transition: background 0.3s;
 }
 
 .dropdown-bullets-top li:hover {
-  background: #8b2626; /* Slightly lighter black on hover */
+  background: #8b2626;
 }
 
-/* Active Menu Item */
+/* 🔹 Active Menu Item */
 .active {
-  border-bottom: 2px solid var(--secondary-color);
+  border-bottom: 2px solid var(--primary-color);
 }
 
-/* Dashboard Content */
+/* 🔹 Dashboard Content */
 .dashboard-content {
-  padding: 90px 30px; /* Slightly more horizontal padding */
+  padding: 6rem 4%; /* Adjusted padding */
   background-color: var(--secondary-color);
-  margin: 10px 0px 20px;
+  margin: 1.5rem auto;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  /* Make content section visually larger */
-  min-height: 600px; /* Add minimum height */
+  min-height: 65vh;
+  max-width: 85vw; /* Slightly reduced width */
+  font-size: 1rem; /* Smaller text */
 }
 
 .dashboard-content h1 {
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 1.6rem; /* Reduced */
+  margin-bottom: 1rem;
 }
 
 .dashboard-content p {
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 1.1rem;
+  line-height: 1.5;
 }
 
-/* Footer */
+/* 🔹 Footer */
 .footer {
   background-color: var(--text-color);
   color: var(--secondary-color);
   text-align: center;
-  padding: 15px 20px;
-  margin-top: 20px;
+  padding: 1.2rem;
+  margin-top: 2rem;
+  font-size: 1rem; /* Reduced */
 }
 
 .footer a {
   color: var(--secondary-color);
   text-decoration: none;
-  margin: 0 10px;
+  margin: 0 0.8rem;
   transition: color 0.3s;
 }
 
 .footer a:hover {
   color: var(--primary-color);
 }
-/* Personal Details Form */
 
+/* 🔹 Personal Details Form */
 .personal-details-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  max-width: 600px;
+  gap: 1rem;
+  max-width: 45vw; /* Reduced */
   margin: auto;
   background: var(--secondary-color);
-  padding: 20px;
+  padding: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .personal-details-form label {
   font-weight: 600;
-  color: var(--text-color);
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 0.4rem;
+  font-size: 1rem; /* Reduced */
 }
 
 .personal-details-form input,
 .personal-details-form select,
 .personal-details-form textarea {
-  padding: 8px;
+  padding: 0.7rem;
   border: 1px solid var(--primary-color);
   border-radius: 5px;
-  font-size: 14px;
-}
-
-.personal-details-form .form-signatures {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  font-size: 1rem;
 }
 
 .personal-details-form button {
   background-color: var(--primary-color);
   color: var(--secondary-color);
-  padding: 10px;
-  font-size: 16px;
+  padding: 0.9rem;
+  font-size: 1rem; /* Reduced */
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -199,4 +195,49 @@ body {
 
 .personal-details-form button:hover {
   background-color: #b71c1c;
+}
+
+/* 🔹 Responsive Fixes */
+@media screen and (max-width: 1024px) {
+  .top-menu {
+    gap: 1rem;
+    font-size: 0.9rem; /* Reduced */
+  }
+
+  .dashboard-content {
+    padding: 5.5rem 3%;
+  }
+
+  .personal-details-form {
+    max-width: 70vw;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .dashboard-top-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.8rem;
+  }
+
+  .top-menu {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .top-menu li {
+    padding: 0.4rem 0;
+  }
+
+  .dashboard-content {
+    padding: 5rem 2%;
+  }
+
+  .personal-details-form {
+    max-width: 85vw;
+  }
+
+  .footer {
+    font-size: 0.9rem; /* Reduced */
+  }
 }
