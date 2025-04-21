@@ -1,5 +1,4 @@
-// AdminDashboard.tsx
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/DashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
@@ -8,75 +7,35 @@ type Student = {
   name: string;
   roll: string;
   room: string;
+  applicationNumber?: string;
+  phone?: string;
+  parentPhone?: string;
+  emergencyContact?: string;
+  school?: string;
+  profilePic?: string;
 };
 
-const AdminDashboard: React.FC = () => {
+const WardenDashboard: React.FC = () => {
   const [selectedMenu, setSelectedMenu] = useState("Overview");
-  const [adminName, setAdminName] = useState("Admin");
   const [searchTerm, setSearchTerm] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [studentData, setStudentData] = useState<Student[]>([]);
   const [selectedBlock, setSelectedBlock] = useState<string | null>(null);
+  const [studentData, setStudentData] = useState<Student[]>([]);
   const [filteredRoomData, setFilteredRoomData] = useState<Student[]>([]);
   const [roomSearchTerm, setRoomSearchTerm] = useState("");
+  const [wardenName, setWardenName] = useState("Warden");
+  const [applicationNumber, setApplicationNumber] = useState<string | null>(null);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
-  const [adminID, setAdminID] = useState<string | null>(null);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const profileRef = useRef<HTMLDivElement | null>(null);
-  const suggestionRefs = useRef<(HTMLLIElement | null)[]>([]);
-  const searchRef = useRef<HTMLDivElement | null>(null);
-
   const navigate = useNavigate();
+
+  const suggestionRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const profileRef = useRef<HTMLDivElement | null>(null);
 
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
   };
-
-  const handleRoomSearch = () => {
-    const results = studentData.filter((s) =>
-      s.room.toLowerCase() === roomSearchTerm.toLowerCase()
-    );
-    setFilteredRoomData(results);
-  };
-
-  useEffect(() => {
-    const storedAdmin = localStorage.getItem("userName");
-    if (storedAdmin) {
-      setAdminName(storedAdmin);
-    }
-  }, []);
-
-  useEffect(() => {
-    const fetchAdminID = async () => {
-      try {
-        const response = await fetch("/api/admin/id");
-        const data = await response.json();
-        setAdminID(data.adminID);
-      } catch (error) {
-        console.error("Error fetching admin ID:", error);
-        setAdminID("Unavailable");
-      }
-    };
-
-    fetchAdminID();
-  }, []);
-
-  const handleClickOutside = (e: MouseEvent) => {
-    const target = e.target as Node;
-  
-    // ✅ Only hide suggestions if click was truly outside search box
-    if (searchRef.current && !searchRef.current.contains(target)) {
-      setShowSuggestions(false);
-      setSelectedSuggestionIndex(-1);
-    }
-  
-    // ✅ Close profile dropdown if click was outside it
-    if (profileRef.current && !profileRef.current.contains(target)) {
-      setShowProfileDropdown(false);
-    }
-  };
-  
 
   const suggestions = [
     { name: "Phase-1", gender: "Boys" },
@@ -92,31 +51,32 @@ const AdminDashboard: React.FC = () => {
     { name: "Kailash", gender: "Girls" },
     { name: "Phase-3", gender: "Girls" },
   ];
+
   const filteredSuggestions = suggestions.filter((s) =>
     s.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    const storedWarden = localStorage.getItem("userName");
+    if (storedWarden) {
+      setWardenName(storedWarden);
+    }
   }, []);
-  
 
-  const handleSuggestionClick = (blockName: string) => {
-    setSelectedBlock(blockName);
-    setShowSuggestions(false);
-    setSearchTerm(blockName);
-    setSelectedSuggestionIndex(-1);
+  useEffect(() => {
+    const fetchApplicationNumber = async () => {
+      try {
+        const response = await fetch("/api/warden/application-number");
+        const data = await response.json();
+        setApplicationNumber(data.applicationNumber);
+      } catch (error) {
+        console.error("Error fetching application number:", error);
+        setApplicationNumber("Unavailable");
+      }
+    };
 
-    const dummyData: Student[] = [
-      { name: "Anjali Sharma", roll: "22BCS011", room: "G-102" },
-      { name: "Megha Rani", roll: "22BCE123", room: "G-104" },
-      { name: "Tanya Roy", roll: "22BCS321", room: "G-201" },
-    ];
-    setStudentData(dummyData);
-    setFilteredRoomData([]);
-    setRoomSearchTerm("");
-  };
+    fetchApplicationNumber();
+  }, []);
 
   useEffect(() => {
     if (
@@ -130,7 +90,60 @@ const AdminDashboard: React.FC = () => {
     }
   }, [selectedSuggestionIndex]);
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const handleSuggestionClick = (blockName: string) => {
+    setSelectedBlock(blockName);
+    setShowSuggestions(false);
+    setSearchTerm(blockName);
+    setSelectedSuggestionIndex(-1);
+
+    const dummyData: Student[] = [
+      {
+        name: "Anjali Sharma",
+        roll: "22BCS011",
+        room: "G-102",
+        applicationNumber: "MUBT0001",
+        phone: "9876543210",
+        parentPhone: "9123456780",
+        emergencyContact: "9988776655",
+        school: "ECSOE",
+        profilePic: "https://i.pravatar.cc/100?img=1"
+      },
+      {
+        name: "Megha Rani",
+        roll: "22BCE123",
+        room: "G-102",
+        applicationNumber: "MUBT0002",
+        phone: "9876512340",
+        parentPhone: "9123456790",
+        emergencyContact: "9988776644",
+        school: "SOL",
+        profilePic: "https://i.pravatar.cc/100?img=2"
+      },
+      {
+        name: "Tanya Roy",
+        roll: "22BCS321",
+        room: "G-201",
+        applicationNumber: "MUBT0003",
+        phone: "9876509870",
+        parentPhone: "9123456700",
+        emergencyContact: "9988776633",
+        school: "SOD",
+        profilePic: "https://i.pravatar.cc/100?img=3"
+      },
+    ];
+
+    setStudentData(dummyData);
+    setFilteredRoomData([]);
+    setRoomSearchTerm("");
+  };
+
+  const handleRoomSearch = () => {
+    const results = studentData.filter((s) =>
+      s.room.toLowerCase() === roomSearchTerm.toLowerCase()
+    );
+    setFilteredRoomData(results);
+  };
+
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") {
       setSelectedSuggestionIndex((prev) =>
@@ -143,9 +156,22 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+  const handleClickOutside = (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest(".search-container")) {
+      setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
+    }
+
+    if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+      setShowProfileDropdown(false);
+    }
   };
+
+  useEffect(() => {
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -157,8 +183,7 @@ const AdminDashboard: React.FC = () => {
             <p className="user-name-top"></p>
           </div>
 
-          {/* ✅ Reverted class names */}
-          <div className="search-container" ref={searchRef}>
+          <div className="search-container">
             <span className="search-icon">🔍</span>
             <input
               type="text"
@@ -177,58 +202,49 @@ const AdminDashboard: React.FC = () => {
               <ul className="suggestion-box">
                 {filteredSuggestions.map((s, index) => (
                   <li
-                  key={index}
-                  ref={(el) => (suggestionRefs.current[index] = el)}
-                  className={`suggestion-item ${s.gender.toLowerCase()} ${
-                    index === selectedSuggestionIndex ? "highlighted" : ""
-                  }`}
-                  onMouseDown={(e) => e.preventDefault()} // Prevents blur event
-                  onClick={() => {
-                    setTimeout(() => handleSuggestionClick(s.name), 0); // Delays the execution
-                  }}
-                >
-                  {s.name} ({s.gender})
-                </li>
+                    key={index}
+                    ref={(el) => (suggestionRefs.current[index] = el)}
+                    className={`suggestion-item ${s.gender.toLowerCase()} ${
+                      index === selectedSuggestionIndex ? "highlighted" : ""
+                    }`}
+                    onClick={() => handleSuggestionClick(s.name)}
+                  >
+                    {s.name} ({s.gender})
+                  </li>
                 ))}
               </ul>
             )}
           </div>
 
           <ul className="top-menu">
-            {[
-              "Overview",
-              "Hostel Management",
-              "Student Management",
-              "Room Management",
-              "Warden Management",
-            ].map((item) => (
+            {["Overview", "Room Allotment", "Payments", "Reports", "Complaints"].map((item) => (
               <li
                 key={item}
                 className={selectedMenu === item ? "active" : ""}
-                onClick={() => setSelectedMenu(item)}
+                onClick={() => {
+                  setSelectedMenu(item);
+                  setSelectedBlock(null);
+                  setStudentData([]);
+                  setFilteredRoomData([]);
+                }}
               >
                 {item}
               </li>
             ))}
           </ul>
 
-          {/* PROFILE BUTTON */}
           <div className="profile-button-container" ref={profileRef}>
             <button
               className="profile-circle-button"
               onClick={() => setShowProfileDropdown((prev) => !prev)}
             >
-              {adminName.charAt(0).toUpperCase()}
+              {wardenName.charAt(0).toUpperCase()}
             </button>
             {showProfileDropdown && (
               <div className="profile-dropdown">
                 <div className="profile-info">
-                  <p>
-                    <strong>Role:</strong> Admin
-                  </p>
-                  <p>
-                    <strong>Admin ID:</strong> {adminID ?? "Loading..."}
-                  </p>
+                  <p><strong>Role:</strong> Warden</p>
+                  <p><strong>Application No:</strong> {applicationNumber ?? "Loading..."}</p>
                 </div>
                 <ul>
                   <li>Profile</li>
@@ -238,17 +254,6 @@ const AdminDashboard: React.FC = () => {
               </div>
             )}
           </div>
-        </div>
-
-        {/* SECONDARY SEARCH BAR */}
-        <div className="search-container">
-          <input
-            type="text"
-            placeholder="Search by student name, ID, or room..."
-            className="search-bar"
-            value={searchQuery}
-            onChange={handleSearch}
-          />
         </div>
 
         {/* MAIN CONTENT */}
@@ -272,16 +277,18 @@ const AdminDashboard: React.FC = () => {
                 <div className="student-block-list">
                   {filteredRoomData.length > 0 ? (
                     filteredRoomData.map((s, index) => (
-                      <div key={index} className="student-card">
-                        <p>
-                          <strong>Name:</strong> {s.name}
-                        </p>
-                        <p>
-                          <strong>Roll No:</strong> {s.roll}
-                        </p>
-                        <p>
-                          <strong>Room No:</strong> {s.room}
-                        </p>
+                      <div key={index} className="student-card detailed-card">
+                        <img src={s.profilePic} alt="Profile" className="profile-pic" />
+                        <div className="student-info">
+                          <p><strong>Name:</strong> {s.name}</p>
+                          <p><strong>Roll No:</strong> {s.roll}</p>
+                          <p><strong>Room No:</strong> {s.room}</p>
+                          <p><strong>Application No:</strong> {s.applicationNumber}</p>
+                          <p><strong>Phone:</strong> {s.phone}</p>
+                          <p><strong>Parent Phone:</strong> {s.parentPhone}</p>
+                          <p><strong>Emergency Contact:</strong> {s.emergencyContact}</p>
+                          <p><strong>School:</strong> {s.school}</p>
+                        </div>
                       </div>
                     ))
                   ) : (
@@ -300,15 +307,11 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* FOOTER */}
-      <footer className="footer">
-        <p>&copy; 2025 Your Company Name. All rights reserved.</p>
-        <p>
-          <a href="/about">About</a> | <a href="/contact">Contact</a> |{" "}
-          <a href="/privacy">Privacy Policy</a>
-        </p>
+      <footer className="dashboard-footer">
+        <p>&copy; {new Date().getFullYear()} Hostel Management System. All rights reserved.</p>
       </footer>
     </>
   );
 };
 
-export default AdminDashboard;
+export default WardenDashboard;

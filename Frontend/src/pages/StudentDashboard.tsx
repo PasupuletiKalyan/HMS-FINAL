@@ -1,243 +1,262 @@
+// StudentDashboard.tsx
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/DashboardStyles.css";
-import collegeLogo from "../assets/college-logo.jpg"; // ✅ Import logo
+import collegeLogo from "../assets/college-logo.jpg";
+import HostelFloorPlanViewer from '../components/HostelFloorPlanViewer.jsx';
+import '../styles/hostelfloorplanviewer.css'; // Import the styles for the component
 
 const StudentDashboard: React.FC = () => {
   const [selectedMenu, setSelectedMenu] = useState("Overview");
   const [showDropdown, setShowDropdown] = useState(false);
-  const [studentName, setStudentName] = useState<string>("Guest");
+  const [studentName, setStudentName] = useState("Guest");
+  const [applicationNo, setApplicationNo] = useState("");
   const [showRoomLayout, setShowRoomLayout] = useState(false);
+  const [greeting, setGreeting] = useState("Welcome");
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showProcessModal, setShowProcessModal] = useState(false);
   const dropdownRef = useRef<HTMLUListElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedName = localStorage.getItem("userName")?.trim();
-    if (storedName) {
-      setStudentName(storedName);
-    }
+    const appNo = localStorage.getItem("applicationNo")?.trim();
+    if (storedName) setStudentName(storedName);
+    if (appNo) setApplicationNo(appNo);
+  }, []);
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting("Good Morning");
+    else if (hour < 17) setGreeting("Good Afternoon");
+    else setGreeting("Good Evening");
   }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false);
-      }
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) setShowDropdown(false);
+
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) setShowProfileDropdown(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleDropdownClick = (option: string) => {
-    setSelectedMenu(option);
-    setShowDropdown(false);
-    if (option === "New Room") {
-      setShowRoomLayout(true);
-    } else if (option === "Change Existing Room") {
-      navigate("/change-room");
-    } else {
-      setShowRoomLayout(false);
+  const handleApplyForRoomClick = () => {
+    setSelectedMenu("Apply for Room");
+    setShowRoomLayout(true);
+  };
+
+  const renderInitials = (name: string) =>
+    name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      const res = await fetch("http://localhost:5000/api/form", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        alert("Form submitted successfully!");
+        e.currentTarget.reset();
+      } else {
+        alert("Failed to submit form.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error submitting form.");
     }
   };
 
   return (
     <div className="dashboard-container">
-      {/* TOP NAVIGATION BAR */}
+      {/* Top Nav */}
       <div className="dashboard-top-nav">
         <div className="profile-section-top">
           <img src={collegeLogo} alt="College Logo" className="college-logo-top" />
-          <p className="user-name-top">{studentName}</p>
         </div>
 
         <ul className="top-menu">
-          {["Personal Details", "Apply for Room", "Layout Info", "My Room Details", "Fees", "More Info"].map(
-            (item) => (
-              <li
-                key={item}
-                className={selectedMenu === item ? "active" : ""}
-                onClick={() => {
-                  if (item === "Apply for Room") {
-                    setShowDropdown(!showDropdown);
-                  } else {
-                    setSelectedMenu(item);
-                    setShowDropdown(false);
-                    setShowRoomLayout(false);
-                  }
-                }}
-              >
-                {item}
-                {item === "Apply for Room" && (
-                  <>
-                    <span className="dropdown-arrow">{showDropdown ? "▲" : "▼"}</span>
-
-                    {/* DROPDOWN MENU */}
-                    {showDropdown && (
-                      <ul className="dropdown-bullets-top" ref={dropdownRef}>
-                        <li onClick={() => handleDropdownClick("New Room")}>New Room</li>
-                        <li onClick={() => handleDropdownClick("Change Existing Room")}>Change Existing Room</li>
-                      </ul>
-                    )}
-                  </>
-                )}
-              </li>
-            )
-          )}
+          {["Overview", "Hostel Form", "Apply for Room", "Layout Info", "My Room Details", "Fees", "More Info"].map(item => (
+            <li
+              key={item}
+              className={selectedMenu === item ? "active" : ""}
+              onClick={() => {
+                if (item === "Apply for Room") {
+                  handleApplyForRoomClick();
+                } else {
+                  setSelectedMenu(item);
+                  setShowDropdown(false);
+                  setShowRoomLayout(false);
+                }
+              }}
+            >
+              {item}
+              {item === "Apply for Room" && (
+                <span className="dropdown-arrow">{showDropdown ? "▲" : "▼"}</span>
+              )}
+            </li>
+          ))}
         </ul>
+
+        {/* Profile + Dropdown */}
+        <div className="profile-box" ref={profileRef}>
+          <span className="student-name">{studentName}</span>
+          <div className="profile-initials" onClick={() => setShowProfileDropdown(!showProfileDropdown)}>
+            {renderInitials(studentName)}
+            {showProfileDropdown && (
+              <div className="profile-dropdown-nice">
+                <p><strong>Role:</strong> Student</p>
+                <p><strong>Application No:</strong> {applicationNo || "N/A"}</p>
+                <button onClick={handleLogout}>Logout</button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* DASHBOARD CONTENT */}
+      {/* Modal Box */}
+      {showProcessModal && (
+        <div className="process-modal-overlay">
+          <div className="process-modal">
+            <button className="close-button" onClick={() => setShowProcessModal(false)}>✕</button>
+            <h2>📘 Hostel Admission Process</h2>
+            <ol style={{ lineHeight: "1.8" }}>
+              <li>First, fill out the hostel admission form with all the required details.</li>
+              <li>Next, proceed to pay your hostel fees through the "Fees" section.</li>
+              <li>Once paid, download your fee receipt and keep it for your records.</li>
+              <li>Then, go to "Apply for Room" and select your preferred room and bed.</li>
+              <li>When you arrive at the hostel, report to the concerned warden and tell your room number.</li>
+              <li>The warden will then hand over your room key.</li>
+            </ol>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
       <div className="dashboard-content">
-        <h1>{selectedMenu}</h1>
+        {selectedMenu === "Overview" && (
+          <>
+            <div className="greeting-card">
+              <h2>{greeting}, {studentName}!</h2>
+              <p>
+                Here’s what’s happening today in your dashboard. &nbsp;
+                <span
+                  style={{ color: "#c23535", textDecoration: "underline", fontWeight: "bold", cursor: "pointer" }}
+                  onClick={() => setShowProcessModal(true)}
+                >
+                  📘 Hostel Admission Process
+                </span>
+              </p>
+            </div>
 
-        {/* ✅ Personal Details Form */}
-        {selectedMenu === "Personal Details" && (
-          <form className="personal-details-form">
-            <label>
-              Admission No:
-              <input type="text" name="admission_no" required />
-            </label>
+            <div className="dashboard-stats">
+              <div className="stat-card"><h4>Room Status</h4><p>Not Allocated</p></div>
+              <div className="stat-card"><h4>Form Status</h4><p>Pending</p></div>
+              <div className="stat-card"><h4>Fee Payment</h4><p>Unpaid</p></div>
+            </div>
 
-            <label>
-              Hall Ticket No:
-              <input type="text" name="hall_ticket_no" required />
-            </label>
-
-            <label>
-              Batch:
-              <input type="text" name="batch" required />
-            </label>
-
-            <label>
-              Programme:
-              <input type="text" name="programme" required />
-            </label>
-
-            <label>
-              Date of Occupation:
-              <input type="date" name="date_of_occupation" required />
-            </label>
-
-            <label>
-              Hostel Room No:
-              <input type="text" name="hostel_room_no" required />
-            </label>
-
-            <label>
-              School:
-              <input type="text" name="school" required />
-            </label>
-
-            <label>
-              Name of the Student:
-              <input type="text" name="student_name" required />
-            </label>
-
-            <label>
-              E-Mail ID of Student:
-              <input type="email" name="student_email" required />
-            </label>
-
-            <label>
-              Father's Name:
-              <input type="text" name="father_name" required />
-            </label>
-
-            <label>
-              Mother's Name:
-              <input type="text" name="mother_name" required />
-            </label>
-
-            <label>
-              E-Mail ID of Parent:
-              <input type="email" name="parent_email" required />
-            </label>
-
-            <label>
-              NRI / Indian:
-              <select name="nationality" required>
-                <option value="Indian">Indian</option>
-                <option value="NRI">NRI</option>
-              </select>
-            </label>
-
-            <label>
-              Date and Place of Birth:
-              <input type="text" name="dob_place" required />
-            </label>
-
-            <label>
-              Blood Group:
-              <input type="text" name="blood_group" required />
-            </label>
-
-            <label>
-              Past Medical History (if any):
-              <textarea name="medical_history"></textarea>
-            </label>
-
-            <label>
-              Student Mobile No:
-              <input type="tel" name="student_mobile" required />
-            </label>
-
-            <label>
-              Permanent Address:
-              <textarea name="permanent_address" required></textarea>
-            </label>
-
-            <label>
-              Parent's Mobile No (Father):
-              <input type="tel" name="father_mobile" required />
-            </label>
-            <label>
-              Parent's Mobile No (Mother):
-              <input type="tel" name="mother_mobile" required />
-            </label>
-
-            <label>
-              Local Guardian (if any):
-              <input type="text" name="local_guardian" />
-            </label>
-
-            <label>
-              Emergency Contact Number:
-              <input type="tel" name="emergency_contact" required />
-            </label>
-
-            <button type="submit">Submit</button>
-          </form>
+            <div className="notice-board">
+              <ul>
+                <li>📝 Hostel fee deadline is April 30th.</li>
+                <li>📢 Room Booking Window Opens From April 10th.</li>
+                <li>📢 Changing of Room Window opens After one Month.</li>
+                <li>🎉 Fresher's Welcome Event: April 20th, ECOLE Auditorium.</li>
+              </ul>
+            </div>
+          </>
         )}
 
-        {/* ✅ Layout Info Section */}
-        {selectedMenu === "Layout Info" && (
-          <div className="layout-info-section">
-            <h2>Hostel Layout Information</h2>
-            <p>This section will contain information about the hostel room layout and structure.</p>
-            <iframe
-              src="/layout_info.html" // ✅ Placeholder page (replace with actual)
-              title="Layout Information"
-              style={{ width: "100%", height: "600px", border: "1px solid #ccc" }}
-            ></iframe>
+        {selectedMenu === "Hostel Form" && (
+          <div className="hostel-form-section">
+            <h2 className="form-heading">Hostel Admission Form</h2>
+            <form onSubmit={handleFormSubmit} className="hostel-form">
+              {[
+                "admission_no",
+                "hall_ticket_no",
+                "batch",
+                "programme",
+                "school",
+                "student_name",
+                "student_email",
+                "father_name",
+                "mother_name",
+                "parent_email",
+                "dob_place",
+                "blood_group",
+                "medical_history",
+                "student_mobile",
+                "permanent_address",
+                "father_mobile",
+                "mother_mobile",
+                "local_guardian",
+                "emergency_contact"
+              ].map((field) => (
+                <div className="form-group" key={field}>
+                  <label>{field.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</label>
+                  {["medical_history", "permanent_address"].includes(field) ? (
+                    <textarea name={field} className="no-resize" required />
+                  ) : (
+                    <input type="text" name={field} required />
+                  )}
+                </div>
+              ))}
+
+              {/* DOB with Calendar */}
+              <div className="form-group">
+                <label>Date Of Birth</label>
+                <input type="date" name="dob" required />
+              </div>
+
+              {/* Nationality Dropdown */}
+              <div className="form-group">
+                <label>Nationality</label>
+                <select name="nationality" required>
+                  <option value="Indian">Indian</option>
+                  <option value="NRI">NRI</option>
+                </select>
+              </div>
+
+              <button type="submit" className="submit-button">Submit</button>
+            </form>
           </div>
         )}
 
-        {/* Room Layout */}
-        {showRoomLayout && (
-          <iframe
-            src="/bed_layout%20final.html"
-            title="Room Layout"
-            style={{ width: "100%", height: "600px", border: "1px solid #ccc" }}
-          ></iframe>
+        {selectedMenu === "Apply for Room" && showRoomLayout && (
+          <div className="hostel-room-booking-section">
+            <h2>Apply for Room</h2>
+            <HostelFloorPlanViewer />
+          </div>
         )}
       </div>
 
-      {/* FOOTER */}
+      {/* Footer */}
       <footer className="footer">
-        <p>&copy; 2025 Your Company Name. All rights reserved.</p>
-        <p>
-          <a href="/about">About</a> | <a href="/contact">Contact</a> |{" "}
-          <a href="/privacy">Privacy Policy</a>
-        </p>
+        <p>&copy; 2025 Your Company. All rights reserved.</p>
+        <p><a href="/about">About</a> | <a href="/contact">Contact</a> | <a href="/privacy">Privacy</a></p>
       </footer>
     </div>
   );
