@@ -1,0 +1,3202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostel Bed Booking - Block E</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        .document {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .page {
+            margin: 100px 0;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display: none; /* Hidden by default, shown via JS */
+        }
+        .page.active {
+            display: block; /* Shown when selected */
+        }
+        .content-from-ocr {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+        .content-from-ocr::before {
+            content: 'CORRIDOR';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) rotate(-90deg);
+            width: 200px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border: 1px dashed #999;
+            z-index: -1;
+            font-size: 14px;
+            color: #666;
+        }
+        .side {
+            width: 45%;
+        }
+        .side h3 {
+            margin-bottom: 10px;
+        }
+        .room {
+            border: 2px solid #333;
+            padding: 15px;
+            margin: 20px 0;
+            position: relative;
+            width: 200px;
+            height: 150px;
+            background: linear-gradient(145deg, #f0f0f0, #ffffff);
+            border-radius: 15px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.1),
+                        -5px -5px 15px rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+        }
+
+        .room:hover {
+            transform: translateY(-5px);
+            box-shadow: 7px 7px 20px rgba(0,0,0,0.15),
+                        -7px -7px 20px rgba(255,255,255,0.9);
+        }
+        .room-number {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-weight: bold;
+        }
+        .bed-container {
+            display: flex;
+            justify-content: space-around;
+            height: 100%;
+        }
+        .bed {
+            width: 40px;
+            height: 80px;
+            border: 2px solid #000;
+            position: relative;
+            margin-top: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .bed:hover {
+            transform: scale(1.05);
+        }
+
+        .bed::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: #ddd;
+            border: 2px solid #000;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .bed.available {
+            background: linear-gradient(to bottom, #7bed9f, #2ed573);
+            border-color: #2ed573;
+        }
+
+        .bed.booked {
+            background: linear-gradient(to bottom, #ff6b81, #ff4757);
+            border-color: #ff4757;
+        }
+        .left-side .room .bed-container {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        .left-side .room .bed-container .bed:first-child {
+            margin-left: 20px; /* A bed closer to window */
+        }
+        .left-side .room .bed-container .bed:last-child {
+            margin-right: 20px; /* B bed closer to door */
+        }
+        .right-side .room .bed-container {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        .furniture,
+        .table,
+        .chair,
+        .entry-label {
+            display: none;
+        }
+        .door {
+            position: absolute;
+            right: -12px;
+            top: 40%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 45px;
+            border: 2px solid #333;
+            background: linear-gradient(145deg, #8b4513, #a0522d);
+            z-index: 1;
+            border-radius: 4px;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.2);
+        }
+
+        .door::after {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: #000;
+            border-radius: 50%;
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 2px rgba(0,0,0,0.5);
+        }
+        .dimensions {
+            display: none;
+        }
+        .window {
+            position: absolute;
+            left: -8px;
+            top: 40%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 40px;
+            border: 2px solid #333;
+            background: linear-gradient(135deg, rgba(135, 206, 235, 0.4), rgba(135, 206, 235, 0.2));
+            z-index: 1;
+            border-radius: 4px;
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        .window::before,
+        .window::after {
+            content: '';
+            position: absolute;
+            background: #333;
+        }
+
+        .window::before {
+            top: 50%;
+            left: 2px;
+            right: 2px;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+
+        .window::after {
+            left: 50%;
+            top: 2px;
+            bottom: 2px;
+            width: 2px;
+            transform: translateX(-50%);
+        }
+
+        /* Add right side specific styles */
+        .right-side .room .door {
+            left: -12px;
+            right: auto;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .right-side .room .window {
+            right: -8px;
+            left: auto;
+        }
+
+        /* Add block selector styles */
+        .block-selector {
+            margin: 20px 0;
+            padding: 10px;
+        }
+        
+        .block {
+            display: none;
+        }
+        
+        .block.active {
+            display: block;
+        }
+
+        .room.combined {
+            height: 300px; /* Double the height of regular rooms */
+            background-color: #e8e8e8;
+        }
+        .room.combined .room-number {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .washroom {
+            height: 300px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            border-radius: 8px;
+            border: 2px solid #ccc;
+        }
+
+        .washroom span {
+            transform: translateY(-10px);
+            filter: grayscale(0.2); /* Makes emoji less colorful */
+        }
+
+        .washroom.triple {
+            height: 450px;
+        }
+    </style>
+</head>
+<body>
+    <div class="document">
+        <h1>Phase 1 Hostel Bed Booking</h1>
+        
+        <!-- Add block selector -->
+        <div class="block-selector">
+            <label for="block-select">Select Block: </label>
+            <select id="block-select" onchange="showBlock()">
+                <option value="E">Block E(BOYS)</option>
+                <option value="P1">Phase 1(BOYS)</option>
+            </select>
+        </div>
+
+        <!-- Block E (existing content) -->
+        <div id="block-E" class="block active">
+            <h1>Phase 1 Block E - Bed Booking</h1>
+            <div class="floor-selector">
+                <label for="floor-select">Select Floor: </label>
+                <select id="floor-select" onchange="showFloor()">
+                    <option value="Ground">Ground Floor</option>
+                    <option value="1st">1st Floor</option>
+                    <option value="2nd">2nd Floor</option>
+                    <option value="3rd">3rd Floor</option>
+                    <option value="4th">4th Floor</option>
+                </select>
+            </div>
+
+            <!-- Ground Floor -->
+            <div class="page active" id="page-Ground">
+                <h2>Ground Floor</h2>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <h3>Left Side</h3>
+                        <div class="room">
+                            <span class="room-number">E09</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E09-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E09-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        
+                        <!-- Combined A and B rooms -->
+                        <div class="room combined">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                                <!-- Empty bed container for common room -->
+                            </div>
+                        </div>
+                        
+                        <div class="room">
+                            <span class="room-number">E08</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E08-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E08-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E07</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E07-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E07-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E06</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E06-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E06-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E05</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E05-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E05-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <h3>Right Side</h3>
+                        <div class="room">
+                            <span class="room-number">E10</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E10-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E10-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E11</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E11-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E11-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E12</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E12-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E12-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E01</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E01-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E01-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E02</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E02-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E02-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E03</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E03-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E03-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E04</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E04-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E04-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1st Floor -->
+            <div class="page" id="page-1st">
+                <h2>1st Floor</h2>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <h3>Left Side</h3>
+                        <div class="room">
+                            <span class="room-number">E109</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E109-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E109-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        
+                        <!-- Combined A and B rooms -->
+                        <div class="room combined">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                                <!-- Empty bed container for common room -->
+                            </div>
+                        </div>
+                        
+                        <div class="room">
+                            <span class="room-number">E108</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E108-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E108-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E107</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E107-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E107-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E106</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E106-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E106-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E105</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E105-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E105-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <h3>Right Side</h3>
+                        <div class="room">
+                            <span class="room-number">E110</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E110-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E110-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E111</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E111-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E111-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E112</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E112-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E112-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E101</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E101-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E101-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E102</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E102-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E102-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E103</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E103-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E103-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E104</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E104-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E104-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2nd Floor -->
+            <div class="page" id="page-2nd">
+                <h2>2nd Floor</h2>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <h3>Left Side</h3>
+                        <div class="room">
+                            <span class="room-number">E209</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E209-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E209-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        
+                        <!-- Combined A and B rooms -->
+                        <div class="room combined">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                                <!-- Empty bed container for common room -->
+                            </div>
+                        </div>
+                        
+                        <div class="room">
+                            <span class="room-number">E208</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E208-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E208-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E207</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E207-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E207-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E206</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E206-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E206-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E205</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E205-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E205-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <h3>Right Side</h3>
+                        <div class="room">
+                            <span class="room-number">E210</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E210-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E210-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E211</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E211-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E211-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E212</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E212-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E212-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E201</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E201-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E201-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E202</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E202-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E202-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E203</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E203-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E203-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E204</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E204-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E204-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3rd Floor -->
+            <div class="page" id="page-3rd">
+                <h2>3rd Floor</h2>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <h3>Left Side</h3>
+                        <div class="room">
+                            <span class="room-number">E309</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E309-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E309-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        
+                        <!-- Combined A and B rooms -->
+                        <div class="room combined">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                                <!-- Empty bed container for common room -->
+                            </div>
+                        </div>
+                        
+                        <div class="room">
+                            <span class="room-number">E308</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E308-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E308-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E307</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E307-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E307-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E306</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E306-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E306-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E305</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E305-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E305-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <h3>Right Side</h3>
+                        <div class="room">
+                            <span class="room-number">E310</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E310-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E310-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E311</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E311-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E311-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E312</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E312-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E312-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E301</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E301-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E301-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E302</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E302-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E302-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E303</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E303-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E303-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E304</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E304-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E304-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4th Floor -->
+            <div class="page" id="page-4th">
+                <h2>4th Floor</h2>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <h3>Left Side</h3>
+                        <div class="room">
+                            <span class="room-number">E409</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E409-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E409-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        
+                        <!-- Combined A and B rooms -->
+                        <div class="room combined">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                                <!-- Empty bed container for common room -->
+                            </div>
+                        </div>
+                        
+                        <div class="room">
+                            <span class="room-number">E408</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E408-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E408-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E407</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E407-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E407-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E406</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E406-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E406-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E405</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E405-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E405-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <h3>Right Side</h3>
+                        <div class="room">
+                            <span class="room-number">E410</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E410-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E410-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E411</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E411-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E411-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E412</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E412-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E412-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E401</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E401-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E401-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E402</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E402-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E402-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E403</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E403-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E403-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">E404</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'E404-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'E404-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">192</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '192-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '192-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 1 Block -->
+        <div id="block-P1" class="block">
+            <div class="floor-selector">
+                <label for="floor-select-p1">Select Floor: </label>
+                <select id="floor-select-p1" onchange="showFloorP1()">
+                    <option value="Ground">Ground Floor</option> <!-- Add Ground floor option -->
+                    <option value="1st">1st Floor</option>
+                    <option value="2nd">2nd Floor</option>
+                    <option value="3rd">3rd Floor</option>
+                    <option value="4th">4th Floor</option>
+                </select>
+            </div>
+
+            <!-- Add Ground Floor for Phase 1 -->
+            <div class="page active" id="page-P1-Ground">
+                <h2>Ground Floor</h2>
+                
+                <!-- Part 1 -->
+                <h3>Part 1</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <h3>Left Side</h3>
+                        <div class="room">
+                            <span class="room-number">G01</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G01-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G01-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G02</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G02-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G02-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G03</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G03-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G03-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G04</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G04-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G04-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room washroom">
+                            <span>🚽</span>
+                        </div>
+                        <div class="room combined">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                                <!-- Empty bed container for common room -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <h3>Right Side</h3>
+                        <div class="room">
+                            <span class="room-number">G33</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G33-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G33-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G32</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G32-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G32-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G31</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G31-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G31-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G30</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G30-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G30-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G29</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G29-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G29-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G28</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G28-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G28-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G27</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G27-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G27-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G26</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G26-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G26-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part 2 -->
+                <h3>Part 2</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <h3>Left Side</h3>
+                        <!-- Replace empty container with washroom before G05 -->
+                        <div class="room washroom">
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G05</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G05-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G05-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G06</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G06-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G06-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G07</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G07-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G07-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G08</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G08-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G08-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <!-- Remove 034-037 rooms -->
+                    </div>
+                    <div class="side right-side">
+                        <h3>Right Side</h3>
+                        <!-- P125-P132 rooms -->
+                        <div class="room">
+                            <span class="room-number">G25</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G25-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G25-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G24</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G24-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G24-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G23</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G23-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G23-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G22</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G22-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G22-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G21</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G21-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G21-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G20</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G20-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G20-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G19</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G19-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G19-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G18</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G18-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G18-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part 3 -->
+                <h3>Part 3</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <h3>Left Side</h3>
+                        <!-- P133-P138 rooms -->
+                        <div class="room combined">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                                <!-- Empty bed container for common room -->
+                            </div>
+                        </div>
+                        <div class="room washroom triple"> <!-- Triple height for combined rooms -->
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G09</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G09-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G09-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                            </div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G10</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G10-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G10-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G11</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G11-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G11-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <h3>Right Side</h3>
+                        <!-- P139-P144 rooms -->
+                        <div class="room">
+                            <span class="room-number">G17</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G17-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G17-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G16</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G16-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G16-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G15</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G15-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G15-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G14</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G14-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G14-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G12A</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G12A-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G12A-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">G12</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, 'G12-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, 'G12-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Phase 1 floors with same structure as Block E -->
+            <div class="page" id="page-P1-1st">
+                <h2>1st Floor</h2>
+                
+                <!-- Part 1 -->
+                <h3>Part 1</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <h3>Left Side</h3>
+                        <!-- 13 rooms P101-P113 -->
+                        <div class="room">
+                            <span class="room-number">074</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '074-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '074-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">075</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '075-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '075-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">076</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '076-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '076-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room washroom">
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">034</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '034-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '034-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">035</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '035-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '035-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">036</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '036-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '036-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">037</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '037-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '037-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <h3>Right Side</h3>
+                        <!-- 13 rooms 073-061 -->
+                        <div class="room">
+                            <span class="room-number">073</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '073-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '073-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">072</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '072-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '072-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">071</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '071-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '071-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">070</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '070-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '070-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">069</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '069-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '069-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">068</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '068-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '068-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">067</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '067-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '067-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">066</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '066-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '066-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">065</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '065-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '065-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">064</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '064-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '064-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">063</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '063-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '063-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">062</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '062-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '062-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">061</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '061-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '061-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part 2 -->
+                <h3>Part 2</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <!-- 8 rooms P127-P134 -->
+                        <div class="room washroom triple"> <!-- Triple height for combined rooms -->
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">038</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '038-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '038-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">039</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '039-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '039-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">040</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '040-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '040-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">041</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '041-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '041-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <!-- 8 rooms 060-053 -->
+                        <div class="room">
+                            <span class="room-number">060</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '060-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '060-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">059</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '059-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '059-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">058</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '058-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '058-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">057</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '057-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '057-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">056</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '056-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '056-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">055</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '055-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '055-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">054</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '054-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '054-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">053</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '053-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '053-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part 3 -->
+                <h3>Part 3</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <!-- 8 rooms P143-P150 -->
+                        <div class="room">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                            </div>
+                        </div>
+                        <div class="room washroom triple"> <!-- Triple height for combined rooms -->
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">042</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '042-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '042-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                            </div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">043</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '043-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '043-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">044</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '044-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '044-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <!-- 8 rooms P151-P158 -->
+                        <div class="room">
+                            <span class="room-number">052</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '052-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '052-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">051</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '051-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '051-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">050</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '050-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '050-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">049</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '049-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '049-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">048</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '048-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '048-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">047</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '047-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '047-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">046</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '046-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '046-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">045</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '045-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '045-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page" id="page-P1-2nd">
+                <h2>2nd Floor</h2>
+                
+                <!-- Part 1 (13 rooms each side) -->
+                <h3>Part 1</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <h3>Left Side</h3>
+                        <div class="room">
+                            <span class="room-number">117</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '117-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '117-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">118</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '118-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '118-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">119</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '119-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '119-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room washroom" style="height: 300px;"> <!-- Double height for combined rooms -->
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">077</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '077-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '077-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">078</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '078-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '078-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">079</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '079-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '079-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">080</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '080-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '080-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <!-- Add 13 room divs continuing the sequence -->
+                        <div class="room">
+                            <span class="room-number">116</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '116-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '116-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">115</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '115-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '115-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">114</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '114-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '114-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">112A</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '112A-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '112A-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">112</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '112-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '112-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">111</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '111-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '111-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">110</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '110-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '110-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">109</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '109-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '109-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">108</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '108-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '108-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">107</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '107-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '107-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">106</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '106-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '106-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">105</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '105-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '105-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">104</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '104-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '104-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part 2 (8 rooms each side) -->
+                <h3>Part 2</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <!-- Add 8 room divs -->
+                        <div class="room washroom triple"> <!-- Triple height for combined rooms -->
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">081</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '081-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '081-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">082</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '082-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '082-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">083</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '083-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '083-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">084</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '084-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '084-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <!-- Add 8 room divs -->
+                        <div class="room">
+                            <span class="room-number">103</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '103-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '103-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">102</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '102-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '102-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">101</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '101-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '101-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">100</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '100-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '100-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">099</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '099-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '099-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">098</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '098-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '098-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">097</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '097-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '097-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">096</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '096-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '096-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part 3 (8 rooms each side) -->
+                <h3>Part 3</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <!-- Add 8 room divs -->
+                        <div class="room">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                            </div>
+                        </div>
+                        <div class="room washroom triple"> <!-- Triple height for combined rooms -->
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">085</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '085-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '085-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                            </div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">086</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '086-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '086-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">087</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '087-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '087-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <!-- Add 8 room divs -->
+                        <div class="room">
+                            <span class="room-number">095</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '095-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '095-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">094</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '094-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '094-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">093</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '093-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '093-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">092</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '092-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '092-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">091</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '091-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '091-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">090</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '090-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '090-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">089</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '089-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '089-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">088</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '088-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '088-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page" id="page-P1-3rd">
+                <h2>3rd Floor</h2>
+                
+                <!-- Part 1 (13 rooms each side) -->
+                <h3>Part 1</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <h3>Left Side</h3>
+                        <div class="room">
+                            <span class="room-number">160</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '160-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '160-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">161</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '161-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '161-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">162</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '162-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '162-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room washroom" style="height: 300px;"> <!-- Double height for combined rooms -->
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">120</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '120-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '120-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">121</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '121-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '121-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">122</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '122-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '122-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">123</span>
+                            <div class="bed-container">
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <!-- Removed rooms P310-P313 -->
+                    </div>
+                    <div class="side right-side">
+                        <div class="room">
+                            <span class="room-number">159</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '159-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '159-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">158</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '158-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '158-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">157</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '157-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '157-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">156</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '156-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '156-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">155</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '155-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '155-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">154</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '154-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '154-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">153</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '153-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '153-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">152</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '152-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '152-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">151</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '151-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '151-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">150</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '150-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '150-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">149</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '149-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '149-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">148</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '148-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '148-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">147</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '147-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '147-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part 2 (8 rooms each side) -->
+                <h3>Part 2</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <!-- Add 8 room divs -->
+                        <!-- Replace P327-P329 rooms with washroom -->
+                        <div class="room washroom triple"> <!-- Triple height for combined rooms -->
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">124</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '124-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '124-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">125</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '125-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '125-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">126</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '126-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '126-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">127</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '127-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '127-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <!-- Add 8 room divs -->
+                        <div class="room">
+                            <span class="room-number">146</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '146-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '146-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">145</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '145-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '145-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">144</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '144-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '144-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">143</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '143-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '143-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">142</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '142-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '142-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">141</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '141-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '141-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">140</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '140-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '140-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">139</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '139-A')">A</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part 3 (8 rooms each side) -->
+                <h3>Part 3</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <!-- Add 8 room divs -->
+                        <div class="room">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                            </div>
+                        </div>
+                        <div class="room washroom triple"> <!-- Triple height for combined rooms -->
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">128</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '128-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '128-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                            </div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">129</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '129-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '129-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">130</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '130-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '130-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <!-- Add 8 room divs -->
+                        <div class="room">
+                            <span class="room-number">138</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '138-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '138-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">137</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '137-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '137-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">136</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '136-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '136-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">135</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '135-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '135-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">134</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '134-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '134-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">133</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '133-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '133-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">132</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '132-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '132-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">131</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '131-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '131-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page" id="page-P1-4th">
+                <h2>4th Floor</h2>
+                
+                <!-- Part 1 (13 rooms each side) -->
+                <h3>Part 1</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <h3>Left Side</h3>
+                        <div class="room">
+                            <span class="room-number">203</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '203-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '203-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">204</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '204-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '204-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">205</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '205-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '205-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <!-- Replace P404-P405 rooms with washroom -->
+                        <div class="room washroom" style="height: 300px;"> <!-- Double height for combined rooms -->
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">163</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '163-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '163-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">164</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '164-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '164-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">165</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '165-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '165-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">166</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '166-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '166-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <!-- Rooms P410-P413 removed -->
+                    </div>
+                    <div class="side right-side">
+                        <div class="room">
+                            <span class="room-number">202</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '202-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '202-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">201</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '201-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '201-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">200</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '200-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '200-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">199</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '199-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '199-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div a class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">198</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '198-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '198-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">197</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '197-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '197-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">196</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '196-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '196-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">195</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '195-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '195-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">194</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '194-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '194-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">193</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '193-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '193-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">192</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '192-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '192-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">191</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '191-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '191-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">190</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '190-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '190-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part 2 (8 rooms each side) -->
+                <h3>Part 2</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <!-- Add 8 room divs -->
+                        <div class="room washroom triple"> <!-- Triple height for combined rooms -->
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">167</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '167-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '167-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">168</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '168-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '168-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">169</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '169-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '169-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">170</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '170-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '170-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <!-- Add 8 room divs -->
+                        <div class="room">
+                            <span class="room-number">189</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '189-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '189-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">188</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '188-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '188-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">187</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '187-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '187-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">186</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '186-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '186-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">185</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '185-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '185-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">184</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '184-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '184-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">183</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '183-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '183-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">182</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '182-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '182-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part 3 (8 rooms each side) -->
+                <h3>Part 3</h3>
+                <div class="content-from-ocr">
+                    <div class="side left-side">
+                        <!-- Add 8 room divs -->
+                        <div class="room">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                            </div>
+                        </div>
+                        <!-- Replace P444-P446 rooms with washroom -->
+                        <div class="room washroom triple"> <!-- Triple height for combined rooms -->
+                            <span>🚽</span>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">171</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '171-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '171-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number"></span>
+                            <div class="bed-container">
+                            </div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">172</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '172-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '172-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">173</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '173-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '173-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                    <div class="side right-side">
+                        <!-- Add 8 room divs -->
+                        <div class="room">
+                            <span class="room-number">181</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '181-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '181-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">180</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '180-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '180-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">179</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '179-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '179-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">178</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '178-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '178-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">177</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '177-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '177-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">176</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '176-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '176-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">175</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '175-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '175-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="room">
+                            <span class="room-number">174</span>
+                            <div class="bed-container">
+                                <div class="bed available" onclick="selectBed(this, '174-A')">A</div>
+                                <div class="bed available" onclick="selectBed(this, '174-B')">B</div>
+                            </div>
+                            <div class="door"></div>
+                            <div class="window"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add block switching functionality
+        function showBlock() {
+            const blockSelect = document.getElementById('block-select').value;
+            const blocks = ['E', 'P1'];
+            blocks.forEach(block => {
+                const blockElement = document.getElementById(`block-${block}`);
+                if (block === blockSelect) {
+                    blockElement.classList.add('active');
+                } else {
+                    blockElement.classList.remove('active');
+                }
+            });
+        }
+
+        // Existing floor switching function for Block E
+        function showFloor() {
+            const floorSelect = document.getElementById('floor-select').value;
+            const floors = ['Ground', '1st', '2nd', '3rd', '4th'];
+            floors.forEach(floor => {
+                const page = document.getElementById(`page-${floor}`);
+                if (floor === floorSelect) {
+                    page.classList.add('active');
+                } else {
+                    page.classList.remove('active');
+                }
+            });
+        }
+
+        // New floor switching function for Phase 1
+        function showFloorP1() {
+            const floorSelect = document.getElementById('floor-select-p1').value;
+            const floors = ['Ground', '1st', '2nd', '3rd', '4th']; // Add Ground to array
+            floors.forEach(floor => {
+                const page = document.getElementById(`page-P1-${floor}`);
+                if (floor === floorSelect) {
+                    page.classList.add('active');
+                } else {
+                    page.classList.remove('active');
+                }
+            });
+        }
+
+        // Modified selectBed function to handle both blocks
+        function selectBed(element, bedId) {
+            if (element.classList.contains('available')) {
+                const blockSelect = document.getElementById('block-select').value;
+                const floorSelect = blockSelect === 'E' ? 
+                    document.getElementById('floor-select').value : 
+                    document.getElementById('floor-select-p1').value;
+                
+                // Format the message based on the bed ID
+                let blockInfo;
+                if (bedId.startsWith('E')) {
+                    blockInfo = 'Block E';
+                } else if (bedId.startsWith('G') || bedId.match(/^\d+/) || bedId.startsWith('P')) {
+                    blockInfo = 'Phase 1';
+                } else {
+                    blockInfo = blockSelect === 'E' ? 'Block E' : 'Phase 1';
+                }
+                
+                const message = `Selected Bed: ${bedId} of ${blockInfo, floorSelect} Floor`;
+                alert(message);
+                element.classList.remove('available');
+                element.classList.add('booked');
+            }
+        }
+
+        // Initial load
+        window.onload = function() {
+            showBlock();
+            showFloor();
+            showFloorP1();
+        };
+    </script>
+</body>
+</html>
