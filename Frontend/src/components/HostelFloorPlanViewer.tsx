@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   Phase1FloorPlan,
   Phase1EBlockFloorPlan,
@@ -179,7 +179,8 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     return occupiedBeds[roomKey] || false;
   };
 
-  // Create a room button (for list view)
+  /* 
+  // Unused function - keeping for potential future use
   const createRoomButton = (roomNumber: number): React.ReactNode => {
     const occupancyStatus = getRoomOccupancyStatus(roomNumber);
     return (
@@ -194,8 +195,8 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
       </button>
     );
   };
-
-  // Create visual layout for E Block floors
+  
+  // Unused function - keeping for potential future use
   const createVisualEBlockLayout = (blockName: string, floorName: string, floorInfo: { start: number; end: number; exceptions: number[] }): React.ReactNode => {
     let offset = 0;
     if (floorName === '1st Floor') offset = 100;
@@ -247,6 +248,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
       </div>
     );
   };
+  */
 
   // Render floor plan content
   const renderFloorPlan = (): React.ReactNode => {

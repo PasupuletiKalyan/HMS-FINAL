@@ -59,7 +59,6 @@ const phase4BConfig = {
 };
 
 // Create a combined Phase4BFloorPlan component
-import React from 'react';
 import { FloorPlanProps } from './types';
 
 // This component will serve as a factory function to choose the right component
