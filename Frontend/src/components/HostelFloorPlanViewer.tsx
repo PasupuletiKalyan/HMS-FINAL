@@ -333,15 +333,14 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
           />
         );
       case 'Phase 4B':
-        return (
-          <Phase4BFloorPlan
-            floor={selectedFloor}
-            onRoomClick={handleRoomClick}
-            occupiedBeds={occupiedBeds}
-            selectedBlock={selectedBlock}
-            selectedFloor={selectedFloor}
-          />
-        );
+        const Phase4BComponent = Phase4BFloorPlan.component({
+          floor: selectedFloor,
+          onRoomClick: handleRoomClick,
+          occupiedBeds: occupiedBeds,
+          selectedBlock: selectedBlock,
+          selectedFloor: selectedFloor
+        });
+        return <Phase4BComponent.type {...Phase4BComponent.props} />;
       default:
         return <p>Floor plan not available for {selectedBlock}</p>;
     }

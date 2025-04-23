@@ -35,18 +35,48 @@ import Phase4AFloorPlan, {
   phase4AGroundFloorSvgString 
 } from './Phase4A';
 
-import Phase4BFloorPlan, { 
-  phase4BConfig,
+// Import the new split components
+import Phase4BLowerFloorPlan, { 
+  phase4BLowerConfig,
+  phase4BGroundFloorSvgString,
   phase4BSecondFloorSvgString,
-  phase4B3rdFloorSvgString,
-  phase4B4thFloorSvgString,
-  phase4B5thFloorSvgString,
+  phase4B3rdFloorSvgString
+} from './Phase4BLowerFloors';
+
+import Phase4BUpperFloorPlan, { 
+  phase4BUpperConfig,
   phase4B6thFloorSvgString,
   phase4B7thFloorSvgString,
   phase4B8thFloorSvgString,
   phase4B9thFloorSvgString,
   phase4B10thFloorSvgString
-} from './Phase4B';
+} from './Phase4BUpperFloors';
+
+// Combined Phase 4B configuration for backward compatibility
+const phase4BConfig = {
+  ...phase4BLowerConfig,
+  ...phase4BUpperConfig
+};
+
+// Create a combined Phase4BFloorPlan component
+import React from 'react';
+import { FloorPlanProps } from './types';
+
+// This component will serve as a factory function to choose the right component
+const Phase4BFloorPlan = {
+  // Create a wrapper that handles the logic of which component to use
+  component: (props: FloorPlanProps) => {
+    // Check if the floor is in the upper floors config
+    const isUpperFloor = Object.keys(phase4BUpperConfig).includes(props.floor);
+    
+    // Return the appropriate component
+    if (isUpperFloor) {
+      return { type: Phase4BUpperFloorPlan, props };
+    } else {
+      return { type: Phase4BLowerFloorPlan, props };
+    }
+  }
+};
 
 // Export types
 export * from './types';
@@ -87,13 +117,24 @@ export {
   phase4AConfig,
   phase4AGroundFloorSvgString,
   
-  // Phase 4B
+  // Phase 4B Component (combined)
   Phase4BFloorPlan,
+  
+  // Phase 4B Lower Floors
+  Phase4BLowerFloorPlan,
+  phase4BLowerConfig,
+  
+  // Phase 4B Upper Floors
+  Phase4BUpperFloorPlan,
+  phase4BUpperConfig,
+  
+  // Phase 4B Combined Config
   phase4BConfig,
+  
+  // Phase 4B SVG Strings
+  phase4BGroundFloorSvgString,
   phase4BSecondFloorSvgString,
   phase4B3rdFloorSvgString,
-  phase4B4thFloorSvgString,
-  phase4B5thFloorSvgString,
   phase4B6thFloorSvgString,
   phase4B7thFloorSvgString,
   phase4B8thFloorSvgString,

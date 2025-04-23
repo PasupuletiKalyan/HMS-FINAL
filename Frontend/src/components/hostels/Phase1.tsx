@@ -256,9 +256,9 @@ export const phase1SecondFloorSvgString = `
       <g data-room-number="107"><rect x="682" y="200" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="222.5" fontSize="12" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">107</text></g>
       <g data-room-number="108"><rect x="682" y="250" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="272.5" fontSize="12" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">108</text></g>
       <g data-room-number="109"><rect x="682" y="300" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="322.5" fontSize="12" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">109</text></g>
-      <g data-room-number="110"><rect x="682" y="350" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="372.5" fontSize="12" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">110</text></g>
-      <g data-room-number="111"><rect x="682" y="400" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="422.5" fontSize="12" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">111</text></g>
-      <g data-room-number="112"><rect x="682" y="460" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="482.5" fontSize="12" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">112</text></g>
+      <g data-room-number="110"><rect x="682" y="350" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="372.5" fontSize="12" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">110</text></g>
+      <g data-room-number="111"><rect x="682" y="400" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="422.5" fontSize="12" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">111</text></g>
+      <g data-room-number="112"><rect x="682" y="460" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="482.5" fontSize="12" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">112</text></g>
       <g data-room-number="112A"><rect x="682" y="500" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="522.5" fontSize="11" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">112A</text></g>
       <g data-room-number="114"><rect x="682" y="540" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="562.5" fontSize="12" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">114</text></g>
       <g data-room-number="115"><rect x="682" y="580" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="602.5" fontSize="12" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">115</text></g>
@@ -347,7 +347,7 @@ export const phase1ThirdFloorSvgString = `
       <g data-room-number="144"><rect x="480" y="50" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="497.5" y="72.5" fontSize="12" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">144</text></g>
       <g data-room-number="145"><rect x="530" y="50" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="547.5" y="72.5" fontSize="12" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">145</text></g>
       <g data-room-number="146"><rect x="580" y="50" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="597.5" y="72.5" fontSize="12" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">146</text></g>
-      <g data-room-number="147"><rect x="682" y="50" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="72.5" fontSize="12" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">147</text></g>
+      <g data-room-number="147"><rect x="682" y="50" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="72.5" fontSize="12" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">147</text></g>
       
       <!-- Right column rooms -->
       <g data-room-number="148"><rect x="682" y="100" width="45" height="35" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/><text x="699.5" y="122.5" fontSize="12" fontWeight="bold" textAnchor="middle" dominant-baseline="middle" fontFamily="Inter, sans-serif">148</text></g>
@@ -522,12 +522,36 @@ const Phase1FloorPlan: React.FC<FloorPlanProps> = ({
     
     const container = svgRef.current;
     
+    // Apply visual updates based on selectedBlock and selectedFloor
+    if (selectedBlock === 'Phase 1' && selectedFloor === floor) {
+      // Highlight the selected floor's SVG container
+      container.classList.add('selected-floor');
+    } else {
+      container.classList.remove('selected-floor');
+    }
+    
+    // Mark occupied beds
+    Object.entries(occupiedBeds).forEach(([roomNumber, isOccupied]) => {
+      if (isOccupied) {
+        const roomElement = container.querySelector(`g[data-room-number="${roomNumber}"]`);
+        if (roomElement) {
+          const bedRect = roomElement.querySelector('rect');
+          if (bedRect) {
+            // Mark as occupied
+            bedRect.setAttribute('fill', '#FDA4AF'); // Occupied color
+            bedRect.setAttribute('stroke', '#E11D48');
+          }
+        }
+      }
+    });
+    
     // Event handler using delegation
     const handleClick = (event: MouseEvent) => {
       const targetGroup = (event.target as Element).closest('g[data-room-number]');
       if (targetGroup) {
         const roomNumber = targetGroup.getAttribute('data-room-number');
         if (roomNumber) {
+          // Pass the room number to the click handler
           onRoomClick(roomNumber);
         }
       }
@@ -538,7 +562,7 @@ const Phase1FloorPlan: React.FC<FloorPlanProps> = ({
     return () => {
       container.removeEventListener('click', handleClick);
     };
-  }, [onRoomClick]);
+  }, [onRoomClick, occupiedBeds, selectedBlock, selectedFloor, floor]);
   
   return (
     <div
