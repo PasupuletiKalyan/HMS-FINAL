@@ -11,7 +11,7 @@ export const phase3NorthWingConfig: Record<string, FloorConfig> = {
   "5th Floor": { start: 501, end: 548, exceptions: [] },
   "6th Floor": { start: 601, end: 648, exceptions: [] },
   "7th Floor": { start: 701, end: 748, exceptions: [] },
-  "8th Floor": { start: 801, end: 835, exceptions: [] },
+  "8th Floor": { start: 801, end: 841, exceptions: [] },
   "9th Floor": { start: 901, end: 935, exceptions: [] }
 };
 
@@ -266,6 +266,183 @@ export const phase3NorthWingHigherFloorSvgString = `
   </svg>
 `;
 
+// SVG String for Phase 3 North Wing 8th Floor
+export const phase3NorthWing8thFloorSvgString = `
+  <svg viewBox="-15 -15 600 600" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="600" height="600" x="-15" y="-15" fill="#ffffff"/>
+    
+    <!-- Top vertical section (left column) -->
+    <g data-room-number="813">
+      <rect x="200" y="10" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="210" y="30" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">813</text>
+    </g>
+    
+    <g data-room-number="812">
+      <rect x="200" y="60" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="210" y="80" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">812</text>
+    </g>
+    
+    <g data-room-number="811">
+      <rect x="200" y="110" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="210" y="130" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">811</text>
+    </g>
+    
+    <g data-room-number="810">
+      <rect x="200" y="160" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="210" y="180" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">810</text>
+    </g>
+    
+    <g data-room-number="809">
+      <rect x="200" y="210" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="210" y="230" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">809</text>
+    </g>
+
+    <!-- Top vertical section (right column) -->
+    <g data-room-number="834">
+      <rect x="270" y="10" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="280" y="30" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">834</text>
+    </g>
+    
+    <g data-room-number="835">
+      <rect x="270" y="60" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="280" y="80" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">835</text>
+    </g>
+    
+    <g data-room-number="836">
+      <rect x="270" y="110" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="280" y="130" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">836</text>
+    </g>
+    
+    <g data-room-number="837">
+      <rect x="270" y="160" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="280" y="180" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">837</text>
+    </g>
+    
+    <g data-room-number="838">
+      <rect x="270" y="210" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="280" y="230" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">838</text>
+    </g>
+
+    <!-- Middle horizontal section -->
+    <!-- Washroom -->
+    <g data-common-area="WS">
+      <rect x="10" y="260" width="150" height="60" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1.5" />
+      <text x="85" y="290" fontSize="16" textAnchor="middle" fontFamily="Inter, sans-serif">WS</text>
+    </g>
+    
+    <!-- Stairs 1 -->
+    <g data-common-area="Stairs1">
+      <rect x="190" y="260" width="60" height="50" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1.5" />
+      <text x="200" y="285" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">Stairs</text>
+    </g>
+    
+    <!-- Lift Area -->
+    <g data-common-area="LiftArea">
+      <rect x="320" y="260" width="60" height="50" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1.5" />
+      <text x="340" y="280" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">Lift</text>
+      <text x="340" y="293" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">Area</text>
+    </g>
+    
+    <g data-room-number="839">
+      <rect x="390" y="260" width="40" height="50" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="400" y="285" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">839</text>
+    </g>
+    
+    <g data-room-number="840">
+      <rect x="440" y="260" width="40" height="50" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="450" y="285" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">840</text>
+    </g>
+    
+    <g data-room-number="841">
+      <rect x="490" y="260" width="40" height="50" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="500" y="285" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">841</text>
+    </g>
+
+    <!-- Middle horizontal section (bottom rooms) -->
+    <g data-room-number="808">
+      <rect x="10" y="350" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="20" y="370" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">808</text>
+    </g>
+    
+    <g data-room-number="807">
+      <rect x="60" y="350" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="70" y="370" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">807</text>
+    </g>
+    
+    <g data-room-number="806">
+      <rect x="190" y="350" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="200" y="370" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">806</text>
+    </g>
+    
+    <g data-room-number="805">
+      <rect x="240" y="350" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="250" y="370" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">805</text>
+    </g>
+    
+    <g data-room-number="804">
+      <rect x="290" y="350" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="300" y="370" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">804</text>
+    </g>
+    
+    <g data-room-number="803">
+      <rect x="360" y="350" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="370" y="370" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">803</text>
+    </g>
+    
+    <g data-room-number="802">
+      <rect x="410" y="350" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="420" y="370" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">802</text>
+    </g>
+    
+    <g data-room-number="801">
+      <rect x="460" y="350" width="40" height="40" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
+      <text x="470" y="370" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">801</text>
+    </g>
+    
+    <g data-common-area="Stairs2">
+      <rect x="530" y="350" width="50" height="40" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1.5" />
+      <text x="530" y="370" fontSize="11" textAnchor="middle" fontFamily="Inter, sans-serif">Stairs</text>
+    </g>
+
+    <!-- Refuge Terrace -->
+    <g data-common-area="RefugeTerrace">
+      <text x="605" y="450" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" transform="rotate(-90 605,450)">Refuge Terrace</text>
+    </g>
+
+    <!-- Corridors and labels -->
+    <!-- Vertical corridor -->
+    <text x="255" y="155" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" transform="rotate(-90 255,150)">Corridor</text>
+    
+    <!-- Horizontal corridor between WS and rooms -->
+    <text x="140" y="340" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
+
+    <!-- Arrow markers definition -->
+    <defs>
+      <marker
+        id="arrowhead-right"
+        markerWidth="8"
+        markerHeight="5"
+        refX="6"
+        refY="2.5"
+        orient="auto"
+        markerUnits="strokeWidth">
+        <polygon points="0 0, 8 2.5, 0 5" fill="#a0a0a0" />
+      </marker>
+      <marker
+        id="arrowhead-left"
+        markerWidth="8"
+        markerHeight="5"
+        refX="2"
+        refY="2.5"
+        orient="auto"
+        markerUnits="strokeWidth">
+        <polygon points="8 0, 0 2.5, 8 5" fill="#a0a0a0" />
+      </marker>
+    </defs>
+  </svg>
+`;
+
 // Component for rendering Phase 3 North Wing SVG
 const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({ 
   floor, 
@@ -424,8 +601,81 @@ const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
       </div>
     );
   }
+
+  // For 8th floor, use the 8th floor SVG layout
+  if (floor === '8th Floor') {
+    const svgRef = React.useRef<HTMLDivElement>(null);
+    
+    React.useEffect(() => {
+      if (!svgRef.current) return;
+      
+      const container = svgRef.current;
+      
+      // Update room numbers based on floor
+      const roomElements = container.querySelectorAll('g[data-room-number]');
+      roomElements.forEach(roomElement => {
+        const originalRoomNumber = roomElement.getAttribute('data-room-number') || '';
+        // Update data attribute to new room number for click handling
+        roomElement.setAttribute('data-room-number', originalRoomNumber);
+        
+        // Apply occupancy colors
+        const bedAKey = `${selectedBlock}_${selectedFloor}_${originalRoomNumber}_A`;
+        const bedBKey = `${selectedBlock}_${selectedFloor}_${originalRoomNumber}_B`;
+        const isBedAOccupied = occupiedBeds[bedAKey] || false;
+        const isBedBOccupied = occupiedBeds[bedBKey] || false;
+        
+        const rect = roomElement.querySelector('rect');
+        if (rect) {
+          if (isBedAOccupied && isBedBOccupied) {
+            // Fully occupied
+            rect.setAttribute('fill', '#fecaca'); // Red-200
+            rect.setAttribute('stroke', '#ef4444'); // Red-500
+          } else if (isBedAOccupied || isBedBOccupied) {
+            // Partially occupied
+            rect.setAttribute('fill', '#fef08a'); // Yellow-200
+            rect.setAttribute('stroke', '#eab308'); // Yellow-500
+          } else {
+            // Available
+            rect.setAttribute('fill', '#bbf7d0'); // Green-200
+            rect.setAttribute('stroke', '#22c55e'); // Green-500
+          }
+        }
+      });
+      
+      // Event handler using delegation
+      const handleClick = (event: MouseEvent) => {
+        const targetGroup = (event.target as Element).closest('g[data-room-number]');
+        if (targetGroup) {
+          const roomNumber = targetGroup.getAttribute('data-room-number');
+          if (roomNumber) {
+            onRoomClick(roomNumber);
+          }
+        }
+      };
+      
+      container.addEventListener('click', handleClick);
+      
+      return () => {
+        container.removeEventListener('click', handleClick);
+      };
+    }, [onRoomClick, occupiedBeds, selectedBlock, selectedFloor]);
+    
+    return (
+      <div>
+        <h3 className="text-center mb-4">{`${selectedBlock} - ${floor}`}</h3>
+        <div
+          ref={svgRef}
+          className="svg-container"
+          dangerouslySetInnerHTML={{ __html: phase3NorthWing8thFloorSvgString }}
+        />
+        <div className="mt-4 text-center text-sm text-gray-500">
+          <p>Click on a room to book a bed</p>
+        </div>
+      </div>
+    );
+  }
   
-  // For other floors (1st, 2nd, 8th, 9th), use a simple list view
+  // For other floors (1st, 2nd, 9th), use a simple list view
   const getRoomOccupancyStatus = (roomNumber: number | string): string => {
     const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
     const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
