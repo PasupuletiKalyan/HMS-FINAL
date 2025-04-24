@@ -5,6 +5,8 @@ const User = require("./models/User");
 const studentFormRoutes = require("./routes/studentFormRoutes");
 // Import the new hostel routes
 const hostelRoutes = require("./routes/hostelRoutes");
+// Import warden routes
+const wardenRoutes = require("./routes/wardenRoutes");
 
 const app = express();
 app.use(express.json());
@@ -50,6 +52,9 @@ app.use("/api/form", studentFormRoutes);
 
 // Mount the hostel routes under /api/hostels
 app.use("/api/hostels", hostelRoutes);
+
+// Mount the warden routes under /api/wardens
+app.use("/api/wardens", wardenRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => {

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/DashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
+import Navbar from "../components/common/Navbar";
 
 type Student = {
   name: string;
@@ -175,6 +176,9 @@ const WardenDashboard: React.FC = () => {
 
   return (
     <>
+      {/* Add Navbar component at the top */}
+      <Navbar activePage="dashboard" userType="warden" />
+      
       <div className="dashboard-container">
         {/* NAVBAR */}
         <div className="dashboard-top-nav">
@@ -203,7 +207,9 @@ const WardenDashboard: React.FC = () => {
                 {filteredSuggestions.map((s, index) => (
                   <li
                     key={index}
-                    ref={(el) => (suggestionRefs.current[index] = el)}
+                    ref={(el) => {
+                      suggestionRefs.current[index] = el;
+                    }}
                     className={`suggestion-item ${s.gender.toLowerCase()} ${
                       index === selectedSuggestionIndex ? "highlighted" : ""
                     }`}

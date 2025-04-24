@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/AuthStyles.css";
-import collegeLogo from "../assets/college-logo.jpg"; // ✅ Import logo
+import collegeLogo from "../assets/college-logo.jpg";
 
 const LoginPage: React.FC = () => {
-  const [identifier, setIdentifier] = useState(""); // Student: Application No | Warden: Email
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -26,8 +26,8 @@ const LoginPage: React.FC = () => {
         const { role, name, userId } = response.data;
         console.log("✅ User Logged In:", name);
 
-        // ✅ Store user details in localStorage (Corrected)
-        localStorage.setItem("userName", name); // Ensure correct key
+        // Store user details in localStorage
+        localStorage.setItem("userName", name);
         localStorage.setItem("userRole", role);
         localStorage.setItem("userId", userId);
 
@@ -37,7 +37,9 @@ const LoginPage: React.FC = () => {
           if (role === "student") {
             navigate("/student-dashboard");
           } else if (role === "warden") {
-            navigate("/admin-dashboard"); // ✅ Redirect wardens to Admin Dashboard
+            navigate("/warden-dashboard"); // Consistent warden redirect
+          } else if (role === "admin") {
+            navigate("/admin-dashboard");
           } else {
             setError("Unauthorized role");
           }

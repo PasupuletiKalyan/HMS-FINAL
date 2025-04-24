@@ -5,9 +5,8 @@ import LoginPage from "./pages/LoginPage";
 import StudentDashboard from "./pages/StudentDashboard";
 import WardenDashboard from "./pages/WardenDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
-// Fix the imports by including the correct file extension
 import HostelBookingPage from "./pages/HostelBookingPage";
-import CurrentBookingPage from "./pages/CurrentBookingPage.tsx";
+import CurrentBookingPage from "./pages/CurrentBookingPage";
 import "./App.css"; // Import global styles
 
 // Define the BookingInfo interface
@@ -27,7 +26,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<WardenDashboard />} />
+        <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/student-dashboard" element={<StudentDashboard 
           currentUserBooking={currentUserBooking} 
@@ -59,6 +58,16 @@ const App: React.FC = () => {
             />
           } 
         />
+
+        {/* Adding missing routes from Navbar */}
+        <Route path="/notices" element={<div>Notices Page (Coming Soon)</div>} />
+        <Route path="/complaints" element={<div>Complaints Page (Coming Soon)</div>} />
+        <Route path="/profile" element={<div>Profile Page (Coming Soon)</div>} />
+        <Route path="/students" element={<div>Students Management (Coming Soon)</div>} />
+        <Route path="/rooms" element={<div>Rooms Management (Coming Soon)</div>} />
+        <Route path="/users" element={<div>Users Management (Coming Soon)</div>} />
+        <Route path="/hostel-management" element={<div>Hostel Management (Coming Soon)</div>} />
+        <Route path="/reports" element={<div>Reports Page (Coming Soon)</div>} />
       </Routes>
     </Router>
   );
