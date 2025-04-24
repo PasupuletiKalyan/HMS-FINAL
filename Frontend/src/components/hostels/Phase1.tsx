@@ -531,16 +531,52 @@ const Phase1FloorPlan: React.FC<FloorPlanProps> = ({
     }
     
     // Mark occupied beds
-    Object.entries(occupiedBeds).forEach(([roomNumber, isOccupied]) => {
-      if (isOccupied) {
-        const roomElement = container.querySelector(`g[data-room-number="${roomNumber}"]`);
-        if (roomElement) {
-          const bedRect = roomElement.querySelector('rect');
-          if (bedRect) {
-            // Mark as occupied
-            bedRect.setAttribute('fill', '#FDA4AF'); // Occupied color
-            bedRect.setAttribute('stroke', '#E11D48');
+    Object.entries(occupiedBeds).forEach(([key, isOccupied]) => {
+      if (isOccupied && key.includes(`${selectedBlock}_${selectedFloor}_`)) {
+        // Extract room number from key (format: block_floor_roomNumber_bed)
+        const parts = key.split('_');
+        if (parts.length >= 3) {
+          const roomNumber = parts[2];
+          const bedLetter = parts[3]; // A or B
+          
+          const roomElement = container.querySelector(`g[data-room-number="${roomNumber}"]`);
+          if (roomElement) {
+            const bedRect = roomElement.querySelector('rect');
+            const currentFill = bedRect?.getAttribute('fill');
+            
+            if (bedRect) {
+              // First check if this room already has one bed occupied (yellow)
+              if (currentFill === '#fef08a') {
+                // Mark as fully-occupied (red) if the other bed is already marked
+                bedRect.setAttribute('fill', '#fecaca'); // Red-200 for fully occupied
+                bedRect.setAttribute('stroke', '#ef4444'); // Red-500
+              } else {
+                // Mark as partially-occupied (yellow) for first bed
+                bedRect.setAttribute('fill', '#fef08a'); // Yellow-200 for partially occupied
+                bedRect.setAttribute('stroke', '#eab308'); // Yellow-500
+              }
+            }
           }
+        }
+      }
+    });
+    
+    // Reset available rooms to green
+    const rooms = container.querySelectorAll('g[data-room-number]');
+    rooms.forEach(room => {
+      // Skip warden room (33)
+      if (room.getAttribute('data-room-number') === '33') return;
+      
+      const roomNumber = room.getAttribute('data-room-number') || '';
+      const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
+      const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
+      
+      // If neither bed is occupied, set to available (green)
+      if (!occupiedBeds[bedAKey] && !occupiedBeds[bedBKey]) {
+        const bedRect = room.querySelector('rect');
+        if (bedRect) {
+          bedRect.setAttribute('fill', '#bbf7d0'); // Green-200 for available
+          bedRect.setAttribute('stroke', '#22c55e'); // Green-500
         }
       }
     });

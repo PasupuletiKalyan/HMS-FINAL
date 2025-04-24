@@ -69,6 +69,33 @@ const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
       
       const container = svgRef.current;
       
+      // Apply room occupancy status colors
+      const roomElements = container.querySelectorAll('g[data-room-number]');
+      roomElements.forEach(roomElement => {
+        const roomNumber = roomElement.getAttribute('data-room-number') || '';
+        const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
+        const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
+        const isBedAOccupied = occupiedBeds[bedAKey] || false;
+        const isBedBOccupied = occupiedBeds[bedBKey] || false;
+        
+        const rect = roomElement.querySelector('rect');
+        if (rect) {
+          if (isBedAOccupied && isBedBOccupied) {
+            // Fully occupied
+            rect.setAttribute('fill', '#fecaca'); // Red-200
+            rect.setAttribute('stroke', '#ef4444'); // Red-500
+          } else if (isBedAOccupied || isBedBOccupied) {
+            // Partially occupied
+            rect.setAttribute('fill', '#fef08a'); // Yellow-200
+            rect.setAttribute('stroke', '#eab308'); // Yellow-500
+          } else {
+            // Available
+            rect.setAttribute('fill', '#bbf7d0'); // Green-200
+            rect.setAttribute('stroke', '#22c55e'); // Green-500
+          }
+        }
+      });
+      
       // Event handler using delegation
       const handleClick = (event: MouseEvent) => {
         const targetGroup = (event.target as Element).closest('g[data-room-number]');
@@ -85,7 +112,7 @@ const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
       return () => {
         container.removeEventListener('click', handleClick);
       };
-    }, [onRoomClick]);
+    }, [onRoomClick, occupiedBeds, selectedBlock, selectedFloor]);
     
     return (
       <div

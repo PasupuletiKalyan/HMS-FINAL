@@ -52,14 +52,14 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
       const isOccupiedB = occupiedBeds[bedBKey] || false;
       
       // Determine color based on occupancy
-      let fillColor = '#bbdefb'; // Default blue for available
+      let fillColor = '#bbf7d0'; // Green-200 for available
       let occupancyText = 'Available';
       
       if (isOccupiedA && isOccupiedB) {
-        fillColor = '#ef5350'; // Red for fully occupied
+        fillColor = '#fecaca'; // Red-200 for fully occupied
         occupancyText = 'Fully Occupied';
       } else if (isOccupiedA || isOccupiedB) {
-        fillColor = '#ffca28'; // Yellow for partially occupied
+        fillColor = '#fef08a'; // Yellow-200 for partially occupied
         occupancyText = 'Partially Occupied';
       }
       
@@ -128,15 +128,15 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
       {/* Legend */}
       <div style={{ position: 'absolute', bottom: '10px', right: '10px', display: 'flex', gap: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', fontSize: '12px' }}>
-          <div style={{ width: '15px', height: '15px', backgroundColor: '#bbdefb', marginRight: '5px', border: '1px solid #1976d2' }}></div>
+          <div style={{ width: '15px', height: '15px', backgroundColor: '#bbf7d0', marginRight: '5px', border: '1px solid #22c55e' }}></div>
           <span>Available</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', fontSize: '12px' }}>
-          <div style={{ width: '15px', height: '15px', backgroundColor: '#ffca28', marginRight: '5px', border: '1px solid #1976d2' }}></div>
+          <div style={{ width: '15px', height: '15px', backgroundColor: '#fef08a', marginRight: '5px', border: '1px solid #eab308' }}></div>
           <span>Partially Occupied</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', fontSize: '12px' }}>
-          <div style={{ width: '15px', height: '15px', backgroundColor: '#ef5350', marginRight: '5px', border: '1px solid #1976d2' }}></div>
+          <div style={{ width: '15px', height: '15px', backgroundColor: '#fecaca', marginRight: '5px', border: '1px solid #ef4444' }}></div>
           <span>Fully Occupied</span>
         </div>
       </div>

@@ -185,6 +185,22 @@ const Phase4BFloorPlan: React.FC<FloorPlanProps> = ({
   const floorInfo = phase4BConfig[floor];
   if (!floorInfo) return <p>Floor data not available</p>;
   
+  // Get room occupancy status - moved up so it can be used for both SVG and grid layout
+  const getRoomOccupancyStatus = (roomNumber: number | string): string => {
+    const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
+    const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
+    const isBedAOccupied = occupiedBeds[bedAKey] || false;
+    const isBedBOccupied = occupiedBeds[bedBKey] || false;
+    
+    if (isBedAOccupied && isBedBOccupied) {
+      return "fully-occupied";
+    } else if (isBedAOccupied || isBedBOccupied) {
+      return "partially-occupied";
+    } else {
+      return "available";
+    }
+  };
+  
   // For 2nd Floor, use SVG rendering
   if (floor === '2nd Floor') {
     const svgRef = React.useRef<HTMLDivElement>(null);
@@ -193,6 +209,37 @@ const Phase4BFloorPlan: React.FC<FloorPlanProps> = ({
       if (!svgRef.current) return;
       
       const container = svgRef.current;
+      
+      // Update room colors based on occupancy
+      const updateRoomColors = () => {
+        // Find all room groups in the SVG
+        const roomGroups = container.querySelectorAll('g[data-room-number]');
+        
+        roomGroups.forEach(group => {
+          const roomNumber = group.getAttribute('data-room-number');
+          if (roomNumber) {
+            const occupancyStatus = getRoomOccupancyStatus(roomNumber);
+            const rect = group.querySelector('rect');
+            
+            if (rect) {
+              // Update fill color and stroke based on occupancy status
+              if (occupancyStatus === "fully-occupied") {
+                rect.setAttribute('fill', '#fecaca'); // Red-200 for fully occupied
+                rect.setAttribute('stroke', '#ef4444'); // Red-500
+              } else if (occupancyStatus === "partially-occupied") {
+                rect.setAttribute('fill', '#fef08a'); // Yellow-200 for partially occupied
+                rect.setAttribute('stroke', '#eab308'); // Yellow-500
+              } else {
+                rect.setAttribute('fill', '#bbf7d0'); // Green-200 for available
+                rect.setAttribute('stroke', '#22c55e'); // Green-500
+              }
+            }
+          }
+        });
+      };
+      
+      // Update colors initially and when occupiedBeds changes
+      updateRoomColors();
       
       // Event handler using delegation
       const handleClick = (event: MouseEvent) => {
@@ -210,7 +257,7 @@ const Phase4BFloorPlan: React.FC<FloorPlanProps> = ({
       return () => {
         container.removeEventListener('click', handleClick);
       };
-    }, [onRoomClick]);
+    }, [onRoomClick, occupiedBeds, selectedBlock, selectedFloor]); // Add deps to re-run when bookings change
     
     return (
       <div
@@ -222,21 +269,6 @@ const Phase4BFloorPlan: React.FC<FloorPlanProps> = ({
   }
   
   // For other floors, use the grid layout
-  const getRoomOccupancyStatus = (roomNumber: number | string): string => {
-    const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
-    const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
-    const isBedAOccupied = occupiedBeds[bedAKey] || false;
-    const isBedBOccupied = occupiedBeds[bedBKey] || false;
-    
-    if (isBedAOccupied && isBedBOccupied) {
-      return "fully-occupied";
-    } else if (isBedAOccupied || isBedBOccupied) {
-      return "partially-occupied";
-    } else {
-      return "available";
-    }
-  };
-  
   const createRoomButton = (roomNumber: number): React.ReactNode => {
     const occupancyStatus = getRoomOccupancyStatus(roomNumber);
     return (

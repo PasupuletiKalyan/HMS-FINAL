@@ -75,12 +75,12 @@ const Phase1EBlockFloorPlan: React.FC<FloorPlanProps> = ({
     const isOccupiedB = occupiedBeds[bedBKey] || false;
     
     // Determine color based on occupancy
-    let fillColor = '#86efac'; // Default blue for available
+    let fillColor = '#bbf7d0'; // Green-200 for available
     
     if (isOccupiedA && isOccupiedB) {
-      fillColor = '#ef5350'; // Red for fully occupied
+      fillColor = '#fecaca'; // Red-200 for fully occupied
     } else if (isOccupiedA || isOccupiedB) {
-      fillColor = '#ffca28'; // Yellow for partially occupied
+      fillColor = '#fef08a'; // Yellow-200 for partially occupied
     }
 
     return (

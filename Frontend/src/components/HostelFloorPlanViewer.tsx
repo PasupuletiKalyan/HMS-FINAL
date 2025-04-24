@@ -353,7 +353,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     return (
       <div className="room-occupancy-legend">
         <div className="legend-item">
-          <div className="legend-color" style={{ backgroundColor: '#22c55e', border: '1px solid #1976d2' }}></div>
+          <div className="legend-color legend-available"></div>
           <span>Available</span>
         </div>
         <div className="legend-item">
