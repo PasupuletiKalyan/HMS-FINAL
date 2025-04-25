@@ -769,7 +769,6 @@ export const phase4A8thFloorSvgString = `
   </svg>
 `;
 
-
 // SVG for Phase 4A 7th Floor (unique layout)
 export const phase4A7thFloorSvgString = `
   <svg viewBox="0 -10 550 770" xmlns="http://www.w3.org/2000/svg">

@@ -35,6 +35,13 @@ import Phase4AFloorPlan, {
   phase4AGroundFloorSvgString 
 } from './Phase4A';
 
+// Import the new Phase4AUpperFloors component
+import Phase4AUpperFloorPlan, {
+  phase4AUpperConfig,
+  phase4A9thFloorSvgString,
+  phase4A10thFloorSvgString
+} from './Phase4AUpperFloors';
+
 // Import the new split components
 import Phase4BLowerFloorPlan, { 
   phase4BLowerConfig,
@@ -77,6 +84,22 @@ const Phase4BFloorPlan = {
   }
 };
 
+// Create a combined Phase4AFloorPlan component wrapper to handle upper floors
+const Phase4ACombinedFloorPlan = {
+  // Create a wrapper that handles the logic of which component to use
+  component: (props: FloorPlanProps) => {
+    // Check if the floor is in the upper floors config
+    const isUpperFloor = Object.keys(phase4AUpperConfig).includes(props.floor);
+    
+    // Return the appropriate component
+    if (isUpperFloor) {
+      return { type: Phase4AUpperFloorPlan, props };
+    } else {
+      return { type: Phase4AFloorPlan, props };
+    }
+  }
+};
+
 // Export types
 export * from './types';
 
@@ -115,6 +138,15 @@ export {
   Phase4AFloorPlan,
   phase4AConfig,
   phase4AGroundFloorSvgString,
+
+  // Phase 4A Upper Floors
+  Phase4AUpperFloorPlan,
+  phase4AUpperConfig,
+  phase4A9thFloorSvgString,
+  phase4A10thFloorSvgString,
+
+  // Phase 4A Combined Component
+  Phase4ACombinedFloorPlan,
   
   // Phase 4B Component (combined)
   Phase4BFloorPlan,

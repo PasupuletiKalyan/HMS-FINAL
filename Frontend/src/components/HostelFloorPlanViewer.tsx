@@ -6,8 +6,8 @@ import {
   Phase2Part5FloorPlan,
   Phase3NorthWingFloorPlan,
   Phase3SouthWingFloorPlan,
-  Phase4AFloorPlan,
   Phase4BFloorPlan,
+  Phase4ACombinedFloorPlan,
   phase1Config,
   phase1EBlockConfig,
   phase2Config,
@@ -15,7 +15,8 @@ import {
   phase3NorthWingConfig,
   phase3SouthWingConfig,
   phase4AConfig,
-  phase4BConfig
+  phase4BConfig,
+  phase4AUpperConfig
 } from './hostels';
 import '../styles/HostelFloorPlanViewer.css';
 
@@ -74,7 +75,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     "Phase 2 Part 5": phase2Part5Config,
     "Phase 3 North Wing": phase3NorthWingConfig,
     "Phase 3 South Wing": phase3SouthWingConfig,
-    "Phase 4A": phase4AConfig,
+    "Phase 4A": { ...phase4AConfig, ...phase4AUpperConfig },
     "Phase 4B": phase4BConfig
   };
   
@@ -179,77 +180,6 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     return occupiedBeds[roomKey] || false;
   };
 
-  /* 
-  // Unused function - keeping for potential future use
-  const createRoomButton = (roomNumber: number): React.ReactNode => {
-    const occupancyStatus = getRoomOccupancyStatus(roomNumber);
-    return (
-      <button
-        key={roomNumber}
-        className={`room-button ${occupancyStatus}`}
-        data-room-number={roomNumber}
-        onClick={() => handleRoomClick(roomNumber.toString())}
-        disabled={occupancyStatus === "fully-occupied"}
-      >
-        {roomNumber}
-      </button>
-    );
-  };
-  
-  // Unused function - keeping for potential future use
-  const createVisualEBlockLayout = (blockName: string, floorName: string, floorInfo: { start: number; end: number; exceptions: number[] }): React.ReactNode => {
-    let offset = 0;
-    if (floorName === '1st Floor') offset = 100;
-    else if (floorName === '2nd Floor') offset = 200;
-    else if (floorName === '3rd Floor') offset = 300;
-    else if (floorName === '4th Floor') offset = 400;
-    // Keep top row the same
-    const topRowStructure = [10, 11, 12, 'Lift', 1, 2, 3, 4];
-    // Add a spacer after WS to align room 8 with room 1
-    const bottomRowStructure = [9, 'WS', 'Spacer', 8, 7, 6, 5];
-    const createBox = (item: number | string): React.ReactNode => {
-      if (typeof item === 'number') {
-        const roomNumber = (floorName === 'Ground Floor' ? item : item + offset);
-        if (roomNumber >= floorInfo.start && roomNumber <= floorInfo.end) {
-          const occupancyStatus = getRoomOccupancyStatus(roomNumber);
-          return (
-            <div
-              key={roomNumber}
-              className={`floor-item room-box ${occupancyStatus}`}
-              data-room-number={roomNumber}
-              onClick={() => handleRoomClick(roomNumber.toString())}
-            >
-              {roomNumber}
-            </div>
-          );
-        } else {
-          return <div key={`empty-${item}`} className="floor-item">-</div>;
-        }
-      } else if (item === 'Lift') {
-        return <div key="lift" className="floor-item lift-box">Lift</div>;
-      } else if (item === 'WS') {
-        return <div key="ws" className="floor-item ws-box">🚽</div>;
-      } else if (item === 'Spacer') {
-        // Empty spacer to align rooms properly
-        return <div key="spacer" className="floor-item spacer-box"></div>;
-      }
-      return null;
-    };
-    return (
-      <div className="floor-plan-visual">
-        <div className="floor-row">
-          {topRowStructure.map(item => createBox(item))}
-        </div>
-        <div className="corridor-label">Corridor</div>
-        <div className="floor-row">
-          {bottomRowStructure.map(item => createBox(item))}
-        </div>
-        <div className="floor-label">{`${blockName} ${floorName}`}</div>
-      </div>
-    );
-  };
-  */
-
   // Render floor plan content
   const renderFloorPlan = (): React.ReactNode => {
     if (!selectedBlock) {
@@ -325,15 +255,15 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
           />
         );
       case 'Phase 4A':
-        return (
-          <Phase4AFloorPlan
-            floor={selectedFloor}
-            onRoomClick={handleRoomClick}
-            occupiedBeds={occupiedBeds}
-            selectedBlock={selectedBlock}
-            selectedFloor={selectedFloor}
-          />
-        );
+        // Use the combined component for Phase 4A that selects the appropriate component
+        const Phase4AComponent = Phase4ACombinedFloorPlan.component({
+          floor: selectedFloor,
+          onRoomClick: handleRoomClick,
+          occupiedBeds: occupiedBeds,
+          selectedBlock: selectedBlock,
+          selectedFloor: selectedFloor
+        });
+        return <Phase4AComponent.type {...Phase4AComponent.props} />;
       case 'Phase 4B':
         const Phase4BComponent = Phase4BFloorPlan.component({
           floor: selectedFloor,
