@@ -567,6 +567,200 @@ export const phase4AHigherFloorsSvgTemplate = `
   </svg>
 `;
 
+// SVG for Phase 4A 7th Floor (unique layout)
+export const phase4A7thFloorSvgString = `
+  <svg viewBox="0 -10 550 770" xmlns="http://www.w3.org/2000/svg">
+    
+    <!-- Title -->
+    <rect x="260" y="5" width="200" height="20" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="1"/>
+    <text x="270" y="20" fontSize="14" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase 4A - 7th Floor</text>
+    
+    <!-- Top-Left Section (Lift & Stair case) -->
+    <g data-room-number="LiftStair1">
+      <rect x="130" y="10" width="60" height="70" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
+      <text x="140" y="35" fontSize="10" textAnchor="middle" dominantBaseline="middle">Lift &</text>
+      <text x="150" y="50" fontSize="10" textAnchor="middle" dominantBaseline="middle">Stair</text>
+      <text x="160" y="65" fontSize="10" textAnchor="middle" dominantBaseline="middle">case</text>
+    </g>
+    
+    <!-- Terrace Area -->
+    <g data-room-number="Terrace">
+      <rect x="130" y="90" width="60" height="100" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
+      <text x="130" y="145" fontSize="10" textAnchor="middle" dominantBaseline="middle">Terrace</text>
+    </g>
+    
+    <!-- Left Column Rooms -->
+    <g data-room-number="718">
+      <rect x="10" y="20" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="40" fontSize="10" textAnchor="middle" dominantBaseline="middle">718</text>
+    </g>
+    
+    <g data-room-number="717">
+      <rect x="10" y="70" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="90" fontSize="10" textAnchor="middle" dominantBaseline="middle">717</text>
+    </g>
+    
+    <g data-room-number="716">
+      <rect x="10" y="120" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="140" fontSize="10" textAnchor="middle" dominantBaseline="middle">716</text>
+    </g>
+    
+    <g data-room-number="715">
+      <rect x="10" y="170" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="190" fontSize="10" textAnchor="middle" dominantBaseline="middle">715</text>
+    </g>
+    
+    <g data-room-number="714">
+      <rect x="10" y="220" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="240" fontSize="10" textAnchor="middle" dominantBaseline="middle">714</text>
+    </g>
+    
+    <g data-room-number="713">
+      <rect x="10" y="270" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="290" fontSize="10" textAnchor="middle" dominantBaseline="middle">713</text>
+    </g>
+    
+    <g data-room-number="712">
+      <rect x="10" y="320" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="340" fontSize="10" textAnchor="middle" dominantBaseline="middle">712</text>
+    </g>
+    
+    <!-- Central WS Area -->
+    <g data-room-number="WS1">
+      <rect x="130" y="200" width="80" height="100" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
+      <text x="160" y="250" fontSize="14" textAnchor="middle" dominantBaseline="middle">WS</text>
+    </g>
+    
+    <!-- Right Top Column Rooms -->
+    <g data-room-number="719">
+      <rect x="180" y="340" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="190" y="365" fontSize="10" textAnchor="middle" dominantBaseline="middle">719</text>
+    </g>
+    
+    <g data-room-number="720">
+      <rect x="180" y="390" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="190" y="415" fontSize="10" textAnchor="middle" dominantBaseline="middle">720</text>
+    </g>
+    
+    <g data-room-number="721">
+      <rect x="180" y="440" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="190" y="465" fontSize="10" textAnchor="middle" dominantBaseline="middle">721</text>
+    </g>
+    
+    <!-- Middle Left Column Rooms -->
+    <g data-room-number="711">
+      <rect x="90" y="440" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="100" y="460" fontSize="10" textAnchor="middle" dominantBaseline="middle">711</text>
+    </g>
+    
+    <g data-room-number="710">
+      <rect x="90" y="490" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="100" y="510" fontSize="10" textAnchor="middle" dominantBaseline="middle">710</text>
+    </g>
+    
+    <g data-room-number="709">
+      <rect x="90" y="540" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="100" y="560" fontSize="10" textAnchor="middle" dominantBaseline="middle">709</text>
+    </g>
+    
+    <g data-room-number="708">
+      <rect x="90" y="590" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="100" y="620" fontSize="10" textAnchor="middle" dominantBaseline="middle">708</text>
+    </g>
+    
+    <g data-room-number="707">
+      <rect x="90" y="640" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="100" y="660" fontSize="10" textAnchor="middle" dominantBaseline="middle">707</text>
+    </g>
+    
+    <!-- Middle Right Column (Lift, Stair, WS) -->
+    <g data-room-number="LiftArea">
+      <rect x="180" y="490" width="50" height="40" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
+      <text x="190" y="505" fontSize="10" textAnchor="middle" dominantBaseline="middle">Lift</text>
+      <text x="190" y="520" fontSize="10" textAnchor="middle" dominantBaseline="middle">Area</text>
+    </g>
+    
+    <g data-room-number="Staircase2">
+      <rect x="180" y="540" width="50" height="40" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
+      <text x="190" y="555" fontSize="10" textAnchor="middle" dominantBaseline="middle">Stair</text>
+      <text x="190" y="570" fontSize="10" textAnchor="middle" dominantBaseline="middle">case</text>
+    </g>
+    
+    <g data-room-number="WS2">
+      <rect x="180" y="590" width="50" height="60" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
+      <text x="200" y="625" fontSize="14" textAnchor="middle" dominantBaseline="middle">WS</text>
+    </g>
+    
+    <!-- Bottom Horizontal Section (Top Row) -->
+    <g data-room-number="722">
+      <rect x="230" y="640" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="240" y="665" fontSize="10" textAnchor="middle" dominantBaseline="middle">722</text>
+    </g>
+    
+    <g data-room-number="723">
+      <rect x="280" y="640" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="290" y="665" fontSize="10" textAnchor="middle" dominantBaseline="middle">723</text>
+    </g>
+    
+    <g data-room-number="724">
+      <rect x="330" y="640" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="340" y="665" fontSize="10" textAnchor="middle" dominantBaseline="middle">724</text>
+    </g>
+    
+    <g data-room-number="725">
+      <rect x="380" y="640" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="390" y="665" fontSize="10" textAnchor="middle" dominantBaseline="middle">725</text>
+    </g>
+    
+    <g data-room-number="726">
+      <rect x="430" y="640" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="440" y="665" fontSize="10" textAnchor="middle" dominantBaseline="middle">726</text>
+    </g>
+    
+    <g data-room-number="Staircase3">
+      <rect x="480" y="640" width="50" height="40" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
+      <text x="490" y="655" fontSize="10" textAnchor="middle" dominantBaseline="middle">Stair</text>
+      <text x="490" y="670" fontSize="10" textAnchor="middle" dominantBaseline="middle">case</text>
+    </g>
+    
+    <!-- Bottom Horizontal Section (Bottom Row) -->
+    <g data-room-number="706">
+      <rect x="230" y="710" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="240" y="735" fontSize="10" textAnchor="middle" dominantBaseline="middle">706</text>
+    </g>
+    
+    <g data-room-number="705">
+      <rect x="280" y="710" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="290" y="735" fontSize="10" textAnchor="middle" dominantBaseline="middle">705</text>
+    </g>
+    
+    <g data-room-number="704">
+      <rect x="330" y="710" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="340" y="735" fontSize="10" textAnchor="middle" dominantBaseline="middle">704</text>
+    </g>
+    
+    <g data-room-number="703">
+      <rect x="380" y="710" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="390" y="735" fontSize="10" textAnchor="middle" dominantBaseline="middle">703</text>
+    </g>
+    
+    <g data-room-number="702">
+      <rect x="430" y="710" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="440" y="735" fontSize="10" textAnchor="middle" dominantBaseline="middle">702</text>
+    </g>
+    
+    <g data-room-number="701">
+      <rect x="480" y="710" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="490" y="735" fontSize="10" textAnchor="middle" dominantBaseline="middle">701</text>
+    </g>
+    
+    <!-- Labels for corridors -->
+    <text x="65" y="230" fontSize="10" transform="rotate(-90 65 200)" textAnchor="middle" dominantBaseline="middle">Corridor</text>
+    <text x="142" y="510" fontSize="10" transform="rotate(-90 155 500)" textAnchor="middle" dominantBaseline="middle">Corridor</text>
+    <text x="350" y="700"fontSize="10" textAnchor="middle" dominantBaseline="middle">Corridor</text>
+  </svg>
+`;
+
 // Component for rendering Phase 4A floors
 const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({ 
   floor, 
@@ -590,9 +784,9 @@ const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({
   };
   
   // For floors with SVG layout, use the visual rendering
-  // Only use SVG layout for Ground, 1st, and 2nd-6th floors as specified
+  // Use specific SVG layouts for Ground, 1st, 2nd-6th, and 7th floors
   if (floor === 'Ground Floor' || floor === '1st Floor' || 
-      ['2nd Floor', '3rd Floor', '4th Floor', '5th Floor', '6th Floor'].includes(floor)) {
+      ['2nd Floor', '3rd Floor', '4th Floor', '5th Floor', '6th Floor', '7th Floor'].includes(floor)) {
     
     const svgRef = React.useRef<HTMLDivElement>(null);
     // Select the appropriate SVG based on the floor
@@ -602,6 +796,9 @@ const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({
       svgString = phase4AGroundFloorSvgString;
     } else if (floor === '1st Floor') {
       svgString = phase4A1stFloorSvgString;
+    } else if (floor === '7th Floor') {
+      // Use the specific 7th floor layout
+      svgString = phase4A7thFloorSvgString;
     } else {
       // For floors 2-6, use the template and replace placeholders
       const floorPrefix = getFloorPrefix(floor);
@@ -673,7 +870,7 @@ const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({
     );
   }
   
-  // Fallback to grid layout for floors 7-10
+  // Fallback to grid layout for floors 8-10
   const getRoomOccupancyStatus = (roomNumber: number | string): string => {
     const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
     const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
