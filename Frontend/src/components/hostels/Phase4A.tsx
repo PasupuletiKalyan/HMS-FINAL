@@ -28,8 +28,8 @@ export const phase4AGroundFloorSvgString = `
     <g data-room-number="LiftStair1">
       <rect x="130" y="40" width="45" height="120" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
       <text x="138" y="90" fontSize="10" textAnchor="middle" dominantBaseline="middle">Lift &</text>
-      <text x="138" y="102" fontSize="10" textAnchor="middle" dominantBaseline="middle">Stair</text>
-      <text x="138" y="114" fontSize="10" textAnchor="middle" dominantBaseline="middle">case</text>
+      <text x="138" y="110" fontSize="10" textAnchor="middle" dominantBaseline="middle">Stair</text>
+      <text x="138" y="120" fontSize="10" textAnchor="middle" dominantBaseline="middle">case</text>
     </g>
     
     <g data-room-number="G09">
@@ -72,7 +72,7 @@ export const phase4AGroundFloorSvgString = `
     
     <g data-room-number="WS1">
       <rect x="130" y="230" width="90" height="70" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
-      <text x="160" y="270" fontSize="12" textAnchor="middle" dominantBaseline="middle">WS</text>
+      <text x="160" y="270" fontSize="12" textAnchor="middle" dominantBaseline="middle">🚽</text>
     </g>
      <text x="140" y="330" fontSize="9" textAnchor="middle" dominantBaseline="middle">Corridor</text>
  
@@ -118,7 +118,7 @@ export const phase4AGroundFloorSvgString = `
     
     <g data-room-number="WS2">
       <rect x="210" y="570" width="40" height="40" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
-      <text x="215" y="600" fontSize="10" textAnchor="middle" dominantBaseline="middle">WS</text>
+      <text x="215" y="600" fontSize="10" textAnchor="middle" dominantBaseline="middle">🚽</text>
     </g>
     
     <text x="162" y="390" fontSize="10" transform="rotate(90 162 410)" textAnchor="middle" dominantBaseline="middle">Corridor</text>
@@ -209,7 +209,7 @@ export const phase4A1stFloorSvgString = `
     <!-- WS Area (Top Middle) -->
     <g data-room-number="WS1">
       <rect x="95" y="240" width="110" height="65" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="135" y="280" fontSize="10" textAnchor="middle" dominantBaseline="middle">WS</text>
+      <text x="135" y="280" fontSize="10" textAnchor="middle" dominantBaseline="middle">🚽</text>
     </g>
     
     <!-- Middle Left Section (Rooms 107-101) -->
@@ -279,7 +279,7 @@ export const phase4A1stFloorSvgString = `
     <!-- WS (Middle) -->
     <g data-room-number="WS2">
       <rect x="180" y="600" width="90" height="90" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="180" y="650" fontSize="10" textAnchor="middle" dominantBaseline="middle">WashRooms</text>
+      <text x="180" y="650" fontSize="10" textAnchor="middle" dominantBaseline="middle">🚽</text>
     </g>
     
     <!-- Bottom Section -->
