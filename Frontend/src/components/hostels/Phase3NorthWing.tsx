@@ -165,13 +165,9 @@ export const phase3NorthWingGroundFloorSvgString = `
 
 // SVG String for Phase 3 North Wing 1st Floor
 export const phase3NorthWing1stFloorSvgString = `
-  <svg viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
     <!-- Background -->
-    <rect width="500" height="350" fill="#ffffff"/>
-    
-    <!-- Outer border/wall using path to match the shape in the diagram -->
-    <path d="M20 20 H 460 V 80 H 330 V 200 H 380 V 300 H 440 V 320 H 310 V 180 H 20 V 20 Z" 
-          fill="none" stroke="#000000" strokeWidth="1"/>
+    <rect width="00" height="400" fill="#ffffff"/>
     
     <!-- Top section with WS, Stairs, Lift, WS -->
     <!-- WS Left -->

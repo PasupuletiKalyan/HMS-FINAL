@@ -141,236 +141,226 @@ export const phase4AGroundFloorSvgString = `
 
 // SVG string for Phase 4A 1st Floor layout
 export const phase4A1stFloorSvgString = `
-  <svg viewBox="0 0 350 600" xmlns="http://www.w3.org/2000/svg">
-    <!-- Background with grid -->
-    <defs>
-      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ccc" stroke-width="0.5"/>
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#grid)" />
-    <rect width="348" height="598" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
+  <svg viewBox="0 0 350 800" xmlns="http://www.w3.org/2000/svg">
     
     <!-- Title -->
-    <rect x="100" y="5" width="150" height="20" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="1"/>
-    <text x="175" y="20" fontSize="14" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase 4A - 1st Floor</text>
+    <rect x="200" y="5" width="180" height="20" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="1"/>
+    <text x="220" y="20" fontSize="14" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase 4A - 1st Floor</text>
     
     <!-- Room Definitions -->
     <!-- Top Left Section (Rooms 114-108) -->
     <g data-room-number="114">
-      <rect x="10" y="10" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="25" y="25" fontSize="10" textAnchor="middle" dominantBaseline="middle">114</text>
+      <rect x="10" y="10" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="20" y="30" fontSize="10" textAnchor="middle" dominantBaseline="middle">114</text>
     </g>
     
     <g data-room-number="113">
-      <rect x="10" y="45" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="25" y="60" fontSize="10" textAnchor="middle" dominantBaseline="middle">113</text>
+      <rect x="10" y="60" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="20" y="90" fontSize="10" textAnchor="middle" dominantBaseline="middle">113</text>
     </g>
     
     <g data-room-number="112">
-      <rect x="10" y="80" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="25" y="95" fontSize="10" textAnchor="middle" dominantBaseline="middle">112</text>
+      <rect x="10" y="110" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="20" y="130" fontSize="10" textAnchor="middle" dominantBaseline="middle">112</text>
     </g>
     
     <g data-room-number="111">
-      <rect x="10" y="115" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="25" y="130" fontSize="10" textAnchor="middle" dominantBaseline="middle">111</text>
+      <rect x="10" y="160" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="20" y="190" fontSize="10" textAnchor="middle" dominantBaseline="middle">111</text>
     </g>
     
     <g data-room-number="110">
-      <rect x="10" y="150" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="25" y="165" fontSize="10" textAnchor="middle" dominantBaseline="middle">110</text>
+      <rect x="10" y="210" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="20" y="240" fontSize="10" textAnchor="middle" dominantBaseline="middle">110</text>
     </g>
     
     <g data-room-number="109">
-      <rect x="10" y="185" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="25" y="200" fontSize="10" textAnchor="middle" dominantBaseline="middle">109</text>
+      <rect x="10" y="260" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="20" y="290" fontSize="10" textAnchor="middle" dominantBaseline="middle">109</text>
     </g>
     
     <g data-room-number="108">
-      <rect x="10" y="220" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="25" y="235" fontSize="10" textAnchor="middle" dominantBaseline="middle">108</text>
+      <rect x="10" y="310" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="20" y="340" fontSize="10" textAnchor="middle" dominantBaseline="middle">108</text>
     </g>
     
     <!-- Lift & Stair case (Top) & Rooms 115-117 -->
     <g data-room-number="LiftStair1">
-      <rect x="45" y="10" width="30" height="65" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="60" y="42.5" fontSize="10" textAnchor="middle" dominantBaseline="middle">Lift &</text>
-      <text x="60" y="52.5" fontSize="10" textAnchor="middle" dominantBaseline="middle">Stair</text>
-      <text x="60" y="62.5" fontSize="10" textAnchor="middle" dominantBaseline="middle">case</text>
+      <rect x="100" y="10" width="40" height="65" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="105" y="45" fontSize="10" textAnchor="middle" dominantBaseline="middle">Lift </text>
+      <text x="105" y="60" fontSize="10" textAnchor="middle" dominantBaseline="middle">Stair</text>
     </g>
     
     <g data-room-number="115">
-      <rect x="45" y="80" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="60" y="95" fontSize="10" textAnchor="middle" dominantBaseline="middle">115</text>
+      <rect x="100" y="80" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="110" y="110" fontSize="10" textAnchor="middle" dominantBaseline="middle">115</text>
     </g>
     
     <g data-room-number="116">
-      <rect x="45" y="115" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="60" y="130" fontSize="10" textAnchor="middle" dominantBaseline="middle">116</text>
+      <rect x="100" y="130" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="110" y="160" fontSize="10" textAnchor="middle" dominantBaseline="middle">116</text>
     </g>
     
     <g data-room-number="117">
-      <rect x="45" y="150" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="60" y="165" fontSize="10" textAnchor="middle" dominantBaseline="middle">117</text>
+      <rect x="100" y="180" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="110" y="200" fontSize="10" textAnchor="middle" dominantBaseline="middle">117</text>
     </g>
     
     <!-- WS Area (Top Middle) -->
     <g data-room-number="WS1">
-      <rect x="95" y="185" width="65" height="65" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="127.5" y="217.5" fontSize="10" textAnchor="middle" dominantBaseline="middle">WS</text>
+      <rect x="95" y="240" width="110" height="65" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="135" y="280" fontSize="10" textAnchor="middle" dominantBaseline="middle">WS</text>
     </g>
     
     <!-- Middle Left Section (Rooms 107-101) -->
     <g data-room-number="107">
-      <rect x="95" y="265" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="110" y="280" fontSize="10" textAnchor="middle" dominantBaseline="middle">107</text>
+      <rect x="95" y="350" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="105" y="380" fontSize="10" textAnchor="middle" dominantBaseline="middle">107</text>
     </g>
     
     <g data-room-number="106">
-      <rect x="95" y="300" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="110" y="315" fontSize="10" textAnchor="middle" dominantBaseline="middle">106</text>
+      <rect x="95" y="400" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="105" y="430" fontSize="10" textAnchor="middle" dominantBaseline="middle">106</text>
     </g>
     
     <g data-room-number="105">
-      <rect x="95" y="335" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="110" y="350" fontSize="10" textAnchor="middle" dominantBaseline="middle">105</text>
+      <rect x="95" y="450" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="105" y="480" fontSize="10" textAnchor="middle" dominantBaseline="middle">105</text>
     </g>
     
     <g data-room-number="104">
-      <rect x="95" y="370" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="110" y="385" fontSize="10" textAnchor="middle" dominantBaseline="middle">104</text>
+      <rect x="95" y="500" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="105" y="530" fontSize="10" textAnchor="middle" dominantBaseline="middle">104</text>
     </g>
     
     <g data-room-number="103">
-      <rect x="95" y="405" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="110" y="420" fontSize="10" textAnchor="middle" dominantBaseline="middle">103</text>
+      <rect x="95" y="550" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="105" y="580" fontSize="10" textAnchor="middle" dominantBaseline="middle">103</text>
     </g>
     
     <g data-room-number="102">
-      <rect x="95" y="440" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="110" y="455" fontSize="10" textAnchor="middle" dominantBaseline="middle">102</text>
+      <rect x="95" y="600" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="105" y="630" fontSize="10" textAnchor="middle" dominantBaseline="middle">102</text>
     </g>
     
     <g data-room-number="101">
-      <rect x="95" y="475" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="110" y="490" fontSize="10" textAnchor="middle" dominantBaseline="middle">101</text>
+      <rect x="95" y="650" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="105" y="680" fontSize="10" textAnchor="middle" dominantBaseline="middle">101</text>
     </g>
     
     <!-- Middle Right Section (Rooms 118-120 & Lift/Stair/WS) -->
     <g data-room-number="118">
-      <rect x="130" y="265" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="145" y="280" fontSize="10" textAnchor="middle" dominantBaseline="middle">118</text>
+      <rect x="180" y="350" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="190" y="380" fontSize="10" textAnchor="middle" dominantBaseline="middle">118</text>
     </g>
     
     <g data-room-number="119">
-      <rect x="130" y="300" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="145" y="315" fontSize="10" textAnchor="middle" dominantBaseline="middle">119</text>
+      <rect x="180" y="400" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="190" y="430" fontSize="10" textAnchor="middle" dominantBaseline="middle">119</text>
     </g>
     
     <g data-room-number="120">
-      <rect x="130" y="335" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="145" y="350" fontSize="10" textAnchor="middle" dominantBaseline="middle">120</text>
+      <rect x="180" y="450" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="190" y="480" fontSize="10" textAnchor="middle" dominantBaseline="middle">120</text>
     </g>
     
     <!-- Lift Area (Middle) -->
     <g data-room-number="LiftArea">
-      <rect x="130" y="370" width="30" height="30" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="145" y="380" fontSize="8" textAnchor="middle" dominantBaseline="middle">Lift</text>
-      <text x="145" y="390" fontSize="8" textAnchor="middle" dominantBaseline="middle">Area</text>
+      <rect x="180" y="500" width="40" height="40" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="190" y="530" fontSize="8" textAnchor="middle" dominantBaseline="middle">Lift</text>
     </g>
     
     <!-- Stair case (Middle) -->
     <g data-room-number="Stair2">
-      <rect x="130" y="405" width="30" height="30" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="145" y="415" fontSize="8" textAnchor="middle" dominantBaseline="middle">Stair</text>
-      <text x="145" y="425" fontSize="8" textAnchor="middle" dominantBaseline="middle">case</text>
+      <rect x="180" y="540" width="40" height="40" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="190" y="570" fontSize="8" textAnchor="middle" dominantBaseline="middle">Stairs</text>
     </g>
     
     <!-- WS (Middle) -->
     <g data-room-number="WS2">
-      <rect x="130" y="440" width="30" height="30" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="145" y="455" fontSize="10" textAnchor="middle" dominantBaseline="middle">WS</text>
+      <rect x="180" y="600" width="90" height="90" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="180" y="650" fontSize="10" textAnchor="middle" dominantBaseline="middle">WashRooms</text>
     </g>
     
     <!-- Bottom Section -->
     <!-- Bottom Row 1 (Rooms 121-125 & Stair case) -->
     <g data-room-number="121">
-      <rect x="95" y="520" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="110" y="535" fontSize="10" textAnchor="middle" dominantBaseline="middle">121</text>
+      <rect x="290" y="680" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="300" y="710" fontSize="10" textAnchor="middle" dominantBaseline="middle">121</text>
     </g>
     
     <g data-room-number="122">
-      <rect x="130" y="520" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="145" y="535" fontSize="10" textAnchor="middle" dominantBaseline="middle">122</text>
+      <rect x="340" y="680" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="350" y="710" fontSize="10" textAnchor="middle" dominantBaseline="middle">122</text>
     </g>
     
     <g data-room-number="123">
-      <rect x="165" y="520" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="180" y="535" fontSize="10" textAnchor="middle" dominantBaseline="middle">123</text>
+      <rect x="390" y="680" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="400" y="710" fontSize="10" textAnchor="middle" dominantBaseline="middle">123</text>
     </g>
     
     <g data-room-number="124">
-      <rect x="200" y="520" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="215" y="535" fontSize="10" textAnchor="middle" dominantBaseline="middle">124</text>
+      <rect x="440" y="680" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="450" y="710" fontSize="10" textAnchor="middle" dominantBaseline="middle">124</text>
     </g>
     
     <g data-room-number="125">
-      <rect x="235" y="520" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="250" y="535" fontSize="10" textAnchor="middle" dominantBaseline="middle">125</text>
+      <rect x="490" y="680" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="500" y="710" fontSize="10" textAnchor="middle" dominantBaseline="middle">125</text>
     </g>
     
     <!-- Stair case (Bottom Right) - Wider -->
     <g data-room-number="Stair3">
-      <rect x="270" y="520" width="45" height="30" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="292.5" y="530" fontSize="8" textAnchor="middle" dominantBaseline="middle">Stair</text>
-      <text x="292.5" y="540" fontSize="8" textAnchor="middle" dominantBaseline="middle">case</text>
+      <rect x="540" y="680" width="60" height="40" fill="#d1d5db" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="550" y="700" fontSize="8" textAnchor="middle" dominantBaseline="middle">Stair</text>
+      <text x="550" y="710" fontSize="8" textAnchor="middle" dominantBaseline="middle">case</text>
     </g>
     
     <!-- Bottom Row 2 (Rooms 131-126) -->
     <g data-room-number="131">
-      <rect x="95" y="555" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="110" y="570" fontSize="10" textAnchor="middle" dominantBaseline="middle">131</text>
+      <rect x="290" y="760"width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="300" y="790" fontSize="10" textAnchor="middle" dominantBaseline="middle">131</text>
     </g>
     
     <g data-room-number="130">
-      <rect x="130" y="555" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="145" y="570" fontSize="10" textAnchor="middle" dominantBaseline="middle">130</text>
+      <rect x="340" y="760" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="350" y="790" fontSize="10" textAnchor="middle" dominantBaseline="middle">130</text>
     </g>
     
     <g data-room-number="129">
-      <rect x="165" y="555" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="180" y="570" fontSize="10" textAnchor="middle" dominantBaseline="middle">129</text>
+      <rect x="390" y="760" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="400" y="790" fontSize="10" textAnchor="middle" dominantBaseline="middle">129</text>
     </g>
     
     <g data-room-number="128">
-      <rect x="200" y="555" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="215" y="570" fontSize="10" textAnchor="middle" dominantBaseline="middle">128</text>
+      <rect x="440" y="760" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="450" y="790" fontSize="10" textAnchor="middle" dominantBaseline="middle">128</text>
     </g>
     
     <g data-room-number="127">
-      <rect x="235" y="555" width="30" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="250" y="570" fontSize="10" textAnchor="middle" dominantBaseline="middle">127</text>
+      <rect x="490" y="760" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="500" y="790" fontSize="10" textAnchor="middle" dominantBaseline="middle">127</text>
     </g>
     
     <!-- Room 126 (Bottom Right) - Wider to match stair case above -->
     <g data-room-number="126">
-      <rect x="270" y="555" width="45" height="30" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
-      <text x="292.5" y="570" fontSize="10" textAnchor="middle" dominantBaseline="middle">126</text>
+      <rect x="540" y="760" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1" rx="2" ry="2"/>
+      <text x="550" y="790" fontSize="10" textAnchor="middle" dominantBaseline="middle">126</text>
     </g>
     
     <!-- Corridors (Using text labels) -->
     <!-- Corridor 1 (Vertical Left) -->
-    <text x="30" y="120" fontSize="10" transform="rotate(-90 30 120)" textAnchor="middle">Corridor</text>
+    <text x="10" y="190" fontSize="10" transform="rotate(-90 30 135)" textAnchor="middle">Corridor</text>
     
     <!-- Corridor 2 (Vertical Middle) -->
-    <text x="145" y="370" fontSize="10" transform="rotate(-90 145 370)" textAnchor="middle">Corridor</text>
+    <text x="30" y="390" fontSize="10" transform="rotate(-90 145 370)" textAnchor="middle">Corridor</text>
     
     <!-- Corridor 3 (Horizontal Bottom 1) -->
-    <text x="200" y="510" fontSize="10" textAnchor="middle">Corridor</text>
+    <text x="110" y="330" fontSize="10" textAnchor="middle">Corridor</text>
     
     <!-- Corridor 4 (Horizontal Bottom 2) -->
-    <text x="200" y="590" fontSize="10" textAnchor="middle">Corridor</text>
+    <text x="400" y="740" fontSize="10" textAnchor="middle">Corridor</text>
+    <text x="160" y="770" fontSize="10" textAnchor="middle">Balcony</text>
   </svg>
 `;
 
