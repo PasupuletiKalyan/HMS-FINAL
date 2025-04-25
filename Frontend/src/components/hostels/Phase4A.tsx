@@ -364,6 +364,209 @@ export const phase4A1stFloorSvgString = `
   </svg>
 `;
 
+// SVG template for Phase 4A floors 2-6 (same structure for all these floors)
+export const phase4AHigherFloorsSvgTemplate = `
+  <svg viewBox="0 -10 550 900" xmlns="http://www.w3.org/2000/svg">
+    
+    <!-- Title -->
+    <rect x="250" y="5" width="200" height="20" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="1"/>
+    <text x="260" y="20" fontSize="14" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase 4A - {FLOOR_NAME}</text>
+    
+    <!-- Top-Left Section (Left Column) -->
+    <g data-room-number="{FLOOR_PREFIX}18">
+      <rect x="10" y="50" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="75" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}18</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}17">
+      <rect x="10" y="100" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="125" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}17</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}16">
+      <rect x="10" y="150" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="175" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}16</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}15">
+      <rect x="10" y="200" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="225" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}15</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}14">
+      <rect x="10" y="250" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="275" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}14</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}13">
+      <rect x="10" y="300" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="325" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}13</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}12">
+      <rect x="10" y="350" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="20" y="375" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}12</text>
+    </g>
+    
+    <!-- Top-Left Section (Right Column & Common) -->
+    <g data-room-number="LiftStair1">
+      <rect x="130" y="10" width="50" height="70" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
+      <text x="140" y="35" fontSize="10" textAnchor="middle" dominantBaseline="middle">Lift &</text>
+      <text x="140" y="50" fontSize="10" textAnchor="middle" dominantBaseline="middle">Stair</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}19">
+      <rect x="130" y="100" width="50" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="140" y="125" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}19</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}20">
+      <rect x="130" y="150" width="50" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="140" y="175" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}20</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}21">
+      <rect x="130" y="200" width="50" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="140" y="225" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}21</text>
+    </g>
+    
+    <!-- Central WS Area -->
+    <g data-room-number="WS1">
+      <rect x="130" y="250" width="90" height="100" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
+      <text x="150" y="300" fontSize="30" textAnchor="middle" dominantBaseline="middle">🚽</text>
+    </g>
+    
+    <!-- Middle Vertical Section (Left Column) -->
+    <g data-room-number="{FLOOR_PREFIX}11">
+      <rect x="140" y="520" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="150" y="540" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}11</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}10">
+      <rect x="140" y="570" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="150" y="590" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}10</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}09">
+      <rect x="140" y="620" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="150" y="640" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}09</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}08">
+      <rect x="140" y="670" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="150" y="690" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}08</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}07">
+      <rect x="140" y="720" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="150" y="740" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}07</text>
+    </g>
+    
+    <!-- Middle Vertical Section (Right Column & Common) -->
+    <g data-room-number="{FLOOR_PREFIX}22">
+      <rect x="230" y="420" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="240" y="440" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}22</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}23">
+      <rect x="230" y="470" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="240" y="490" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}23</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}24">
+      <rect x="230" y="520" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="240" y="540" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}24</text>
+    </g>
+    
+    <g data-room-number="LiftArea">
+      <rect x="230" y="570" width="40" height="40" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
+      <text x="240" y="590" fontSize="10" textAnchor="middle" dominantBaseline="middle">Lift</text>
+    </g>
+    
+    <g data-room-number="Staircase2">
+      <rect x="230" y="620" width="40" height="40" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
+      <text x="230" y="640" fontSize="10" textAnchor="middle" dominantBaseline="middle">Stairs</text>
+    </g>
+    
+    <g data-room-number="WS2">
+      <rect x="230" y="670" width="80" height="100" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
+      <text x="240" y="690" fontSize="14" textAnchor="middle" dominantBaseline="middle">🚽</text>
+    </g>
+    
+    <!-- Bottom Horizontal Section (Top Row) -->
+    <g data-room-number="{FLOOR_PREFIX}25">
+      <rect x="350" y="740" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="360" y="760" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}25</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}26">
+      <rect x="400" y="740" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="410" y="760" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}26</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}27">
+      <rect x="450" y="740" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="460" y="760" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}27</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}28">
+      <rect x="500" y="740" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="510" y="760" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}28</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}29">
+      <rect x="550" y="740" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="560" y="760" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}29</text>
+    </g>
+    
+    <g data-room-number="Staircase3">
+      <rect x="600" y="740" width="50" height="40" fill="#d3d3d3" stroke="grey" strokeWidth="1"/>
+      <text x="610" y="760" fontSize="10" textAnchor="middle" dominantBaseline="middle">Stair</text>
+      <text x="610" y="770" fontSize="10" textAnchor="middle" dominantBaseline="middle">case</text>
+    </g>
+    
+    <!-- Bottom Horizontal Section (Bottom Row) -->
+    <g data-room-number="{FLOOR_PREFIX}06">
+      <rect x="350" y="830" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="360" y="850" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}06</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}05">
+      <rect x="400" y="830" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="410" y="850" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}05</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}04">
+      <rect x="450" y="830" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="460" y="850" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}04</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}03">
+      <rect x="500" y="830" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="510" y="850" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}03</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}02">
+      <rect x="550" y="830" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="560" y="850" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}02</text>
+    </g>
+    
+    <g data-room-number="{FLOOR_PREFIX}01">
+      <rect x="600" y="830" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
+      <text x="610" y="850" fontSize="10" textAnchor="middle" dominantBaseline="middle">{FLOOR_PREFIX}01</text>
+    </g>
+    
+    <!-- Labels for corridors -->
+    <text x="20" y="230" fontSize="10" transform="rotate(-90 65 200)" textAnchor="middle" dominantBaseline="middle">Corridor</text>
+    <text x="90" y="500" fontSize="10" transform="rotate(-90 205 500)" textAnchor="middle" dominantBaseline="middle">Corridor</text>
+    <text x="420" y="810" fontSize="10" textAnchor="middle" dominantBaseline="middle">Corridor</text>
+    <text x="200" y="850" fontSize="10" textAnchor="middle" dominantBaseline="middle">Balcony</text>
+    <text x="90" y="480" fontSize="10" textAnchor="middle" dominantBaseline="middle">Balcony</text>
+    <text x="120" y="380" fontSize="10" textAnchor="middle" dominantBaseline="middle">Corridor</text>
+
+  </svg>
+`;
+
 // Component for rendering Phase 4A floors
 const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({ 
   floor, 
@@ -377,11 +580,35 @@ const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({
   const floorInfo = phase4AConfig[floor];
   if (!floorInfo) return <p>Floor data not available</p>;
   
-  // For Ground Floor or 1st Floor, use the SVG rendering
-  if (floor === 'Ground Floor' || floor === '1st Floor') {
+  // Get the floor prefix based on the floor name (e.g., "2" for "2nd Floor")
+  const getFloorPrefix = (floorName: string): string => {
+    if (floorName === 'Ground Floor') return '';
+    
+    // Extract the number from the floor name
+    const floorNumber = floorName.match(/(\d+)/)?.[1] || '';
+    return floorNumber;
+  };
+  
+  // For floors with SVG layout, use the visual rendering
+  // Only use SVG layout for Ground, 1st, and 2nd-6th floors as specified
+  if (floor === 'Ground Floor' || floor === '1st Floor' || 
+      ['2nd Floor', '3rd Floor', '4th Floor', '5th Floor', '6th Floor'].includes(floor)) {
+    
     const svgRef = React.useRef<HTMLDivElement>(null);
     // Select the appropriate SVG based on the floor
-    const svgString = floor === 'Ground Floor' ? phase4AGroundFloorSvgString : phase4A1stFloorSvgString;
+    let svgString = '';
+    
+    if (floor === 'Ground Floor') {
+      svgString = phase4AGroundFloorSvgString;
+    } else if (floor === '1st Floor') {
+      svgString = phase4A1stFloorSvgString;
+    } else {
+      // For floors 2-6, use the template and replace placeholders
+      const floorPrefix = getFloorPrefix(floor);
+      svgString = phase4AHigherFloorsSvgTemplate
+        .replace(/{FLOOR_NAME}/g, floor)
+        .replace(/{FLOOR_PREFIX}/g, floorPrefix);
+    }
     
     React.useEffect(() => {
       if (!svgRef.current) return;
@@ -446,7 +673,7 @@ const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({
     );
   }
   
-  // For other floors, use a grid layout
+  // Fallback to grid layout for floors 7-10
   const getRoomOccupancyStatus = (roomNumber: number | string): string => {
     const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
     const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
@@ -492,6 +719,6 @@ const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({
       </div>
     </div>
   );
-};
+}
 
 export default Phase4AFloorPlan;
