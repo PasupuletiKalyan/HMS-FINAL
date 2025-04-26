@@ -16,8 +16,8 @@ export const newBlocksGroundFloorSvgString = `
     <rect width="648" height="398" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
     
     <!-- Title box in the center -->
-    <rect x="225" y="175" width="200" height="50" rx="5" fill="#f0f4f8" stroke="#e2e8f0" strokeWidth="1"/>
-    <text x="325" y="205" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif" class="block-title">Ground Floor</text>
+    <rect x="225" y="150" width="200" height="100" rx="5" fill="#f0f4f8" stroke="#e2e8f0" strokeWidth="1"/>
+    <text x="260" y="140" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif" class="block-title">Ground Floor</text>
     
     <!-- Outer Walls Path -->
     <path
@@ -36,7 +36,7 @@ export const newBlocksGroundFloorSvgString = `
     />
     
     <!-- Central Court Yard Text -->
-    <text x="325" y="200" fontSize="12" fontFamily="sans-serif" textAnchor="middle" dominantBaseline="middle">Central Court Yard</text>
+    <text x="250" y="200" fontSize="10" fontFamily="sans-serif" textAnchor="middle" dominantBaseline="middle">Central Court Yard</text>
     
     <!-- Top Row Rooms (2-9) -->
     <g data-room-number="2"> <rect x="90" y="50" width="40" height="40" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/> <text x="110" y="75" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif">2</text> </g>
@@ -49,7 +49,7 @@ export const newBlocksGroundFloorSvgString = `
     <g data-room-number="9"> <rect x="520" y="50" width="40" height="40" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/> <text x="540" y="75" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif">9</text> </g>
     
     <!-- Side Rooms (WR, 10, 20, 11) -->
-    <g class="warden-room"> <rect x="20" y="100" width="40" height="60" rx="4" fill="#d8b4fe" stroke="#9333ea" strokeWidth="1.5"/> <text x="40" y="135" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif" font-weight="bold">WR</text> </g>
+    <g class="warden-room"> <rect x="20" y="100" width="40" height="60" rx="4" fill="#d8b4fe" stroke="#9333ea" strokeWidth="1.5"/> <text x="30" y="135" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif" font-weight="bold">WR</text> </g>
     <g data-room-number="10"> <rect x="590" y="100" width="40" height="60" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/> <text x="610" y="135" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif">10</text> </g>
     <g data-room-number="20"> <rect x="20" y="240" width="40" height="60" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/> <text x="40" y="275" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif">20</text> </g>
     <g data-room-number="11"> <rect x="590" y="240" width="40" height="60" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/> <text x="610" y="275" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif">11</text> </g>
@@ -65,12 +65,12 @@ export const newBlocksGroundFloorSvgString = `
     <g data-room-number="12"> <rect x="520" y="310" width="40" height="40" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/> <text x="540" y="335" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif">12</text> </g>
     
     <!-- Central Area Features -->
-    <g> <rect x="170" y="180" width="80" height="40" rx="4" fill="#a0aec0" stroke="#718096" strokeWidth="1"/> <text x="210" y="205" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="white">Staircase</text> </g>
-    <g> <rect x="400" y="180" width="80" height="40" rx="4" fill="#a0aec0" stroke="#718096" strokeWidth="1"/> <text x="440" y="205" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="white">Staircase</text> </g>
+    <g> <rect x="160" y="170" width="60" height="40" rx="4" fill="#a0aec0" stroke="#718096" strokeWidth="1"/> <text x="170" y="195" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text> </g>
+    <g> <rect x="430" y="170" width="60" height="40" rx="4" fill="#a0aec0" stroke="#718096" strokeWidth="1"/> <text x="440" y="195" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text> </g>
     
     <!-- Corridors -->
-    <text x="325" y="100" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
-    <text x="325" y="300" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
+    <text x="290" y="100" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
+    <text x="290" y="330" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
     
     <!-- Entry -->
     <g transform="translate(-50, 0)">
@@ -88,8 +88,8 @@ export const newBlocksFirstFloorSvgString = `
     <rect width="648" height="398" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
     
     <!-- Title box in the center -->
-    <rect x="225" y="175" width="200" height="50" rx="5" fill="#f0f4f8" stroke="#e2e8f0" strokeWidth="1"/>
-    <text x="325" y="205" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif" class="block-title">1st Floor</text>
+    <rect x="225" y="150" width="200" height="100" rx="5" fill="#f0f4f8" stroke="#e2e8f0" strokeWidth="1"/>
+    <text x="260" y="130" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif" class="block-title">1st Floor</text>
     
     <!-- Outer Walls Path -->
     <path
@@ -108,7 +108,7 @@ export const newBlocksFirstFloorSvgString = `
     />
     
     <!-- Central Court Yard Text -->
-    <text x="325" y="200" fontSize="12" fontFamily="sans-serif" textAnchor="middle" dominantBaseline="middle">Central Court Yard</text>
+    <text x="250" y="200" fontSize="12" fontFamily="sans-serif" textAnchor="middle" dominantBaseline="middle">Central Court Yard</text>
     
     <!-- Top Row Rooms (22-29) -->
     <g data-room-number="22"> <rect x="90" y="50" width="40" height="40" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/> <text x="110" y="75" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif">22</text> </g>
@@ -137,12 +137,12 @@ export const newBlocksFirstFloorSvgString = `
     <g data-room-number="32"> <rect x="520" y="310" width="40" height="40" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/> <text x="540" y="335" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif">32</text> </g>
     
     <!-- Central Area Features -->
-    <g> <rect x="170" y="180" width="80" height="40" rx="4" fill="#a0aec0" stroke="#718096" strokeWidth="1"/> <text x="210" y="205" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="white">Staircase</text> </g>
-    <g> <rect x="400" y="180" width="80" height="40" rx="4" fill="#a0aec0" stroke="#718096" strokeWidth="1"/> <text x="440" y="205" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="white">Staircase</text> </g>
+    <g> <rect x="160" y="170" width="60" height="40" rx="4" fill="#a0aec0" stroke="#718096" strokeWidth="1"/> <text x="170" y="195" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text> </g>
+    <g> <rect x="430" y="170" width="60" height="40" rx="4" fill="#a0aec0" stroke="#718096" strokeWidth="1"/> <text x="440" y="195" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text> </g>
     
     <!-- Corridors -->
-    <text x="325" y="100" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
-    <text x="325" y="300" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
+    <text x="300" y="100" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
+    <text x="300" y="330" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
   </svg>
 `;
 
@@ -153,8 +153,8 @@ export const newBlocksSecondFloorSvgString = `
     <rect width="648" height="398" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
     
     <!-- Title box in the center -->
-    <rect x="225" y="175" width="200" height="50" rx="5" fill="#f0f4f8" stroke="#e2e8f0" strokeWidth="1"/>
-    <text x="325" y="205" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif" class="block-title">2nd Floor</text>
+    <rect x="225" y="150" width="200" height="100" rx="5" fill="#f0f4f8" stroke="#e2e8f0" strokeWidth="1"/>
+    <text x="250" y="130" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif" class="block-title">2nd Floor</text>
     
     <!-- Outer Walls Path -->
     <path
@@ -173,7 +173,7 @@ export const newBlocksSecondFloorSvgString = `
     />
     
     <!-- Central Court Yard Text -->
-    <text x="325" y="200" fontSize="12" fontFamily="sans-serif" textAnchor="middle" dominantBaseline="middle">Central Court Yard</text>
+    <text x="250" y="200" fontSize="12" fontFamily="sans-serif" textAnchor="middle" dominantBaseline="middle">Central Court Yard</text>
     
     <!-- Top Row Rooms (42-49) -->
     <g data-room-number="42"> <rect x="90" y="50" width="40" height="40" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/> <text x="110" y="75" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif">42</text> </g>
@@ -202,12 +202,12 @@ export const newBlocksSecondFloorSvgString = `
     <g data-room-number="52"> <rect x="520" y="310" width="40" height="40" rx="4" fill="#86efac" stroke="#1976d2" strokeWidth="1"/> <text x="540" y="335" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif">52</text> </g>
     
     <!-- Central Area Features -->
-    <g> <rect x="170" y="180" width="80" height="40" rx="4" fill="#a0aec0" stroke="#718096" strokeWidth="1"/> <text x="210" y="205" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="white">Staircase</text> </g>
-    <g> <rect x="400" y="180" width="80" height="40" rx="4" fill="#a0aec0" stroke="#718096" strokeWidth="1"/> <text x="440" y="205" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="white">Staircase</text> </g>
+    <g> <rect x="160" y="170" width="60" height="40" rx="4" fill="#a0aec0" stroke="#718096" strokeWidth="1"/> <text x="170" y="195" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text> </g>
+    <g> <rect x="430" y="170" width="60" height="40" rx="4" fill="#a0aec0" stroke="#718096" strokeWidth="1"/> <text x="440" y="195" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text> </g>
     
     <!-- Corridors -->
-    <text x="325" y="100" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
-    <text x="325" y="300" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
+    <text x="300" y="100" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
+    <text x="300" y="330" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
   </svg>
 `;
 
@@ -272,7 +272,6 @@ const NewBlocksFloorPlan: React.FC<FloorPlanProps> = ({
         const parts = key.split('_');
         if (parts.length >= 3) {
           const roomNumber = parts[2];
-          const bedLetter = parts[3]; // A or B
           
           const roomElement = container.querySelector(`g[data-room-number="${roomNumber}"]`);
           if (roomElement) {

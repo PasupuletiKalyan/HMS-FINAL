@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 // Define colors matched with the old room layout
-const defaultFill = '#fed7aa'; // Same as bed-a/bed-b in CSS (#fed7aa)
 const availableBedFill = '#fed7aa'; // Orange bed color from old layout
 const selectedBedFill = '#bbf7d0'; // Green-200 for selected beds
 const occupiedBedFill = '#fecaca'; // Red-200 for occupied beds

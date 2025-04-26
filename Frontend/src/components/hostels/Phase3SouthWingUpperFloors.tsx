@@ -11,16 +11,7 @@ export const phase3SouthWingConfig: Record<string, FloorConfig> = {
 
 // SVG string for Phase 3 South Wing 5th Floor
 export const phase3SouthWing5thFloorSvgString = `
-  <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">
-    <!-- Background with grid -->
-    <defs>
-      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ccc" stroke-width="0.5"/>
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#grid)" />
-    <rect width="798" height="698" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
-    
+  <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">    
     <!-- Title -->
     <rect x="350" y="200" width="250" height="60" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="2"/>
     <text x="360" y="230" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase-3 South Wing 5th Floor</text>
@@ -170,16 +161,7 @@ export const phase3SouthWing5thFloorSvgString = `
 
 // SVG string for Phase 3 South Wing 6th Floor
 export const phase3SouthWing6thFloorSvgString = `
-  <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">
-    <!-- Background with grid -->
-    <defs>
-      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ccc" stroke-width="0.5"/>
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#grid)" />
-    <rect width="798" height="698" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
-    
+  <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">    
     <!-- Title -->
     <rect x="350" y="200" width="250" height="60" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="2"/>
     <text x="360" y="230" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase-3 South Wing 6th Floor</text>
@@ -329,16 +311,7 @@ export const phase3SouthWing6thFloorSvgString = `
 
 // SVG string for Phase 3 South Wing 7th Floor
 export const phase3SouthWing7thFloorSvgString = `
-  <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">
-    <!-- Background with grid -->
-    <defs>
-      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ccc" stroke-width="0.5"/>
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#grid)" />
-    <rect width="798" height="698" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
-    
+  <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">    
     <!-- Title -->
     <rect x="350" y="200" width="250" height="60" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="2"/>
     <text x="360" y="230" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase-3 South Wing 7th Floor</text>
@@ -488,16 +461,7 @@ export const phase3SouthWing7thFloorSvgString = `
 
 // SVG string for Phase 3 South Wing 8th Floor
 export const phase3SouthWing8thFloorSvgString = `
-  <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">
-    <!-- Background with grid -->
-    <defs>
-      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ccc" stroke-width="0.5"/>
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#grid)" />
-    <rect width="798" height="698" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
-    
+  <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">    
     <!-- Title -->
     <rect x="350" y="200" width="250" height="60" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="2"/>
     <text x="360" y="230" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase-3 South Wing 8th Floor</text>
@@ -648,15 +612,6 @@ export const phase3SouthWing8thFloorSvgString = `
 // SVG string for Phase 3 South Wing 9th Floor
 export const phase3SouthWing9thFloorSvgString = `
   <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">
-    <!-- Background with grid -->
-    <defs>
-      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ccc" stroke-width="0.5"/>
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#grid)" />
-    <rect width="798" height="698" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
-    
     <!-- Title -->
     <rect x="350" y="200" width="250" height="60" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="2"/>
     <text x="360" y="230" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase-3 South Wing 9th Floor</text>

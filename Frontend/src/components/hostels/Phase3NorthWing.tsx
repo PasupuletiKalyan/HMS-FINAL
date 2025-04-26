@@ -698,9 +698,9 @@ export const phase3NorthWingHigherFloorSvgString = `
 
 // SVG String for Phase 3 North Wing 8th Floor
 export const phase3NorthWing8thFloorSvgString = `
-  <svg viewBox="-15 -15 600 600" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="-15 -45 700 600" xmlns="http://www.w3.org/2000/svg">
     <!-- Background -->
-    <rect width="600" height="600" x="-15" y="-15" fill="#ffffff"/>
+    <rect width="800" height="600" x="-15" y="-45" fill="#ffffff"/>
     
     <!-- Top vertical section (left column) -->
     <g data-room-number="813">
@@ -846,13 +846,7 @@ export const phase3NorthWing8thFloorSvgString = `
     
     <!-- Horizontal corridor between WS and rooms -->
     <text x="135" y="340" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
-    
-    <!-- Bottom vertical corridor -->
-    <text x="580" y="480" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" transform="rotate(-90 605,475)">Corridor</text>
-    
-    <!-- Balcony label -->
-    <text x="520" y="370" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" transform="rotate(-90 540,300)">Balcony</text>
-
+        
     <!-- Corridor arrows -->
     <line x1="125" y1="330" x2="105" y2="330" style="stroke:#a0a0a0;stroke-width:1.5;" marker-end="url(#arrowhead-left)" />
     <line x1="145" y1="330" x2="165" y2="330" style="stroke:#a0a0a0;stroke-width:1.5;" marker-end="url(#arrowhead-right)" />
@@ -887,7 +881,7 @@ export const phase3NorthWing8thFloorSvgString = `
 export const phase3NorthWing9thFloorSvgString = `
   <svg viewBox="-15 -15 600 600" xmlns="http://www.w3.org/2000/svg">
     <!-- Background -->
-    <rect width="600" height="600" x="-15" y="-15" fill="#ffffff"/>
+    <rect width="700" height="600" x="-15" y="-15" fill="#ffffff"/>
     
     <!-- Top vertical section (left column) -->
     <g data-room-number="913">
@@ -993,12 +987,6 @@ export const phase3NorthWing9thFloorSvgString = `
     <!-- Horizontal corridor between WS and rooms -->
     <text x="135" y="340" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
     
-    <!-- Bottom vertical corridor -->
-    <text x="605" y="480" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" transform="rotate(-90 605,475)">Corridor</text>
-    
-    <!-- Balcony label -->
-    <text x="520" y="370" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" transform="rotate(-90 540,300)">Balcony</text>
-
     <!-- Arrow markers definition -->
     <defs>
       <marker
