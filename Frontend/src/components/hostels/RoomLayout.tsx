@@ -1,12 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-// Define colors for consistency
-const defaultFill = '#f0f0f0';
-const filledFill = '#cccccc';
-const defaultStroke = '#555';
-const filledStroke = '#333';
+// Define colors matched with the old room layout
+const defaultFill = '#fed7aa'; // Same as bed-a/bed-b in CSS (#fed7aa)
+const availableBedFill = '#fed7aa'; // Orange bed color from old layout
+const selectedBedFill = '#bbf7d0'; // Green-200 for selected beds
+const occupiedBedFill = '#fecaca'; // Red-200 for occupied beds
+const furnitureFill = '#e5e7eb'; // Gray background for furniture
+const mirrorFill = '#e0e7ff'; // Light purple for mirror
+const entryFill = '#a16207'; // Brown color for entry
+const balconyFill = '#d1d5db'; // Gray for balcony
+const washRoomFill = '#d1d5db'; // Gray for washroom
+const tableFill = '#e5e7eb'; // Gray for study tables
+
+// Border colors
+const defaultStroke = '#fb923c'; // Same as bed-a/bed-b border in CSS (#fb923c)
+const selectedBedStroke = '#22c55e'; // Green-500 for selected bed border
+const occupiedBedStroke = '#ef4444'; // Red-500 for occupied bed border
+const furnitureStroke = '#9ca3af'; // Gray-400 border for furniture
+const mirrorStroke = '#a5b4fc'; // Purple border for mirror
+const entryStroke = '#a16207'; // Same as entry fill
+
+// Text colors
 const textFill = '#000000'; // Black text
-const hoverFill = '#e2e8f0'; // Light blue-gray for hover effect
 
 // Component for a single room item (rectangle + text)
 // Simplifies creating each element
@@ -21,7 +36,7 @@ const RoomItem = ({
   stroke, 
   label,
   onClick,
-  isBed = false
+  isSelected = false
 }: {
   x: number;
   y: number;
@@ -33,13 +48,13 @@ const RoomItem = ({
   stroke: string;
   label: string;
   onClick?: () => void;
-  isBed?: boolean;
+  isSelected?: boolean;
 }) => {
   // Calculate center coordinates for the text
   const textX = x + width / 2;
   const textY = y + height / 2;
   
-  // Add hover styles for interactive elements
+  // Add hover state for interactive elements
   const [isHovered, setIsHovered] = React.useState(false);
   
   // Only apply hover effects if onClick exists
@@ -49,8 +64,12 @@ const RoomItem = ({
   // Add cursor style if clickable
   const cursorStyle = onClick ? { cursor: 'pointer' } : {};
   
-  // Determine fill color based on hover state
-  const currentFill = (isHovered && isBed) ? hoverFill : fill;
+  // Apply transform effect on hover for beds (matches the old room layout hover)
+  const transform = (isHovered && onClick) ? 'translate(0, -2px)' : 'none';
+  const boxShadow = (isHovered && onClick) ? '0 3px 6px rgba(0, 0, 0, 0.15)' : 'none';
+  
+  // Add selected style shadow similar to the old layout
+  const selectedShadow = isSelected ? '0 0 0 3px rgba(34, 197, 94, 0.3)' : 'none';
 
   return (
     <g
@@ -67,9 +86,14 @@ const RoomItem = ({
         height={height}
         rx={rx} // Horizontal corner radius
         ry={ry} // Vertical corner radius
-        fill={currentFill}
+        fill={fill}
         stroke={stroke}
         strokeWidth="1" // Border thickness
+        style={{ 
+          transform, 
+          boxShadow: isSelected ? selectedShadow : boxShadow,
+          transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out'
+        }}
       />
       {/* The label text, centered within the rectangle */}
       <text
@@ -105,63 +129,144 @@ const RoomLayout: React.FC<RoomLayoutProps> = ({
   floor = '',
   onSelectBed
 }) => {
+  // Track selected bed
+  const [selectedBed, setSelectedBed] = useState<string | null>(null);
+
   // Keep the viewBox the same - this defines the internal coordinate system
   const viewBoxWidth = 800;
   const viewBoxHeight = 400;
 
-  // Determine fill colors based on occupancy
-  const bedAFill = bedAOccupied ? '#fecaca' : defaultFill; // Red if occupied
-  const bedAStroke = bedAOccupied ? '#dc2626' : defaultStroke; // Darker red border if occupied
+  // Determine fill colors based on occupancy and selection
+  const bedAFill = bedAOccupied ? occupiedBedFill : selectedBed === 'A' ? selectedBedFill : availableBedFill;
+  const bedAStroke = bedAOccupied ? occupiedBedStroke : selectedBed === 'A' ? selectedBedStroke : defaultStroke;
   
-  const bedBFill = bedBOccupied ? '#fecaca' : defaultFill;
-  const bedBStroke = bedBOccupied ? '#dc2626' : defaultStroke;
+  const bedBFill = bedBOccupied ? occupiedBedFill : selectedBed === 'B' ? selectedBedFill : availableBedFill;
+  const bedBStroke = bedBOccupied ? occupiedBedStroke : selectedBed === 'B' ? selectedBedStroke : defaultStroke;
   
   // Define click handlers for beds
   const handleBedAClick = () => {
-    if (!bedAOccupied && onSelectBed) {
-      onSelectBed('A');
+    if (!bedAOccupied) {
+      setSelectedBed('A');
+      if (onSelectBed) {
+        onSelectBed('A');
+      }
     }
   };
   
   const handleBedBClick = () => {
-    if (!bedBOccupied && onSelectBed) {
-      onSelectBed('B');
+    if (!bedBOccupied) {
+      setSelectedBed('B');
+      if (onSelectBed) {
+        onSelectBed('B');
+      }
     }
   };
 
   return (
-    // Reduced padding on the container
-    <div className="flex justify-center items-center p-2 bg-gray-100">
+    // Container with styling similar to old layout
+    <div style={{ 
+      width: '100%', 
+      maxWidth: '500px', 
+      margin: '0 auto', 
+      border: '2px solid #d1d5db',
+      borderRadius: '0.375rem',
+      backgroundColor: '#f9fafb', 
+      padding: '1rem',
+      boxSizing: 'border-box'
+    }}>
       {/* Room number and location display */}
       {roomNumber && (
-        <div className="absolute top-2 left-2 bg-white px-3 py-1 shadow rounded-md">
-          <h2 className="text-base font-semibold">Room {roomNumber}</h2>
+        <div style={{
+          textAlign: 'center',
+          marginBottom: '0.5rem'
+        }}>
+          <h2 style={{
+            margin: '0',
+            fontSize: '1.25rem',
+            fontWeight: 600,
+            color: '#1f2937'
+          }}>Room {roomNumber}</h2>
           {block && floor && (
-            <p className="text-xs text-gray-600">{block} - {floor}</p>
+            <p style={{
+              margin: '0',
+              fontSize: '0.875rem',
+              color: '#6b7280'
+            }}>{block} - {floor}</p>
           )}
         </div>
       )}
        
-      {/* Container div for centering and padding */}
+      {/* SVG container */}
       <svg
         width="100%" // Make SVG take full width of its container
         height="100%" // Make SVG take full height of its container
         viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`} // Define coordinate system (remains the same)
         preserveAspectRatio="xMidYMid meet" // Maintain aspect ratio and center
-        // Reduced maxWidth to make the SVG display smaller
-        style={{ maxWidth: '500px', border: '2px solid black' }} // Add border and max width
+        style={{ maxWidth: '500px' }} // Add max width
       >
-        {/* Top Row */}
-        <RoomItem x={80} y={10} width={150} height={50} fill={defaultFill} stroke={defaultStroke} label="Cupboards" />
-        <RoomItem x={300} y={10} width={60} height={40} fill={defaultFill} stroke={defaultStroke} label="Mirror" />
-        <RoomItem x={430} y={10} width={150} height={50} fill={defaultFill} stroke={defaultStroke} label="Cupboards" />
-        <RoomItem x={viewBoxWidth - 10 - 60} y={10} width={60} height={70} fill={filledFill} stroke={filledStroke} label="Entry" />
+        {/* Top Row - Furniture/Cupboards */}
+        <RoomItem 
+          x={80} 
+          y={10} 
+          width={150} 
+          height={50} 
+          fill={furnitureFill} 
+          stroke={furnitureStroke} 
+          label="Cupboards" 
+        />
+        <RoomItem 
+          x={300} 
+          y={10} 
+          width={60} 
+          height={40} 
+          fill={mirrorFill} 
+          stroke={mirrorStroke} 
+          label="Mirror" 
+        />
+        <RoomItem 
+          x={430} 
+          y={10} 
+          width={150} 
+          height={50} 
+          fill={furnitureFill} 
+          stroke={furnitureStroke} 
+          label="Cupboards" 
+        />
+        <RoomItem 
+          x={viewBoxWidth - 10 - 60} 
+          y={10} 
+          width={60} 
+          height={70} 
+          fill={entryFill} 
+          stroke={entryStroke} 
+          label="Entry" 
+        />
 
-        {/* Left Side */}
-        <RoomItem x={10} y={150} width={50} height={120} fill={filledFill} stroke={filledStroke} label="Balcony" />
-        <RoomItem x={60} y={viewBoxHeight - 10 - 50} width={100} height={50} rx={10} ry={10} fill={defaultFill} stroke={defaultStroke} label="Study Table" />
+        {/* Left Side - Balcony */}
+        <RoomItem 
+          x={10} 
+          y={150} 
+          width={50} 
+          height={120} 
+          fill={balconyFill} 
+          stroke={furnitureStroke} 
+          label="Balcony" 
+        />
+        
+        {/* Study Tables */}
+        <RoomItem 
+          x={60} 
+          y={viewBoxHeight - 10 - 50} 
+          width={100} 
+          height={50} 
+          rx={10} 
+          ry={10} 
+          fill={tableFill} 
+          stroke={furnitureStroke} 
+          label="Study Table" 
+        />
 
-        {/* Center Area */}
+        {/* Center Area - Bed B */}
         <RoomItem 
           x={160} 
           y={200} 
@@ -172,15 +277,35 @@ const RoomLayout: React.FC<RoomLayoutProps> = ({
           fill={bedBFill} 
           stroke={bedBStroke} 
           label="Bed B" 
-          onClick={handleBedBClick}
-          isBed={true}
+          onClick={!bedBOccupied ? handleBedBClick : undefined}
+          isSelected={selectedBed === 'B'}
         />
         
         {/* Central Wall - No label needed */}
-        <rect x={320} y={120} width={40} height={250} fill={filledFill} stroke={filledStroke} strokeWidth="1" />
-        <RoomItem x={380} y={viewBoxHeight - 10 - 50} width={100} height={50} rx={10} ry={10} fill={defaultFill} stroke={defaultStroke} label="Study Table" />
+        <rect 
+          x={320} 
+          y={120} 
+          width={40} 
+          height={250} 
+          fill={furnitureFill} 
+          stroke={furnitureStroke} 
+          strokeWidth="1" 
+        />
+        
+        {/* Right side table */}
+        <RoomItem 
+          x={380} 
+          y={viewBoxHeight - 10 - 50} 
+          width={100} 
+          height={50} 
+          rx={10} 
+          ry={10} 
+          fill={tableFill} 
+          stroke={furnitureStroke} 
+          label="Study Table" 
+        />
 
-        {/* Right Side */}
+        {/* Right Side - Bed A */}
         <RoomItem 
           x={viewBoxWidth - 230 - 90} 
           y={200} 
@@ -191,8 +316,8 @@ const RoomLayout: React.FC<RoomLayoutProps> = ({
           fill={bedAFill} 
           stroke={bedAStroke} 
           label="Bed A" 
-          onClick={handleBedAClick}
-          isBed={true}
+          onClick={!bedAOccupied ? handleBedAClick : undefined}
+          isSelected={selectedBed === 'A'}
         />
         
         {/* Washroom */}
@@ -204,8 +329,8 @@ const RoomLayout: React.FC<RoomLayoutProps> = ({
             height={250}
             rx={15}
             ry={15}
-            fill={filledFill}
-            stroke={filledStroke}
+            fill={washRoomFill}
+            stroke={furnitureStroke}
             strokeWidth="1"
           />
           <text
@@ -223,11 +348,14 @@ const RoomLayout: React.FC<RoomLayoutProps> = ({
 
         {/* Legend for bed status */}
         <g transform="translate(20, 20)">
-          <rect x={0} y={0} width={15} height={15} fill={defaultFill} stroke={defaultStroke} />
+          <rect x={0} y={0} width={15} height={15} fill={availableBedFill} stroke={defaultStroke} />
           <text x={25} y={12} fontSize={10}>Available</text>
           
-          <rect x={0} y={25} width={15} height={15} fill="#fecaca" stroke="#dc2626" />
+          <rect x={0} y={25} width={15} height={15} fill={occupiedBedFill} stroke={occupiedBedStroke} />
           <text x={25} y={37} fontSize={10}>Occupied</text>
+          
+          <rect x={0} y={50} width={15} height={15} fill={selectedBedFill} stroke={selectedBedStroke} />
+          <text x={25} y={62} fontSize={10}>Selected</text>
         </g>
       </svg>
     </div>
