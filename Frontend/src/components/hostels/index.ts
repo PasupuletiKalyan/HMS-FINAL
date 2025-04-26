@@ -59,6 +59,32 @@ import Phase4BUpperFloorPlan, {
   phase4B10thFloorSvgString
 } from './Phase4BUpperFloors';
 
+// Import RoomLayout component
+import RoomLayout from './RoomLayout';
+
+// Import the new blocks components
+import NewBlocksFloorPlan, {
+  AravaliFloorPlan,
+  AjantaFloorPlan,
+  HimalayaFloorPlan,
+  ShivalikFloorPlan,
+  VindyaFloorPlan,
+  NilgiriFloorPlan,
+  SatpuraFloorPlan,
+  KailashFloorPlan,
+  aravaliConfig,
+  ajantaConfig,
+  himalayaConfig,
+  shivalikConfig,
+  vindyaConfig,
+  nilgiriConfig,
+  satpuraConfig,
+  kailashConfig,
+  newBlocksGroundFloorSvgString,
+  newBlocksFirstFloorSvgString,
+  newBlocksSecondFloorSvgString
+} from './NewBlocks';
+
 // Combined Phase 4B configuration for backward compatibility
 const phase4BConfig = {
   ...phase4BLowerConfig,
@@ -170,5 +196,48 @@ export {
   phase4B7thFloorSvgString,
   phase4B8thFloorSvgString,
   phase4B9thFloorSvgString,
-  phase4B10thFloorSvgString
+  phase4B10thFloorSvgString,
+
+  // New Hostel Blocks
+  NewBlocksFloorPlan,
+  
+  // Aravali Block
+  AravaliFloorPlan,
+  aravaliConfig,
+  
+  // Ajanta Block
+  AjantaFloorPlan,
+  ajantaConfig,
+  
+  // Himalaya Block
+  HimalayaFloorPlan,
+  himalayaConfig,
+  
+  // Shivalik Block
+  ShivalikFloorPlan,
+  shivalikConfig,
+  
+  // Vindya Block
+  VindyaFloorPlan,
+  vindyaConfig,
+  
+  // Nilgiri Block
+  NilgiriFloorPlan,
+  nilgiriConfig,
+  
+  // Satpura Block
+  SatpuraFloorPlan,
+  satpuraConfig,
+  
+  // Kailash Block
+  KailashFloorPlan,
+  kailashConfig,
+  
+  // New Blocks SVG Strings
+  newBlocksGroundFloorSvgString,
+  newBlocksFirstFloorSvgString,
+  newBlocksSecondFloorSvgString,
+  
+  // Room Layout Component
+  RoomLayout
 };
