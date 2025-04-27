@@ -1,10 +1,11 @@
 import React from 'react';
 import { FloorConfig, FloorPlanProps } from './types';
+import { SiS7Airlines } from 'react-icons/si';
 
 // Phase 2 configuration
 export const phase2Config: Record<string, FloorConfig> = {
   "Ground Floor": { start: 1, end: 52, exceptions: [] },
-  "1st Floor": { start: 101, end: 140, exceptions: [] },
+  "1st Floor": { start: 101, end: 153, exceptions: [] },
   "2nd Floor": { start: 201, end: 240, exceptions: [] },
   "3rd Floor": { start: 301, end: 340, exceptions: [] },
   "4th Floor": { start: 401, end: 440, exceptions: [] },
@@ -28,6 +29,279 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
   
   const floorInfo = phase2Config[floor];
   if (!floorInfo) return <p>Floor data not available</p>;
+  
+  // 1st Floor specific SVG layout
+  const renderFirstFloorLayout = () => {
+    // Room dimensions and spacing
+    const roomW = 40; // Room width
+    const roomH = 40; // Room height
+    const vGap = 5;   // Vertical gap
+    const hGap = 0;   // Horizontal gap
+    
+    // Helper function for vertical positioning
+    const getY = (baseY: number, rowNum: number): number => baseY - (rowNum * (roomH + vGap));
+
+    // Calculate derived positions
+    const topRowY = getY(600, 19); // Align with top of 117/118
+    const bottomRowY = getY(600, 18); // Align with top of 116
+    const wsTopLEndX = 10 + 6*(roomW + hGap) + roomW * 1.5 + hGap; // End X of first top WS
+    const liftsTopMEndX = wsTopLEndX + hGap + roomW + hGap + roomW; // End X of first top Lifts
+    const startBottomRightX = liftsTopMEndX + hGap; // Start X for second horizontal group
+    const g150EndX = startBottomRightX + 3*(roomW + hGap) + roomW; // End X of room 150
+    const wsTopREndX = g150EndX + hGap * 3 + roomW * 1.5 + hGap; // End X of second top WS
+    const g149StartX = wsTopREndX + hGap + 2*(roomW + hGap) + hGap; // Calculate 149 start X
+
+    const elements = [
+      // --- Bottom Vertical Section (Left) ---
+      // Column 1 (x=10)
+      { id: '101', x: 10, y: getY(600, 0), width: roomW, height: roomH, type: 'room' },
+      { id: '102', x: 10, y: getY(600, 1), width: roomW, height: roomH, type: 'room' },
+      { id: '103', x: 10, y: getY(600, 2), width: roomW, height: roomH, type: 'room' },
+      { id: 'WS_Btm_L', x: 105, y: getY(600, 2) - 5, width: roomW, height: 90, type: 'common', label: 'WS' },
+      { id: 'Stairs_Btm_L', x: 105, y: getY(600, 3) - 5, width: roomW, height: 40, type: 'common', label: 'Stairs' },
+      { id: '104', x: 10, y: getY(600, 3), width: roomW, height: roomH, type: 'room' },
+      { id: '105', x: 10, y: getY(600, 4), width: roomW, height: roomH, type: 'room' },
+      { id: 'Lifts_Btm_L', x: 105, y: getY(600, 5) - 5, width: roomW, height: 60, type: 'common', label: 'Lifts' },
+      { id: '106', x: 10, y: getY(600, 5), width: roomW, height: roomH, type: 'room' },
+      { id: '107', x: 10, y: getY(600, 6), width: roomW, height: roomH, type: 'room' },
+
+      // Column 2 (x=50) - Bottom part aligns with Column 1
+      { id: '108', x: 60 + roomW + hGap, y: getY(600, 0), width: roomW, height: roomH, type: 'room' },
+      // Middle part aligns with mid-section of Column 1
+      { id: '109', x: -30 + roomW + hGap, y: getY(600, 8), width: roomW, height: roomH, type: 'room' },
+      { id: '110', x: -30 + roomW + hGap, y: getY(600, 9), width: roomW, height: roomH, type: 'room' },
+      { id: '111', x: -30 + roomW + hGap, y: getY(600, 10), width: roomW, height: roomH, type: 'room' },
+      { id: '112', x:-30 + roomW + hGap, y: getY(600, 11), width: roomW, height: roomH, type: 'room' },
+      { id: 'WS_Mid_L', x: 50 + roomW + hGap, y: getY(600, 13) - 5, width: roomW, height: 90, type: 'common', label: 'WS' },
+      { id: '113', x: -30 + roomW + hGap, y: getY(600, 12), width: roomW, height: roomH, type: 'room' },
+      { id: '114', x: -30 + roomW + hGap, y: getY(600, 13), width: roomW, height: roomH, type: 'room' },
+      { id: '115', x: -30 + roomW + hGap, y: getY(600, 14), width: roomW, height: roomH, type: 'room' },
+      { id: '116', x: -30 + roomW + hGap, y: getY(600, 15), width: roomW, height: roomH, type: 'room' }, // Aligns with bottomRowY
+
+      // Column 3 (x=90)
+      { id: '122', x: 10 + 2*(roomW + hGap), y: getY(600, 8), width: roomW, height: roomH, type: 'room' },
+      { id: '121', x: 10 + 2*(roomW + hGap), y: getY(600, 9), width: roomW, height: roomH, type: 'room' },
+      { id: '120', x: 10 + 2*(roomW + hGap), y: getY(600, 10), width: roomW, height: roomH, type: 'room' },
+      { id: '119', x: 10 + 2*(roomW + hGap), y: getY(600, 11), width: roomW, height: roomH, type: 'room' },
+
+
+      // --- Top Horizontal Section ---
+      // Bottom Row Left Part (aligned with Col 3)
+      { id: 'Stairs_Top_L', x: 10 + 2*(roomW + hGap), y:getY(600,15)-5, width: roomW, height: roomH, type: 'common', label: 'Stairs' },
+      { id: '135', x: 20 + 3*(roomW + hGap), y: getY(650,17)-5, width: roomW, height: roomH, type: 'room' },
+      { id: '134', x: 30 + 4*(roomW + hGap), y: getY(650,17)-5,bottomRowY, width: roomW, height: roomH, type: 'room' },
+      { id: '133', x: 40 + 5*(roomW + hGap), y: getY(650,17)-5, width: roomW, height: roomH, type: 'room' },
+      { id: 'WS_Top_L', x: 50 + 6*(roomW + hGap), y: getY(650,17)-5, width: 130, height: roomH, type: 'common', label: 'WS' }, // Wider WS
+      { id: 'Stairs_Top_M', x:240 + 5*(roomW + hGap), y: getY(650,17)-5, width: roomW, height: roomH, type: 'common', label: 'Stairs' },
+      { id: 'Lifts_Top_M', x: 300 + 5*(roomW + hGap) , y: getY(650,17)-5, width: 90, height: roomH, type: 'common', label: 'Lifts' },
+
+      // Top Row Left Part (aligned with bottom row where possible)
+      { id: '117', x: 10, y: getY(650,18)-5, width: roomW, height: roomH, type: 'room' },
+      { id: '118', x: 50 + roomW + hGap, y:getY(650,19)-5, width: roomW, height: roomH, type: 'room' },
+      { id: '123', x: 20 + 3*(roomW + hGap), y:getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 123 above 135
+      { id: '124', x: 30 + 4*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 124 above 134
+      { id: '125', x: 40 + 5*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 125 above 133
+      { id: '126', x: 50 + 6*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 126 above start of WS
+      { id: '127', x: 60 + 7*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' },
+      { id: '128', x: 70 + 8*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 128 above Stairs_M
+      { id: '129', x: 80 + 9*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 129 above Lifts_M
+      { id: '130', x: 90 + 10*(roomW + hGap), y:getY(650,19)-5, width: roomW, height: roomH, type: 'room' },
+      { id: '131', x: 100 + 11*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' },
+      { id: '132', x: 110 + 12*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' },
+
+
+      // Bottom Row Right Part
+      { id: '153', x: 440 + 5*(roomW + hGap), y: getY(650,17)-5, width: roomW, height: roomH, type: 'room' },
+      { id: '152', x: 490 + 5*(roomW + hGap), y: getY(650,17)-5, width: roomW, height: roomH, type: 'room' },
+      { id: '151', x: 540 + 5*(roomW + hGap), y: getY(650,17)-5, width: roomW, height: roomH, type: 'room' },
+      { id: '150', x: 600 + 5*(roomW + hGap), y: getY(650,17)-5, width: roomW, height: roomH, type: 'room' },
+      { id: 'WS_Top_R', x: 720 + 5*(roomW + hGap), y: getY(650,17)-5, width:110, height: roomH, type: 'common', label: 'WS' }, // Wider WS, larger gap
+      { id: 'Stairs_Top_R', x: 850 + 5*(roomW + hGap), y:getY(650,17)-5, width: roomW, height: roomH, type: 'common', label: 'Stairs' },
+      { id: 'Lifts_Top_R',x: 910 + 5*(roomW + hGap), y: getY(650,17)-5, width: 60, height: roomH, type: 'common', label: 'Lifts' },
+      { id: '149', x: 1060 + 5*(roomW + hGap), y: getY(650,17)-5, width: roomW, height: roomH, type: 'room' }, // Use calculated start X
+
+      // Top Row Right Part (aligned with bottom row where possible)
+      { id: '136', x: 160 + 12*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 136 above 153
+      { id: '137', x: 170 + 12*(roomW + hGap) + (roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 137 above 152
+      { id: '138', x:180 + 12*(roomW + hGap) + 2*(roomW + hGap), y:getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 138 above 151
+      { id: '139', x: 190 + 12*(roomW + hGap) + 3*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 139 above 150
+      { id: '140', x: 200 + 12*(roomW + hGap) + 4*(roomW + hGap) + hGap*2, y:getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Align 140 above start of WS_R gap
+      { id: '141', x: 210 + 12*(roomW + hGap)+ 5*(roomW + hGap) + hGap*2, y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' },
+      { id: '142', x: 460 + 12*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Align 142 above Stairs_R
+      { id: '143', x: 510 + 12*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Align 143 above Lifts_R
+      { id: '144', x:560 + 12*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Position relative to 149 start
+      { id: '145', x: 610 + 12*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Align 145 above 149
+      { id: '146', x: 660 + 12*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' },
+      { id: '147', x: 710 + 12*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' },
+      { id: '148', x: 770 + 12*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' },
+
+      // Labels (Adjusted positions)
+      { id: 'Corridor_Btm_V', x: 30 + roomW + hGap/2, y: 400, label: 'Corridor', type: 'label', rotation: -90 }, // Centered in gap
+      { id: 'Corridor_Mid_V', x: 0 + 2*(roomW + hGap) - hGap/2, y: 40, label: 'Corridor', type: 'label', rotation: -90 }, // Centered in gap
+      { id: 'Corridor_Top_L', x: (10 + 2*(roomW + hGap) + liftsTopMEndX)/2, y:-140, label: 'Corridor', type: 'label', rotation: 0 }, // Centered horizontally
+      { id: 'Corridor_Top_R', x: (liftsTopMEndX + hGap + g149StartX + roomW) / 2 , y: -140, label: 'Corridor', type: 'label', rotation: 0 }, // Centered horizontally
+    ];
+SiS7Airlines
+    // Calculate viewBox dimensions
+    const padding = 15;
+    const shapeElements = elements.filter(e => e.x !== undefined);
+    const minX = Math.min(...shapeElements.map(e => e.x)) - padding;
+    const minY = Math.min(...shapeElements.map(e => e.y ?? Infinity)) - padding;
+    const maxX = Math.max(...shapeElements.map(e => (e.x || 0) + (e.width || 0))) + padding;
+    const maxY = Math.max(...shapeElements.map(e => (e.y || 0) + (e.height || 0))) + padding;
+    
+    // Adjust bounds for rotated labels manually if needed
+    const finalMaxX = maxX + 110; // Extra space for rotated label width
+    const finalMaxY = maxY + 10; // Extra space for rotated label height
+    
+    const svgWidth = finalMaxX - minX; // Intrinsic width based on content
+    const svgHeight = finalMaxY - minY; // Intrinsic height based on content
+    
+    // Style definitions
+    const styles = {
+      room: {
+        fill: 'white',
+        stroke: 'black',
+        strokeWidth: 0.5,
+      },
+      common: {
+        fill: '#d3d3d3', // Light gray
+        stroke: 'black',
+        strokeWidth: 0.5,
+      },
+      text: {
+        fontSize: '9px',
+        fontFamily: 'sans-serif',
+        textAnchor: 'middle' as const,
+        dominantBaseline: 'middle' as const,
+        pointerEvents: 'none' as const,
+      },
+      labelText: {
+        fontSize: '10px',
+        fontFamily: 'sans-serif',
+        textAnchor: 'middle' as const,
+        dominantBaseline: 'middle' as const,
+      },
+    };
+
+    // Render all elements
+    return (
+      <div style={{ 
+        width: '100%',
+        height: '95vh',
+        overflow: 'auto',
+        border: '1px solid #eee',
+        padding: '10px',
+        boxSizing: 'border-box'
+      }}>
+        <svg 
+          width={svgWidth} 
+          height={svgHeight} 
+          viewBox={`${minX} ${minY} ${svgWidth} ${svgHeight}`}
+          style={{ border: '1px solid #ccc', display: 'block' }}
+        >
+          {elements.map((el) => {
+            if (el.type === 'label') {
+              // Render text labels
+              const label = el.label || el.id;
+              const lines = label.split('\n'); // Handle multi-line labels
+
+              return (
+                <g key={el.id} transform={`rotate(${el.rotation || 0} ${el.x} ${el.y})`}>
+                  {lines.map((line, index) => (
+                    <text
+                      key={`${el.id}-line-${index}`}
+                      x={el.x}
+                      y={el.y + (index - (lines.length - 1) / 2) * 12}
+                      style={styles.labelText}
+                      textAnchor="middle"
+                    >
+                      {line}
+                    </text>
+                  ))}
+                </g>
+              );
+            } else if (el.type === 'room' || el.type === 'common') {
+              // Determine if this element is a room that should be clickable and color-coded
+              const isClickableRoom = el.type === 'room';
+              const roomId = el.id; // Use room ID directly for 1st floor (already has numbers like 101)
+              
+              // Get room status if it's a clickable room
+              let fillColor = isClickableRoom ? '#bbf7d0' : '#d3d3d3'; // Default: green for available rooms, gray for common areas
+              let occupancyText = 'Available';
+              
+              if (isClickableRoom) {
+                const roomNumber = roomId;
+                const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
+                const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
+                
+                const isOccupiedA = occupiedBeds[bedAKey] || false;
+                const isOccupiedB = occupiedBeds[bedBKey] || false;
+                
+                if (isOccupiedA && isOccupiedB) {
+                  fillColor = '#fecaca'; // Red for fully occupied
+                  occupancyText = 'Fully Occupied';
+                } else if (isOccupiedA || isOccupiedB) {
+                  fillColor = '#fef08a'; // Yellow for partially occupied
+                  occupancyText = 'Partially Occupied';
+                }
+              }
+              
+              // Render rectangles for rooms and common areas
+              const style = isClickableRoom ? 
+                { ...styles.room, fill: fillColor } : 
+                styles.common;
+              
+              // Use custom label if provided, else use id
+              const label = el.label || (isClickableRoom ? el.id : el.id);
+              const textX = el.x + (el.width || 0) / 2;
+              const textY = el.y + (el.height || 0) / 2;
+              const lines = label.split('\n'); // Handle multi-line labels if any
+              
+              // Determine font size based on number of lines for common areas
+              let specificTextStyle = styles.text;
+              if (el.type === 'common' && lines.length > 1) {
+                specificTextStyle = { 
+                  ...styles.text, 
+                  fontSize: '8px' 
+                }; // Adjusted size for multi-line common
+              }
+              
+              // For clickable room elements
+              const handleClick = isClickableRoom ? () => onRoomClick(roomId) : undefined;
+              
+              return (
+                <g key={el.id}>
+                  <rect
+                    x={el.x}
+                    y={el.y}
+                    width={el.width}
+                    height={el.height}
+                    style={style}
+                    cursor={isClickableRoom ? 'pointer' : 'default'}
+                    onClick={handleClick}
+                    data-title={isClickableRoom ? occupancyText : label}
+                  />
+                  {lines.map((line, index) => (
+                    <text
+                      key={`${el.id}-line-${index}`}
+                      x={textX}
+                      y={textY + (index - (lines.length - 1) / 2) * (parseInt(specificTextStyle.fontSize) + 2)}
+                      style={specificTextStyle}
+                      pointerEvents="none"
+                    >
+                      {line}
+                    </text>
+                  ))}
+                </g>
+              );
+            }
+            return null;
+          })}
+        </svg>
+      </div>
+    );
+  };
   
   // Ground Floor specific SVG layout
   const renderGroundFloorLayout = () => {
@@ -286,7 +560,7 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
     );
   };
   
-  // Generate grid layout for Phase 2 (for non-ground floors)
+  // Generate grid layout for Phase 2 (for floors other than Ground and 1st)
   const renderPhase2Layout = () => {
     const rooms = [];
     const { start, end, exceptions } = floorInfo;
@@ -380,7 +654,12 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
         Phase 2 - {floor}
       </div>
       
-      {floor === "Ground Floor" ? renderGroundFloorLayout() : renderPhase2Layout()}
+      {floor === "Ground Floor" 
+        ? renderGroundFloorLayout() 
+        : floor === "1st Floor" 
+          ? renderFirstFloorLayout() 
+          : renderPhase2Layout()
+      }
       
       {/* Legend */}
       <div style={{ position: 'absolute', bottom: '10px', right: '10px', display: 'flex', gap: '10px' }}>
