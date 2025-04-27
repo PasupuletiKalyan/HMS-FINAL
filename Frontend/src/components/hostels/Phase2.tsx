@@ -141,7 +141,7 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
       { id: 'Corridor_Top_L', x: (10 + 2*(roomW + hGap) + liftsTopMEndX)/2, y:-140, label: 'Corridor', type: 'label', rotation: 0 }, // Centered horizontally
       { id: 'Corridor_Top_R', x: (liftsTopMEndX + hGap + g149StartX + roomW) / 2 , y: -140, label: 'Corridor', type: 'label', rotation: 0 }, // Centered horizontally
     ];
-SiS7Airlines
+
     // Calculate viewBox dimensions
     const padding = 15;
     const shapeElements = elements.filter(e => e.x !== undefined);
@@ -542,7 +542,6 @@ SiS7Airlines
                     <text
                       key={`${el.id}-line-${index}`}
                       x={textX}
-                      // Adjust Y based on number of lines and font size
                       y={textY + (index - (lines.length - 1) / 2) * (parseInt(specificTextStyle.fontSize) + 2)} // Adjust line spacing
                       style={specificTextStyle}
                       pointerEvents="none"
