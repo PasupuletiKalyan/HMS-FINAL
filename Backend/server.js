@@ -3,22 +3,24 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const User = require("./models/User");
 const studentFormRoutes = require("./routes/studentFormRoutes");
-// Import the new hostel routes
-const hostelRoutes = require("./routes/hostelRoutes");
-// Import warden routes
-const wardenRoutes = require("./routes/wardenRoutes");
+// Load environment variables
+require('dotenv').config();
 
 const app = express();
 app.use(express.json());
+
+// Enable CORS
 app.use(cors());
 
-mongoose
-  .connect("mongodb://localhost:27017/hostelDB", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB Connected Successfully"))
-  .catch((err) => console.error("❌ MongoDB Connection Failed:", err));
+// Use environment variables for the connection string
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://OmSaiVikranth:HMS_SE_CodeMonkeys@cluster0.zvkzt5n.mongodb.net/hostelDB?retryWrites=true&w=majority&appName=Cluster0";
+
+mongoose.connect(MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("MongoDB Connected Successfully"))
+.catch((err) => console.error("❌ MongoDB Connection Failed:", err));
 
 // Login Route
 app.post("/api/login", async (req, res) => {
@@ -49,12 +51,6 @@ app.post("/api/login", async (req, res) => {
 
 // Form Routes
 app.use("/api/form", studentFormRoutes);
-
-// Mount the hostel routes under /api/hostels
-app.use("/api/hostels", hostelRoutes);
-
-// Mount the warden routes under /api/wardens
-app.use("/api/wardens", wardenRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => {
