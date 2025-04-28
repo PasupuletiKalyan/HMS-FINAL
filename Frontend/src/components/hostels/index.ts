@@ -35,6 +35,13 @@ import Phase4AFloorPlan, {
   phase4AGroundFloorSvgString 
 } from './Phase4A';
 
+// Import the new Phase4AUpperFloors component
+import Phase4AUpperFloorPlan, {
+  phase4AUpperConfig,
+  phase4A9thFloorSvgString,
+  phase4A10thFloorSvgString
+} from './Phase4AUpperFloors';
+
 // Import the new split components
 import Phase4BLowerFloorPlan, { 
   phase4BLowerConfig,
@@ -52,6 +59,32 @@ import Phase4BUpperFloorPlan, {
   phase4B10thFloorSvgString
 } from './Phase4BUpperFloors';
 
+// Import RoomLayout component
+import RoomLayout from './RoomLayout';
+
+// Import the new blocks components
+import NewBlocksFloorPlan, {
+  AravaliFloorPlan,
+  AjantaFloorPlan,
+  HimalayaFloorPlan,
+  ShivalikFloorPlan,
+  VindyaFloorPlan,
+  NilgiriFloorPlan,
+  SatpuraFloorPlan,
+  KailashFloorPlan,
+  aravaliConfig,
+  ajantaConfig,
+  himalayaConfig,
+  shivalikConfig,
+  vindyaConfig,
+  nilgiriConfig,
+  satpuraConfig,
+  kailashConfig,
+  newBlocksGroundFloorSvgString,
+  newBlocksFirstFloorSvgString,
+  newBlocksSecondFloorSvgString
+} from './NewBlocks';
+
 // Combined Phase 4B configuration for backward compatibility
 const phase4BConfig = {
   ...phase4BLowerConfig,
@@ -59,7 +92,6 @@ const phase4BConfig = {
 };
 
 // Create a combined Phase4BFloorPlan component
-import React from 'react';
 import { FloorPlanProps } from './types';
 
 // This component will serve as a factory function to choose the right component
@@ -74,6 +106,22 @@ const Phase4BFloorPlan = {
       return { type: Phase4BUpperFloorPlan, props };
     } else {
       return { type: Phase4BLowerFloorPlan, props };
+    }
+  }
+};
+
+// Create a combined Phase4AFloorPlan component wrapper to handle upper floors
+const Phase4ACombinedFloorPlan = {
+  // Create a wrapper that handles the logic of which component to use
+  component: (props: FloorPlanProps) => {
+    // Check if the floor is in the upper floors config
+    const isUpperFloor = Object.keys(phase4AUpperConfig).includes(props.floor);
+    
+    // Return the appropriate component
+    if (isUpperFloor) {
+      return { type: Phase4AUpperFloorPlan, props };
+    } else {
+      return { type: Phase4AFloorPlan, props };
     }
   }
 };
@@ -116,6 +164,15 @@ export {
   Phase4AFloorPlan,
   phase4AConfig,
   phase4AGroundFloorSvgString,
+
+  // Phase 4A Upper Floors
+  Phase4AUpperFloorPlan,
+  phase4AUpperConfig,
+  phase4A9thFloorSvgString,
+  phase4A10thFloorSvgString,
+
+  // Phase 4A Combined Component
+  Phase4ACombinedFloorPlan,
   
   // Phase 4B Component (combined)
   Phase4BFloorPlan,
@@ -139,5 +196,48 @@ export {
   phase4B7thFloorSvgString,
   phase4B8thFloorSvgString,
   phase4B9thFloorSvgString,
-  phase4B10thFloorSvgString
+  phase4B10thFloorSvgString,
+
+  // New Hostel Blocks
+  NewBlocksFloorPlan,
+  
+  // Aravali Block
+  AravaliFloorPlan,
+  aravaliConfig,
+  
+  // Ajanta Block
+  AjantaFloorPlan,
+  ajantaConfig,
+  
+  // Himalaya Block
+  HimalayaFloorPlan,
+  himalayaConfig,
+  
+  // Shivalik Block
+  ShivalikFloorPlan,
+  shivalikConfig,
+  
+  // Vindya Block
+  VindyaFloorPlan,
+  vindyaConfig,
+  
+  // Nilgiri Block
+  NilgiriFloorPlan,
+  nilgiriConfig,
+  
+  // Satpura Block
+  SatpuraFloorPlan,
+  satpuraConfig,
+  
+  // Kailash Block
+  KailashFloorPlan,
+  kailashConfig,
+  
+  // New Blocks SVG Strings
+  newBlocksGroundFloorSvgString,
+  newBlocksFirstFloorSvgString,
+  newBlocksSecondFloorSvgString,
+  
+  // Room Layout Component
+  RoomLayout
 };

@@ -4,7 +4,7 @@ import '../../styles/Navbar.css';
 
 interface NavbarProps {
   activePage: string;
-  userType: 'student' | 'warden' | 'admin';
+  userType: string;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ activePage, userType }) => {
@@ -13,6 +13,8 @@ const Navbar: React.FC<NavbarProps> = ({ activePage, userType }) => {
   const handleLogout = () => {
     // Clear any stored user data
     localStorage.removeItem('userName');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userId');
     localStorage.removeItem('userToken');
     // Redirect to login page
     window.location.href = '/login';

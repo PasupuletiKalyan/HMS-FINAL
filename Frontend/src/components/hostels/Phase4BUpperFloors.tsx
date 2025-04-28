@@ -12,16 +12,7 @@ export const phase4BUpperConfig: Record<string, FloorConfig> = {
 
 export const phase4B6thFloorSvgString = `
   <!-- SVG content for 6th floor -->
-      <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">
-      <!-- Background with grid -->
-      <defs>
-        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ccc" stroke-width="0.5"/>
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#grid)" />
-      <rect width="798" height="698" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
-      
+      <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">      
       <!-- Title -->
       <rect x="230" y="400" width="200" height="60" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="2"/>
       <text x="260" y="435" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase-4B 6th Floor</text>
@@ -187,14 +178,6 @@ export const phase4B6thFloorSvgString = `
 export const phase4B7thFloorSvgString = `
   <!-- SVG content for 7th floor -->
       <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">
-      <!-- Background with grid -->
-      <defs>
-        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ccc" stroke-width="0.5"/>
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#grid)" />
-      <rect width="798" height="698" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
       
       <!-- Title -->
       <rect x="230" y="400" width="200" height="60" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="2"/>
@@ -351,15 +334,6 @@ export const phase4B7thFloorSvgString = `
 export const phase4B8thFloorSvgString = `
   <!-- SVG content for 8th floor -->
       <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">
-      <!-- Background with grid -->
-      <defs>
-        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ccc" stroke-width="0.5"/>
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#grid)" />
-      <rect width="798" height="698" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
-      
       <!-- Title -->
       <rect x="230" y="400" width="200" height="60" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="2"/>
       <text x="260" y="435" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase-4B 8th Floor</text>
@@ -524,16 +498,7 @@ export const phase4B8thFloorSvgString = `
 
 export const phase4B9thFloorSvgString = `
   <!-- SVG content for 9th floor -->
-      <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">
-      <!-- Background with grid -->
-      <defs>
-        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ccc" stroke-width="0.5"/>
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#grid)" />
-      <rect width="798" height="698" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
-      
+      <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">      
       <!-- Title -->
       <rect x="230" y="400" width="200" height="60" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="2"/>
       <text x="270" y="435" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase-4B 9th Floor</text>
@@ -698,16 +663,7 @@ export const phase4B9thFloorSvgString = `
 
 export const phase4B10thFloorSvgString = `
   <!-- SVG content for 10th floor -->
-      <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">
-      <!-- Background with grid -->
-      <defs>
-        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ccc" stroke-width="0.5"/>
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#grid)" />
-      <rect width="798" height="698" x="1" y="1" fill="none" stroke="#e2e8f0" strokeWidth="2"/>
-      
+      <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">      
       <!-- Title -->
       <rect x="230" y="400" width="200" height="60" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="2"/>
       <text x="260" y="435" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase-4B 10th Floor</text>

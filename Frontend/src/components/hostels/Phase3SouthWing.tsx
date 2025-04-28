@@ -1,18 +1,38 @@
 import React from 'react';
 import { FloorConfig, FloorPlanProps } from './types';
+import { phase3SouthWingConfig as lowerFloorsConfig, 
+  phase3SouthWingGroundFloorSvgString,
+  phase3SouthWing1stFloorSvgString,
+  phase3SouthWing2ndFloorSvgString,
+  phase3SouthWing3rdFloorSvgString,
+  phase3SouthWing4thFloorSvgString 
+} from './Phase3SouthWingLowerFloors';
+import { phase3SouthWingConfig as upperFloorsConfig,
+  phase3SouthWing5thFloorSvgString,
+  phase3SouthWing6thFloorSvgString,
+  phase3SouthWing7thFloorSvgString,
+  phase3SouthWing8thFloorSvgString,
+  phase3SouthWing9thFloorSvgString 
+} from './Phase3SouthWingUpperFloors';
 
-// Phase 3 South Wing configuration
+// Combined Phase 3 South Wing configuration
 export const phase3SouthWingConfig: Record<string, FloorConfig> = {
-  "Ground Floor": { start: 1, end: 35, exceptions: [] },
-  "1st Floor": { start: 101, end: 135, exceptions: [] },
-  "2nd Floor": { start: 201, end: 235, exceptions: [] },
-  "3rd Floor": { start: 301, end: 335, exceptions: [] },
-  "4th Floor": { start: 401, end: 435, exceptions: [] },
-  "5th Floor": { start: 501, end: 535, exceptions: [] },
-  "6th Floor": { start: 601, end: 635, exceptions: [] },
-  "7th Floor": { start: 701, end: 735, exceptions: [] },
-  "8th Floor": { start: 801, end: 835, exceptions: [] },
-  "9th Floor": { start: 901, end: 935, exceptions: [] }
+  ...lowerFloorsConfig,
+  ...upperFloorsConfig
+};
+
+// Export all SVG strings
+export {
+  phase3SouthWingGroundFloorSvgString,
+  phase3SouthWing1stFloorSvgString,
+  phase3SouthWing2ndFloorSvgString,
+  phase3SouthWing3rdFloorSvgString,
+  phase3SouthWing4thFloorSvgString,
+  phase3SouthWing5thFloorSvgString,
+  phase3SouthWing6thFloorSvgString,
+  phase3SouthWing7thFloorSvgString,
+  phase3SouthWing8thFloorSvgString,
+  phase3SouthWing9thFloorSvgString
 };
 
 // Create a simple list view for Phase 3 South Wing floors
@@ -28,6 +48,98 @@ const Phase3SouthWingFloorPlan: React.FC<FloorPlanProps> = ({
   const floorInfo = phase3SouthWingConfig[floor];
   if (!floorInfo) return <p>Floor data not available</p>;
   
+  // For all floors, use SVG rendering
+  if (floor === 'Ground Floor' || floor === '1st Floor' || 
+      floor === '2nd Floor' || floor === '3rd Floor' || 
+      floor === '4th Floor' || floor === '5th Floor' || 
+      floor === '6th Floor' || floor === '7th Floor' ||
+      floor === '8th Floor' || floor === '9th Floor') {
+    const svgRef = React.useRef<HTMLDivElement>(null);
+    
+    React.useEffect(() => {
+      if (!svgRef.current) return;
+      
+      const container = svgRef.current;
+      
+      // Apply room occupancy status colors
+      const roomElements = container.querySelectorAll('g[data-room-number]');
+      roomElements.forEach(roomElement => {
+        const roomNumber = roomElement.getAttribute('data-room-number') || '';
+        const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
+        const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
+        const isBedAOccupied = occupiedBeds[bedAKey] || false;
+        const isBedBOccupied = occupiedBeds[bedBKey] || false;
+        
+        const rect = roomElement.querySelector('rect');
+        if (rect) {
+          if (isBedAOccupied && isBedBOccupied) {
+            // Fully occupied
+            rect.setAttribute('fill', '#fecaca'); // Red-200
+            rect.setAttribute('stroke', '#ef4444'); // Red-500
+          } else if (isBedAOccupied || isBedBOccupied) {
+            // Partially occupied
+            rect.setAttribute('fill', '#fef08a'); // Yellow-200
+            rect.setAttribute('stroke', '#eab308'); // Yellow-500
+          } else {
+            // Available
+            rect.setAttribute('fill', '#bbf7d0'); // Green-200
+            rect.setAttribute('stroke', '#22c55e'); // Green-500
+          }
+        }
+      });
+      
+      // Event handler using delegation
+      const handleClick = (event: MouseEvent) => {
+        const targetGroup = (event.target as Element).closest('g[data-room-number]');
+        if (targetGroup) {
+          const roomNumber = targetGroup.getAttribute('data-room-number');
+          if (roomNumber) {
+            onRoomClick(roomNumber);
+          }
+        }
+      };
+      
+      container.addEventListener('click', handleClick);
+      
+      return () => {
+        container.removeEventListener('click', handleClick);
+      };
+    }, [onRoomClick, occupiedBeds, selectedBlock, selectedFloor]);
+    
+    // Select the correct SVG string based on the floor
+    let svgString = ""; // Default to empty string to avoid undefined
+    if (floor === 'Ground Floor') {
+      svgString = phase3SouthWingGroundFloorSvgString;
+    } else if (floor === '1st Floor') {
+      svgString = phase3SouthWing1stFloorSvgString;
+    } else if (floor === '2nd Floor') {
+      svgString = phase3SouthWing2ndFloorSvgString;
+    } else if (floor === '3rd Floor') {
+      svgString = phase3SouthWing3rdFloorSvgString;
+    } else if (floor === '4th Floor') {
+      svgString = phase3SouthWing4thFloorSvgString;
+    } else if (floor === '5th Floor') {
+      svgString = phase3SouthWing5thFloorSvgString;
+    } else if (floor === '6th Floor') {
+      svgString = phase3SouthWing6thFloorSvgString;
+    } else if (floor === '7th Floor') {
+      svgString = phase3SouthWing7thFloorSvgString;
+    } else if (floor === '8th Floor') {
+      svgString = phase3SouthWing8thFloorSvgString;
+    } else if (floor === '9th Floor') {
+      svgString = phase3SouthWing9thFloorSvgString;
+    }
+    
+    return (
+      <div
+        ref={svgRef}
+        className="svg-container"
+        dangerouslySetInnerHTML={{ __html: svgString }}
+      />
+    );
+  }
+  
+  // For other floors, use the grid layout
   const getRoomOccupancyStatus = (roomNumber: number | string): string => {
     const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
     const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;

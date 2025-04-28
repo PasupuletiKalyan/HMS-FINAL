@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   Phase1FloorPlan,
   Phase1EBlockFloorPlan,
@@ -6,8 +6,17 @@ import {
   Phase2Part5FloorPlan,
   Phase3NorthWingFloorPlan,
   Phase3SouthWingFloorPlan,
-  Phase4AFloorPlan,
   Phase4BFloorPlan,
+  Phase4ACombinedFloorPlan,
+  AravaliFloorPlan,
+  AjantaFloorPlan,
+  HimalayaFloorPlan,
+  ShivalikFloorPlan,
+  VindyaFloorPlan,
+  NilgiriFloorPlan,
+  SatpuraFloorPlan,
+  KailashFloorPlan,
+  RoomLayout,
   phase1Config,
   phase1EBlockConfig,
   phase2Config,
@@ -15,7 +24,16 @@ import {
   phase3NorthWingConfig,
   phase3SouthWingConfig,
   phase4AConfig,
-  phase4BConfig
+  phase4BConfig,
+  phase4AUpperConfig,
+  aravaliConfig,
+  ajantaConfig,
+  himalayaConfig,
+  shivalikConfig,
+  vindyaConfig,
+  nilgiriConfig,
+  satpuraConfig,
+  kailashConfig
 } from './hostels';
 import '../styles/HostelFloorPlanViewer.css';
 
@@ -74,8 +92,16 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     "Phase 2 Part 5": phase2Part5Config,
     "Phase 3 North Wing": phase3NorthWingConfig,
     "Phase 3 South Wing": phase3SouthWingConfig,
-    "Phase 4A": phase4AConfig,
-    "Phase 4B": phase4BConfig
+    "Phase 4A": { ...phase4AConfig, ...phase4AUpperConfig },
+    "Phase 4B": phase4BConfig,
+    "Aravali": aravaliConfig,
+    "Ajanta": ajantaConfig,
+    "Himalaya": himalayaConfig,
+    "Shivalik": shivalikConfig,
+    "Vindya": vindyaConfig,
+    "Nilgiri": nilgiriConfig,
+    "Satpura": satpuraConfig,
+    "Kailash": kailashConfig
   };
   
   // Fix the room occupancy status function - completely separate from SVG
@@ -179,75 +205,6 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     return occupiedBeds[roomKey] || false;
   };
 
-  // Create a room button (for list view)
-  const createRoomButton = (roomNumber: number): React.ReactNode => {
-    const occupancyStatus = getRoomOccupancyStatus(roomNumber);
-    return (
-      <button
-        key={roomNumber}
-        className={`room-button ${occupancyStatus}`}
-        data-room-number={roomNumber}
-        onClick={() => handleRoomClick(roomNumber.toString())}
-        disabled={occupancyStatus === "fully-occupied"}
-      >
-        {roomNumber}
-      </button>
-    );
-  };
-
-  // Create visual layout for E Block floors
-  const createVisualEBlockLayout = (blockName: string, floorName: string, floorInfo: { start: number; end: number; exceptions: number[] }): React.ReactNode => {
-    let offset = 0;
-    if (floorName === '1st Floor') offset = 100;
-    else if (floorName === '2nd Floor') offset = 200;
-    else if (floorName === '3rd Floor') offset = 300;
-    else if (floorName === '4th Floor') offset = 400;
-    // Keep top row the same
-    const topRowStructure = [10, 11, 12, 'Lift', 1, 2, 3, 4];
-    // Add a spacer after WS to align room 8 with room 1
-    const bottomRowStructure = [9, 'WS', 'Spacer', 8, 7, 6, 5];
-    const createBox = (item: number | string): React.ReactNode => {
-      if (typeof item === 'number') {
-        const roomNumber = (floorName === 'Ground Floor' ? item : item + offset);
-        if (roomNumber >= floorInfo.start && roomNumber <= floorInfo.end) {
-          const occupancyStatus = getRoomOccupancyStatus(roomNumber);
-          return (
-            <div
-              key={roomNumber}
-              className={`floor-item room-box ${occupancyStatus}`}
-              data-room-number={roomNumber}
-              onClick={() => handleRoomClick(roomNumber.toString())}
-            >
-              {roomNumber}
-            </div>
-          );
-        } else {
-          return <div key={`empty-${item}`} className="floor-item">-</div>;
-        }
-      } else if (item === 'Lift') {
-        return <div key="lift" className="floor-item lift-box">Lift</div>;
-      } else if (item === 'WS') {
-        return <div key="ws" className="floor-item ws-box">🚽</div>;
-      } else if (item === 'Spacer') {
-        // Empty spacer to align rooms properly
-        return <div key="spacer" className="floor-item spacer-box"></div>;
-      }
-      return null;
-    };
-    return (
-      <div className="floor-plan-visual">
-        <div className="floor-row">
-          {topRowStructure.map(item => createBox(item))}
-        </div>
-        <div className="corridor-label">Corridor</div>
-        <div className="floor-row">
-          {bottomRowStructure.map(item => createBox(item))}
-        </div>
-        <div className="floor-label">{`${blockName} ${floorName}`}</div>
-      </div>
-    );
-  };
-
   // Render floor plan content
   const renderFloorPlan = (): React.ReactNode => {
     if (!selectedBlock) {
@@ -323,15 +280,15 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
           />
         );
       case 'Phase 4A':
-        return (
-          <Phase4AFloorPlan
-            floor={selectedFloor}
-            onRoomClick={handleRoomClick}
-            occupiedBeds={occupiedBeds}
-            selectedBlock={selectedBlock}
-            selectedFloor={selectedFloor}
-          />
-        );
+        // Use the combined component for Phase 4A that selects the appropriate component
+        const Phase4AComponent = Phase4ACombinedFloorPlan.component({
+          floor: selectedFloor,
+          onRoomClick: handleRoomClick,
+          occupiedBeds: occupiedBeds,
+          selectedBlock: selectedBlock,
+          selectedFloor: selectedFloor
+        });
+        return <Phase4AComponent.type {...Phase4AComponent.props} />;
       case 'Phase 4B':
         const Phase4BComponent = Phase4BFloorPlan.component({
           floor: selectedFloor,
@@ -341,6 +298,86 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
           selectedFloor: selectedFloor
         });
         return <Phase4BComponent.type {...Phase4BComponent.props} />;
+      case 'Aravali':
+        return (
+          <AravaliFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Ajanta':
+        return (
+          <AjantaFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Himalaya':
+        return (
+          <HimalayaFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Shivalik':
+        return (
+          <ShivalikFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Vindya':
+        return (
+          <VindyaFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Nilgiri':
+        return (
+          <NilgiriFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Satpura':
+        return (
+          <SatpuraFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Kailash':
+        return (
+          <KailashFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
       default:
         return <p>Floor plan not available for {selectedBlock}</p>;
     }
@@ -351,7 +388,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     return (
       <div className="room-occupancy-legend">
         <div className="legend-item">
-          <div className="legend-color" style={{ backgroundColor: '#22c55e', border: '1px solid #1976d2' }}></div>
+          <div className="legend-color legend-available"></div>
           <span>Available</span>
         </div>
         <div className="legend-item">
@@ -370,6 +407,11 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     );
   };
 
+  // Check if the current block is one of the new blocks with the RoomLayout
+  const isNewBlock = (): boolean => {
+    return ["Aravali", "Ajanta", "Himalaya", "Shivalik", "Vindya", "Nilgiri", "Satpura", "Kailash"].includes(modalRoomInfo.block);
+  };
+  
   // Check if the current block is one of the newer phases with different layout
   const isNewLayoutBlock = (): boolean => {
     return ["Phase 3 North Wing", "Phase 3 South Wing", "Phase 4A", "Phase 4B"].includes(modalRoomInfo.block);
@@ -422,6 +464,14 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
             <option value="Phase 3 South Wing">Phase 3 South Wing</option>
             <option value="Phase 4A">Phase 4A</option>
             <option value="Phase 4B">Phase 4B</option>
+            <option value="Aravali">Aravali</option>
+            <option value="Ajanta">Ajanta</option>
+            <option value="Himalaya">Himalaya</option>
+            <option value="Shivalik">Shivalik</option>
+            <option value="Vindya">Vindya</option>
+            <option value="Nilgiri">Nilgiri</option>
+            <option value="Satpura">Satpura</option>
+            <option value="Kailash">Kailash</option>
           </select>
         </div>
         <div className="control-group">
@@ -506,7 +556,66 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
                 : 'Click on a bed to select it'}
             </p>
             
-            {isNewLayoutBlock() ? (
+            {isNewBlock() ? (
+              // New blocks use the enhanced RoomLayout component
+              <div style={{ width: '100%', maxWidth: '500px', margin: '0 auto' }}>
+                <RoomLayout 
+                  bedAOccupied={isBedOccupied(modalRoomInfo.number, 'A')}
+                  bedBOccupied={isBedOccupied(modalRoomInfo.number, 'B')}
+                  roomNumber={modalRoomInfo.number}
+                  block={modalRoomInfo.block}
+                  floor={modalRoomInfo.floor}
+                  onSelectBed={handleBedClick}
+                />
+                
+                {/* Add bed selection buttons below the layout */}
+                <div className="bed-selection-buttons" style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-around', 
+                  marginTop: '1rem' 
+                }}>
+                  <button
+                    style={{
+                      backgroundColor: isBedOccupied(modalRoomInfo.number, 'A') ? 
+                        '#fecaca' : modalRoomInfo.bed === 'A' ? 
+                        '#bbf7d0' : '#f9fafb',
+                      border: `1px solid ${isBedOccupied(modalRoomInfo.number, 'A') ? 
+                        '#ef4444' : modalRoomInfo.bed === 'A' ? 
+                        '#22c55e' : '#d1d5db'}`,
+                      padding: '0.5rem 1rem',
+                      borderRadius: '0.375rem',
+                      fontWeight: 500,
+                      cursor: isBedOccupied(modalRoomInfo.number, 'A') ? 'not-allowed' : 'pointer',
+                      opacity: isBedOccupied(modalRoomInfo.number, 'A') ? 0.7 : 1
+                    }}
+                    disabled={isBedOccupied(modalRoomInfo.number, 'A')}
+                    onClick={() => !isBedOccupied(modalRoomInfo.number, 'A') && handleBedClick('A')}
+                  >
+                    {isBedOccupied(modalRoomInfo.number, 'A') ? 'Bed A (Occupied)' : 'Select Bed A'}
+                  </button>
+                  
+                  <button
+                    style={{
+                      backgroundColor: isBedOccupied(modalRoomInfo.number, 'B') ? 
+                        '#fecaca' : modalRoomInfo.bed === 'B' ? 
+                        '#bbf7d0' : '#f9fafb',
+                      border: `1px solid ${isBedOccupied(modalRoomInfo.number, 'B') ? 
+                        '#ef4444' : modalRoomInfo.bed === 'B' ? 
+                        '#22c55e' : '#d1d5db'}`,
+                      padding: '0.5rem 1rem',
+                      borderRadius: '0.375rem',
+                      fontWeight: 500,
+                      cursor: isBedOccupied(modalRoomInfo.number, 'B') ? 'not-allowed' : 'pointer',
+                      opacity: isBedOccupied(modalRoomInfo.number, 'B') ? 0.7 : 1
+                    }}
+                    disabled={isBedOccupied(modalRoomInfo.number, 'B')}
+                    onClick={() => !isBedOccupied(modalRoomInfo.number, 'B') && handleBedClick('B')}
+                  >
+                    {isBedOccupied(modalRoomInfo.number, 'B') ? 'Bed B (Occupied)' : 'Select Bed B'}
+                  </button>
+                </div>
+              </div>
+            ) : isNewLayoutBlock() ? (
               // Modern layout for Phase 3 and Phase 4 blocks using inline styles
               <div style={{
                 position: 'relative',

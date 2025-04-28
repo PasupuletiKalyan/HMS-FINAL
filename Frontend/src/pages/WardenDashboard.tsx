@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/WardenDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
-import HostelFloorPlanViewer from '../components/HostelFloorPlanViewer';
 
 type Student = {
   name: string;
@@ -1088,66 +1087,18 @@ const WardenDashboard: React.FC = () => {
   );
 
   return (
-    <>
-      <div className="dashboard-container">
-        <div className="dashboard-top-nav">
-          <div className="profile-section-top">
-            <img src={collegeLogo} alt="College Logo" className="college-logo-top" />
-            <p className="user-name-top">{wardenName}</p>
-          </div>
-
-          <ul className="top-menu">
-            {["Overview", "Room Allotment", "Maintenance Complaints"].map((item) => (
-              <li
-                key={item}
-                className={selectedMenu === item ? "active" : ""}
-                onClick={() => {
-                  setSelectedMenu(item);
-                  setSelectedBlock(null);
-                  setStudentData([]);
-                  setFilteredRoomData([]);
-                }}
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
-
-          <div className="profile-button-container" ref={profileRef}>
-            <button
-              className="profile-circle-button"
-              onClick={() => setShowProfileDropdown((prev) => !prev)}
-            >
-              {wardenName.charAt(0).toUpperCase()}
-            </button>
-            {showProfileDropdown && (
-              <div className="profile-dropdown">
-                <div className="profile-info">
-                  <p><strong>Role:</strong> Warden</p>
-                  <p><strong>Application No:</strong> {applicationNumber ?? "Loading..."}</p>
-                </div>
-                <ul>
-                  <li>Profile</li>
-                  <li>Settings</li>
-                  <li onClick={handleLogout}>Logout</li>
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="dashboard-content">
-          <h1>{selectedMenu}</h1>
-          {selectedMenu === "Overview" && renderOverviewContent()}
-          {selectedMenu === "Room Allotment" && renderRoomAllotmentContent()}
-          {selectedMenu === "Maintenance Complaints" && renderComplaintsContent()}
-        </div>
+    <div className="dashboard-container">
+      <div className="dashboard-content">
+        <h1>{selectedMenu}</h1>
+        {selectedMenu === "Overview" && renderOverviewContent()}
+        {selectedMenu === "Room Allotment" && renderRoomAllotmentContent()}
+        {selectedMenu === "Maintenance Complaints" && renderComplaintsContent()}
       </div>
 
       <footer className="dashboard-footer">
         <p>&copy; {new Date().getFullYear()} Hostel Management System. All rights reserved.</p>
       </footer>
-    </>
+    </div>
   );
 };
 
