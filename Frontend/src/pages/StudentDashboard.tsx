@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
-import "../styles/Dashboard.css";
+import "../styles/WardenDashboardStyles.css";
 
 // Define proper BookingInfo interface instead of using 'any'
 interface BookingInfo {
@@ -10,6 +10,9 @@ interface BookingInfo {
   roomNumber: string;
   bed: string;
   roomKey: string;
+  allottedBy?: string;
+  allotmentReason?: string;
+  allotmentDate?: string;
 }
 
 interface StudentDashboardProps {
@@ -54,6 +57,13 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking 
                   <p><strong>Block:</strong> {currentUserBooking.block}</p>
                   <p><strong>Room:</strong> {currentUserBooking.roomNumber}</p>
                   <p><strong>Bed:</strong> {currentUserBooking.bed}</p>
+                  {currentUserBooking.allottedBy && (
+                    <>
+                      <p><strong>Allotted By:</strong> {currentUserBooking.allottedBy}</p>
+                      <p><strong>Allotment Date:</strong> {new Date(currentUserBooking.allotmentDate!).toLocaleDateString()}</p>
+                      <p><strong>Reason:</strong> {currentUserBooking.allotmentReason}</p>
+                    </>
+                  )}
                 </div>
               ) : (
                 <p>You haven't booked a hostel room yet.</p>

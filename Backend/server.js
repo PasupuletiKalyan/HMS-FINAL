@@ -3,20 +3,19 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const User = require("./models/User");
 const studentFormRoutes = require("./routes/studentFormRoutes");
-// Import the new hostel routes
-const hostelRoutes = require("./routes/hostelRoutes");
 
 const app = express();
 app.use(express.json());
+
+// Enable CORS
 app.use(cors());
 
-mongoose
-  .connect("mongodb://localhost:27017/hostelDB", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB Connected Successfully"))
-  .catch((err) => console.error("❌ MongoDB Connection Failed:", err));
+mongoose.connect("mongodb+srv://OmSaiVikranth:HMS_SE_CodeMonkeys@cluster0.zvkzt5n.mongodb.net/hostelDB?retryWrites=true&w=majority&appName=Cluster0", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("MongoDB Connected Successfully"))
+.catch((err) => console.error("❌ MongoDB Connection Failed:", err));
 
 // Login Route
 app.post("/api/login", async (req, res) => {
@@ -47,9 +46,6 @@ app.post("/api/login", async (req, res) => {
 
 // Form Routes
 app.use("/api/form", studentFormRoutes);
-
-// Mount the hostel routes under /api/hostels
-app.use("/api/hostels", hostelRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => {

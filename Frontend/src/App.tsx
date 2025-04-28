@@ -27,7 +27,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<WardenDashboard />} />
+        <Route path="/" element={<LoginPage/>} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/student-dashboard" element={<StudentDashboard 
           currentUserBooking={currentUserBooking} 
