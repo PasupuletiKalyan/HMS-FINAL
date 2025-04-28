@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // Import from TypeScript component file
 import HostelFloorPlanViewer from '../components/HostelFloorPlanViewer';
-import Navbar from '../components/common/Navbar';
 
 // Define proper BookingInfo interface instead of using 'any'
 interface BookingInfo {
@@ -32,17 +31,23 @@ const HostelBookingPage: React.FC<HostelBookingPageProps> = ({
   setOccupiedBeds
 }) => {
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    // Check if payment is completed before allowing access
+    const isPaymentCompleted = localStorage.getItem("paymentCompleted") === "true";
+    if (!isPaymentCompleted) {
+      alert("Please complete the payment before accessing hostel booking.");
+      navigate("/student-dashboard");
+      return;
+    }
+  }, [navigate]);
 
   const navigateToBookingPage = () => {
-    navigate('/current-booking');
+    navigate("/student-dashboard", { state: { section: "My Booking" } });
   };
 
   return (
     <div className="hostel-booking-page">
-      <Navbar 
-        activePage="hostel-booking"
-        userType="student"
-      />
       <div className="page-container">
         <h1 className="page-title">Hostel Room Selection</h1>
         <p className="page-description">

@@ -10,13 +10,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-mongoose
-  .connect("mongodb://localhost:27017/hostelDB", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB Connected Successfully"))
-  .catch((err) => console.error("❌ MongoDB Connection Failed:", err));
+mongoose.connect("mongodb+srv://OmSaiVikranth:HMS_SE_CodeMonkeys@cluster0.zvkzt5n.mongodb.net/hostelDB?retryWrites=true&w=majority&appName=Cluster0", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("MongoDB Connected Successfully"))
+.catch((err) => console.error("❌ MongoDB Connection Failed:", err));
 
 // Login Route
 app.post("/api/login", async (req, res) => {
