@@ -3,6 +3,7 @@ import {
   Phase1FloorPlan,
   Phase1EBlockFloorPlan,
   Phase2FloorPlan,
+  Phase2ThirdFloorPlan, // Added the new Phase 2 Third Floor component
   Phase2Part5FloorPlan,
   Phase3NorthWingFloorPlan,
   Phase3SouthWingFloorPlan,
@@ -20,6 +21,7 @@ import {
   phase1Config,
   phase1EBlockConfig,
   phase2Config,
+  phase2ThirdFloorConfig, // Added the missing configuration
   phase2Part5Config,
   phase3NorthWingConfig,
   phase3SouthWingConfig,
@@ -84,11 +86,11 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     bed: null 
   });
   
-  // Updated hostelData structure with imported configurations
   const hostelData = {
     "Phase 1": phase1Config,
     "Phase 1 E Block": phase1EBlockConfig,
     "Phase 2": phase2Config,
+    "Phase 2 Third Floor": phase2ThirdFloorConfig,
     "Phase 2 Part 5": phase2Part5Config,
     "Phase 3 North Wing": phase3NorthWingConfig,
     "Phase 3 South Wing": phase3SouthWingConfig,
@@ -242,6 +244,16 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
       case 'Phase 2':
         return (
           <Phase2FloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Phase 2 Third Floor': // Render the new Phase 2 Third Floor
+        return (
+          <Phase2ThirdFloorPlan
             floor={selectedFloor}
             onRoomClick={handleRoomClick}
             occupiedBeds={occupiedBeds}
@@ -459,6 +471,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
             <option value="Phase 1">Phase 1</option>
             <option value="Phase 1 E Block">Phase 1 E Block</option>
             <option value="Phase 2">Phase 2</option>
+            <option value="Phase 2 Third Floor">Phase 2 Third Floor</option>
             <option value="Phase 2 Part 5">Phase 2 Part 5</option>
             <option value="Phase 3 North Wing">Phase 3 North Wing</option>
             <option value="Phase 3 South Wing">Phase 3 South Wing</option>

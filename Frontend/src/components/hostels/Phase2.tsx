@@ -1,5 +1,6 @@
 import React from 'react';
 import { FloorConfig, FloorPlanProps } from './types';
+import Phase2ThirdFloorPlan from './Phase2ThirdFloor';
 
 // Phase 2 configuration
 export const phase2Config: Record<string, FloorConfig> = {
@@ -28,6 +29,19 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
   
   const floorInfo = phase2Config[floor];
   if (!floorInfo) return <p>Floor data not available</p>;
+  
+  // Use the dedicated Third Floor component
+  if (floor === "3rd Floor") {
+    return (
+      <Phase2ThirdFloorPlan
+        floor={floor}
+        onRoomClick={onRoomClick}
+        occupiedBeds={occupiedBeds}
+        selectedBlock={selectedBlock}
+        selectedFloor={selectedFloor}
+      />
+    );
+  }
   
   // 1st Floor specific SVG layout
   const renderFirstFloorLayout = () => {
@@ -811,7 +825,7 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
                     <text
                       key={`${el.id}-line-${index}`}
                       x={textX}
-                      y={textY + (index - (lines.length - 1) / 2) * (parseInt(specificTextStyle.fontSize) + 2)}
+                      y={textY + (index - (lines.length - 1) / 2) * (parseInt(specificTextStyle.fontSize) + 2)} // Adjust line spacing
                       style={specificTextStyle}
                       pointerEvents="none"
                     >
