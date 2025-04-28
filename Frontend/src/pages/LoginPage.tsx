@@ -31,19 +31,15 @@ const LoginPage: React.FC = () => {
         localStorage.setItem("userRole", role);
         localStorage.setItem("userId", userId);
 
-        console.log("📌 Stored in LocalStorage:", localStorage.getItem("userName"));
+        console.log("📌 Stored in Localstorage:", localStorage.getItem("userName"));
 
         setTimeout(() => {
           if (role === "student") {
             navigate("/student-dashboard");
           } else if (role === "warden") {
-<<<<<<< HEAD
-            navigate("/warden-Dashboard");
-=======
             navigate("/warden-dashboard"); // Consistent warden redirect
           } else if (role === "admin") {
             navigate("/admin-dashboard");
->>>>>>> floor-layouts
           } else {
             setError("Unauthorized role");
           }

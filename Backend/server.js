@@ -3,11 +3,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const User = require("./models/User");
 const studentFormRoutes = require("./routes/studentFormRoutes");
-<<<<<<< HEAD
-=======
 // Load environment variables
 require('dotenv').config();
->>>>>>> floor-layouts
 
 const app = express();
 app.use(express.json());
@@ -15,14 +12,10 @@ app.use(express.json());
 // Enable CORS
 app.use(cors());
 
-<<<<<<< HEAD
-mongoose.connect("mongodb+srv://OmSaiVikranth:HMS_SE_CodeMonkeys@cluster0.zvkzt5n.mongodb.net/hostelDB?retryWrites=true&w=majority&appName=Cluster0", {
-=======
 // Use environment variables for the connection string
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://OmSaiVikranth:HMS_SE_CodeMonkeys@cluster0.zvkzt5n.mongodb.net/hostelDB?retryWrites=true&w=majority&appName=Cluster0";
 
 mongoose.connect(MONGODB_URI, {
->>>>>>> floor-layouts
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -61,5 +54,5 @@ app.use("/api/form", studentFormRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => {
-  console.log('Server running on port ${PORT}');
+  console.log(`Server running on port ${PORT}`);
 });

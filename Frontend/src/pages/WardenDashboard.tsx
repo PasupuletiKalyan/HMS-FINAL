@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/WardenDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
+import HostelFloorPlanViewer from "../components/HostelFloorPlanViewer"; // Add this import
 
 type Student = {
   name: string;
