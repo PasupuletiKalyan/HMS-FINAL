@@ -36,6 +36,7 @@ const Navbar: React.FC<NavbarProps> = ({ activePage, userType }) => {
           { name: 'Rooms', path: '/rooms', id: 'rooms' },
           { name: 'Notices', path: '/notices', id: 'notices' },
           { name: 'Complaints', path: '/complaints', id: 'complaints' },
+          { name: 'Search Student', path: '/search-student', id: 'search-student' },
         ];
       case 'admin':
         return [

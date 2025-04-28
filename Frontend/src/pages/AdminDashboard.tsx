@@ -1,14 +1,14 @@
 // AdminDashboard.tsx
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/DashboardStyles.css";
+import "../styles/WardenDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
 
-type Student = {
+interface Student {
   name: string;
   roll: string;
   room: string;
-};
+}
 
 const AdminDashboard: React.FC = () => {
   const [selectedMenu, setSelectedMenu] = useState("Overview");
@@ -178,7 +178,9 @@ const AdminDashboard: React.FC = () => {
                 {filteredSuggestions.map((s, index) => (
                   <li
                   key={index}
-                  ref={(el) => (suggestionRefs.current[index] = el)}
+                  ref={(el: HTMLLIElement | null) => {
+                    suggestionRefs.current[index] = el;
+                  }}
                   className={`suggestion-item ${s.gender.toLowerCase()} ${
                     index === selectedSuggestionIndex ? "highlighted" : ""
                   }`}

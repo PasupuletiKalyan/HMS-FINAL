@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/common/Navbar';
 import '../styles/CurrentBookingPage.css';
 
 // Define proper BookingInfo interface
@@ -49,10 +48,6 @@ const CurrentBookingPage: React.FC<CurrentBookingPageProps> = ({
 
   return (
     <div className="current-booking-page">
-      <Navbar 
-        activePage="current-booking"
-        userType="student"
-      />
       <div className="page-container">
         <h1 className="page-title">Your Current Booking</h1>
         

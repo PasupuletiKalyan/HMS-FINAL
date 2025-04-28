@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const User = require("./models/User");
 const studentFormRoutes = require("./routes/studentFormRoutes");
+<<<<<<< HEAD
 // Import the new hostel routes
 const hostelRoutes = require("./routes/hostelRoutes");
 
@@ -17,6 +18,21 @@ mongoose
   })
   .then(() => console.log("MongoDB Connected Successfully"))
   .catch((err) => console.error("❌ MongoDB Connection Failed:", err));
+=======
+
+const app = express();
+app.use(express.json());
+
+// Enable CORS
+app.use(cors());
+
+mongoose.connect("mongodb+srv://OmSaiVikranth:HMS_SE_CodeMonkeys@cluster0.zvkzt5n.mongodb.net/hostelDB?retryWrites=true&w=majority&appName=Cluster0", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("MongoDB Connected Successfully"))
+.catch((err) => console.error("❌ MongoDB Connection Failed:", err));
+>>>>>>> wardendashboard-changes
 
 // Login Route
 app.post("/api/login", async (req, res) => {
@@ -48,9 +64,12 @@ app.post("/api/login", async (req, res) => {
 // Form Routes
 app.use("/api/form", studentFormRoutes);
 
+<<<<<<< HEAD
 // Mount the hostel routes under /api/hostels
 app.use("/api/hostels", hostelRoutes);
 
+=======
+>>>>>>> wardendashboard-changes
 const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

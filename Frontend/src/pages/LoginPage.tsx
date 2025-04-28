@@ -37,7 +37,7 @@ const LoginPage: React.FC = () => {
           if (role === "student") {
             navigate("/student-dashboard");
           } else if (role === "warden") {
-            navigate("/admin-dashboard"); // ✅ Redirect wardens to Admin Dashboard
+            navigate("/warden-Dashboard");
           } else {
             setError("Unauthorized role");
           }
@@ -47,7 +47,7 @@ const LoginPage: React.FC = () => {
       }
     } catch (err) {
       console.error("🔥 Fetch Error:", err);
-      setError("Something went wrong. Please try again.");
+      setError("Invalid credentials");
     }
   };
 
@@ -87,7 +87,7 @@ const LoginPage: React.FC = () => {
 
           {error && <p className="error-message">{error}</p>}
 
-          <button type="submit">Login</button>
+          <button type="submit" className="login-btn">Login</button>
         </form>
       </div>
     </div>
