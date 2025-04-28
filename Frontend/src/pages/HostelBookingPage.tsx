@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // Import from TypeScript component file
 import HostelFloorPlanViewer from '../components/HostelFloorPlanViewer';
@@ -31,9 +31,19 @@ const HostelBookingPage: React.FC<HostelBookingPageProps> = ({
   setOccupiedBeds
 }) => {
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    // Check if payment is completed before allowing access
+    const isPaymentCompleted = localStorage.getItem("paymentCompleted") === "true";
+    if (!isPaymentCompleted) {
+      alert("Please complete the payment before accessing hostel booking.");
+      navigate("/student-dashboard");
+      return;
+    }
+  }, [navigate]);
 
   const navigateToBookingPage = () => {
-    navigate("/student-dashboard", { state: { section: "My Booking" } }); // Navigate to "My Booking" section in StudentDashboard
+    navigate("/student-dashboard", { state: { section: "My Booking" } });
   };
 
   return (

@@ -9,6 +9,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import HostelBookingPage from "./pages/HostelBookingPage";
 import CurrentBookingPage from "./pages/CurrentBookingPage.tsx";
 import "./App.css"; // Import global styles
+import PaymentPage from "./pages/PaymentPage"; // Import PaymentPage
 
 // Define the BookingInfo interface
 interface BookingInfo {
@@ -27,7 +28,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage/>} />
+        <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/student-dashboard" element={<StudentDashboard 
           currentUserBooking={currentUserBooking} 
@@ -59,6 +60,7 @@ const App: React.FC = () => {
             />
           } 
         />
+        <Route path="/payment" element={<PaymentPage />} /> {/* Add route for PaymentPage */}
       </Routes>
     </Router>
   );
