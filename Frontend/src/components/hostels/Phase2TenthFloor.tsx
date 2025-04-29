@@ -270,7 +270,7 @@ const Phase2TenthFloorPlan: React.FC<FloorPlanProps> = ({
             
             // Render rectangles for rooms and common areas
             const style = { 
-              ...baseStyle, 
+              ...(el.type === 'room' ? styles.room : styles.common), 
               fill: fillColor 
             };
             

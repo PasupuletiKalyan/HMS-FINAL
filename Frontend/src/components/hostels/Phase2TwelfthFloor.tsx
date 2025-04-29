@@ -234,18 +234,12 @@ const Phase2TwelfthFloorPlan: React.FC<FloorPlanProps> = ({
       </div>
     );
   } else {
-    // Render standard grid for if needed for any other floors
-    const rooms: React.ReactNode[] = [];
-    for (let i = floorInfo.start; i <= floorInfo.end; i++) {
-      if (floorInfo.exceptions && floorInfo.exceptions.includes(i)) continue;
-      rooms.push(createRoomButton(i));
-    }
-    
+    // This else block isn't needed since this component only renders the 12th floor
     return (
       <div className="room-list-container">
         <h3>{`${selectedBlock} - ${selectedFloor}`}</h3>
         <div className="room-grid">
-          {rooms}
+          <p>Floor plan not available</p>
         </div>
       </div>
     );

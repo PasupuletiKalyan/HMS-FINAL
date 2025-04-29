@@ -265,7 +265,7 @@ const Phase2EleventhFloorPlan: React.FC<FloorPlanProps> = ({
             
             // Render rectangles for rooms and common areas
             const style = { 
-              ...baseStyle, 
+              ...(el.type === 'room' ? styles.room : styles.common), 
               fill: fillColor 
             };
             
@@ -275,6 +275,8 @@ const Phase2EleventhFloorPlan: React.FC<FloorPlanProps> = ({
             const textY = el.y + (el.height || 0) / 2;
             const lines = label.split('\n'); // Handle multi-line labels if any
             
+            let occupancyText = isClickableRoom ? getRoomOccupancyStatus(Number(roomId)).status : '';
+
             // Determine font size based on special cases
             let specificTextStyle = styles.text;
             if (el.type === 'common' && lines.length > 1) {

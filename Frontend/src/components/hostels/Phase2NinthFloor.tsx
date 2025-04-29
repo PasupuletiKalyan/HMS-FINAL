@@ -20,15 +20,19 @@ const Phase2NinthFloorPlan: React.FC<FloorPlanProps> = ({
   const hGap = 10;  // Horizontal gap
 
   // Function to determine room occupancy status
-  const getRoomOccupancyStatus = (room: string) => {
-    // This is a placeholder function - in a real application, this would fetch data from an API
-    const randomStatus = Math.random();
-    if (randomStatus < 0.3) {
-      return { color: 'green', status: 'available' };
-    } else if (randomStatus < 0.7) {
-      return { color: 'red', status: 'occupied' };
+  const getRoomOccupancyStatus = (roomNumber: string): { color: string; status: string } => {
+    const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
+    const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
+    
+    const isOccupiedA = occupiedBeds[bedAKey] || false;
+    const isOccupiedB = occupiedBeds[bedBKey] || false;
+    
+    if (isOccupiedA && isOccupiedB) {
+      return { color: '#fecaca', status: 'Fully Occupied' }; // Light red for fully occupied
+    } else if (isOccupiedA || isOccupiedB) {
+      return { color: '#fef08a', status: 'Partially Occupied' }; // Light yellow for partially occupied
     } else {
-      return { color: 'orange', status: 'maintenance' };
+      return { color: '#bbf7d0', status: 'Available' }; // Light green for available
     }
   };
 
@@ -245,24 +249,31 @@ const Phase2NinthFloorPlan: React.FC<FloorPlanProps> = ({
             const roomId = el.id; // Use room ID directly (already has numbers like 901)
             
             // Get room status if it's a clickable room
-            let fillColor = isClickableRoom ? getRoomOccupancyStatus(roomId).color : '#d3d3d3'; // Default: green for available rooms, gray for common areas
-            let occupancyText = 'Available';
+            let fillColor;
+            let occupancyText = '';
             
             if (isClickableRoom) {
-              const roomNumber = roomId;
-              const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
-              const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
-              
-              const isOccupiedA = occupiedBeds[bedAKey] || false;
-              const isOccupiedB = occupiedBeds[bedBKey] || false;
-              
-              if (isOccupiedA && isOccupiedB) {
-                fillColor = '#fecaca'; // Red for fully occupied
-                occupancyText = 'Fully Occupied';
-              } else if (isOccupiedA || isOccupiedB) {
-                fillColor = '#fef08a'; // Yellow for partially occupied
-                occupancyText = 'Partially Occupied';
-              }
+              const roomStatus = getRoomOccupancyStatus(roomId);
+              fillColor = roomStatus.color;
+              occupancyText = roomStatus.status;
+            } else if (el.id.includes('WS')) {
+              // Special color for washrooms
+              fillColor = '#fff9c4'; // Light yellow for washrooms
+            } else if (el.id.includes('Stairs')) {
+              // Special color for stairs
+              fillColor = '#c8e6c9'; // Light green for stairs
+            } else if (el.id.includes('Lifts')) {
+              // Special color for lifts
+              fillColor = '#bbdefb'; // Light blue for lifts
+            } else if (el.id.includes('Balcony')) {
+              // Use balcony style
+              fillColor = styles.balcony.fill;
+            } else if (el.id.includes('WR')) {
+              // Use waiting room style
+              fillColor = styles.waitingroom.fill;
+            } else {
+              // Default for other common areas
+              fillColor = '#d3d3d3'; // Light gray
             }
             
             // Render rectangles for rooms and common areas

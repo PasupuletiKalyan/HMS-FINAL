@@ -22,6 +22,16 @@ import Phase2ThirdFloorPlan, {
   phase2ThirdFloorConfig
 } from './Phase2ThirdFloor';
 
+// Import the Phase 2 Fourth Floor component
+import Phase2FourthFloorPlan, {
+  phase2FourthFloorConfig
+} from './Phase2FourthFloor';
+
+// Import the Phase 2 Fifth Floor component
+import Phase2FifthFloorPlan, {
+  phase2FifthFloorConfig
+} from './Phase2FifthFloor';
+
 // Import the new Phase 2 Sixth Floor component
 import Phase2SixthFloorPlan, {
   phase2SixthFloorConfig
@@ -192,6 +202,14 @@ export {
   // Phase 2 Third Floor specific component
   Phase2ThirdFloorPlan,
   phase2ThirdFloorConfig,
+
+  // Phase 2 Fourth Floor specific component
+  Phase2FourthFloorPlan,
+  phase2FourthFloorConfig,
+
+  // Phase 2 Fifth Floor specific component
+  Phase2FifthFloorPlan,
+  phase2FifthFloorConfig,
 
   // Phase 2 Sixth Floor specific component
   Phase2SixthFloorPlan,
