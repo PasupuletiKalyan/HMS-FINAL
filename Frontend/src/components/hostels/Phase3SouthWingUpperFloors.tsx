@@ -1,5 +1,27 @@
 import { FloorConfig } from './types';
 
+// Function to determine room occupancy status
+export const getRoomOccupancyStatus = (
+  roomNumber: string,
+  selectedBlock: string,
+  selectedFloor: string,
+  occupiedBeds: Record<string, boolean>
+) => {
+  const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
+  const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
+  
+  const isOccupiedA = occupiedBeds[bedAKey] || false;
+  const isOccupiedB = occupiedBeds[bedBKey] || false;
+  
+  if (isOccupiedA && isOccupiedB) {
+    return { color: '#fecaca', status: 'Fully Occupied' }; // Red for fully occupied
+  } else if (isOccupiedA || isOccupiedB) {
+    return { color: '#fef08a', status: 'Partially Occupied' }; // Yellow for partially occupied
+  } else {
+    return { color: '#bbf7d0', status: 'Available' }; // Green for available
+  }
+};
+
 // Phase 3 South Wing configuration
 export const phase3SouthWingConfig: Record<string, FloorConfig> = {
   "5th Floor": { start: 501, end: 535, exceptions: [] },

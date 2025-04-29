@@ -1,6 +1,9 @@
 import React from 'react';
 import { FloorConfig, FloorPlanProps } from './types';
 import Phase2ThirdFloorPlan from './Phase2ThirdFloor';
+import Phase2FourthFloorPlan from './Phase2FourthFloor';
+import Phase2FifthFloorPlan from './Phase2FifthFloor';
+import Phase2SixthFloorPlan from './Phase2SixthFloor';
 
 // Phase 2 configuration
 export const phase2Config: Record<string, FloorConfig> = {
@@ -43,6 +46,45 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
     );
   }
   
+  // Use the dedicated Fourth Floor component
+  if (floor === "4th Floor") {
+    return (
+      <Phase2FourthFloorPlan
+        floor={floor}
+        onRoomClick={onRoomClick}
+        occupiedBeds={occupiedBeds}
+        selectedBlock={selectedBlock}
+        selectedFloor={selectedFloor}
+      />
+    );
+  }
+  
+  // Use the dedicated Fifth Floor component
+  if (floor === "5th Floor") {
+    return (
+      <Phase2FifthFloorPlan
+        floor={floor}
+        onRoomClick={onRoomClick}
+        occupiedBeds={occupiedBeds}
+        selectedBlock={selectedBlock}
+        selectedFloor={selectedFloor}
+      />
+    );
+  }
+  
+  // Use the dedicated Sixth Floor component
+  if (floor === "6th Floor") {
+    return (
+      <Phase2SixthFloorPlan
+        floor={floor}
+        onRoomClick={onRoomClick}
+        occupiedBeds={occupiedBeds}
+        selectedBlock={selectedBlock}
+        selectedFloor={selectedFloor}
+      />
+    );
+  }
+  
   // 1st Floor specific SVG layout
   const renderFirstFloorLayout = () => {
     // Room dimensions and spacing
@@ -55,7 +97,6 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
     const getY = (baseY: number, rowNum: number): number => baseY - (rowNum * (roomH + vGap));
 
     // Calculate derived positions
-    const topRowY = getY(600, 19); // Align with top of 117/118
     const bottomRowY = getY(600, 18); // Align with top of 116
     const wsTopLEndX = 10 + 6*(roomW + hGap) + roomW * 1.5 + hGap; // End X of first top WS
     const liftsTopMEndX = wsTopLEndX + hGap + roomW + hGap + roomW; // End X of first top Lifts
@@ -582,10 +623,6 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
     
     // Helper function for vertical positioning
     const getY = (baseY: number, rowNum: number): number => baseY - (rowNum * (roomH + vGap));
-    
-    // Calculate derived positions
-    const topRowY = getY(600, 19); // Align with top of 212A/214
-    const bottomRowY = getY(600, 18); // Align with top of Bal/Stairs
     
     // Calculate positions for the Top Horizontal Section - Left Part
     const wsTopLStartX = 10 + 5*(roomW + hGap) + hGap*2;

@@ -16,6 +16,28 @@ export const phase4AConfig: Record<string, FloorConfig> = {
   "10th Floor": { start: 1001, end: 1030, exceptions: [] }
 };
 
+// Function to determine room occupancy status
+export const getRoomOccupancyStatus = (
+  roomNumber: string,
+  selectedBlock: string,
+  selectedFloor: string,
+  occupiedBeds: Record<string, boolean>
+) => {
+  const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
+  const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
+  
+  const isOccupiedA = occupiedBeds[bedAKey] || false;
+  const isOccupiedB = occupiedBeds[bedBKey] || false;
+  
+  if (isOccupiedA && isOccupiedB) {
+    return { color: '#fecaca', status: 'Fully Occupied' }; // Red for fully occupied
+  } else if (isOccupiedA || isOccupiedB) {
+    return { color: '#fef08a', status: 'Partially Occupied' }; // Yellow for partially occupied
+  } else {
+    return { color: '#bbf7d0', status: 'Available' }; // Green for available
+  }
+};
+
 // SVG string for Phase 4A Ground Floor with proper room layout
 export const phase4AGroundFloorSvgString = `
   <svg viewBox="0 0 400 700" xmlns="http://www.w3.org/2000/svg">
@@ -563,7 +585,6 @@ export const phase4AHigherFloorsSvgTemplate = `
     <text x="200" y="850" fontSize="10" textAnchor="middle" dominantBaseline="middle">Balcony</text>
     <text x="90" y="480" fontSize="10" textAnchor="middle" dominantBaseline="middle">Balcony</text>
     <text x="120" y="380" fontSize="10" textAnchor="middle" dominantBaseline="middle">Corridor</text>
-
   </svg>
 `;
 
@@ -955,7 +976,7 @@ export const phase4A7thFloorSvgString = `
       <rect x="480" y="710" width="40" height="40" fill="#bbf7d0" stroke="grey" strokeWidth="1"/>
       <text x="490" y="735" fontSize="10" textAnchor="middle" dominantBaseline="middle">701</text>
     </g>
-    
+
     <!-- Labels for corridors -->
     <text x="65" y="230" fontSize="10" transform="rotate(-90 65 200)" textAnchor="middle" dominantBaseline="middle">Corridor</text>
     <text x="142" y="510" fontSize="10" transform="rotate(-90 155 500)" textAnchor="middle" dominantBaseline="middle">Corridor</text>
@@ -964,7 +985,7 @@ export const phase4A7thFloorSvgString = `
 `;
 
 // Component for rendering Phase 4A floors
-const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({ 
+export const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({ 
   floor, 
   onRoomClick, 
   occupiedBeds, 
@@ -1020,10 +1041,7 @@ const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({
       const roomElements = container.querySelectorAll('g[data-room-number]');
       roomElements.forEach(roomElement => {
         const roomNumber = roomElement.getAttribute('data-room-number') || '';
-        const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
-        const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
-        const isBedAOccupied = occupiedBeds[bedAKey] || false;
-        const isBedBOccupied = occupiedBeds[bedBKey] || false;
+        const { color } = getRoomOccupancyStatus(roomNumber, selectedBlock, selectedFloor, occupiedBeds);
         
         const rect = roomElement.querySelector('rect');
         if (rect) {
@@ -1031,19 +1049,7 @@ const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({
           const currentFill = rect.getAttribute('fill');
           if (currentFill === '#d3d3d3' || currentFill === '#d1d5db') return;
 
-          if (isBedAOccupied && isBedBOccupied) {
-            // Fully occupied
-            rect.setAttribute('fill', '#fecaca'); // Red-200
-            rect.setAttribute('stroke', '#ef4444'); // Red-500
-          } else if (isBedAOccupied || isBedBOccupied) {
-            // Partially occupied
-            rect.setAttribute('fill', '#fef08a'); // Yellow-200
-            rect.setAttribute('stroke', '#eab308'); // Yellow-500
-          } else {
-            // Available
-            rect.setAttribute('fill', '#bbf7d0'); // Green-200
-            rect.setAttribute('stroke', '#22c55e'); // Green-500
-          }
+          rect.setAttribute('fill', color);
         }
       });
       
@@ -1075,30 +1081,15 @@ const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({
   }
   
   // Fallback to grid layout for floors 9-10
-  const getRoomOccupancyStatus = (roomNumber: number | string): string => {
-    const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
-    const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
-    const isBedAOccupied = occupiedBeds[bedAKey] || false;
-    const isBedBOccupied = occupiedBeds[bedBKey] || false;
-    
-    if (isBedAOccupied && isBedBOccupied) {
-      return "fully-occupied";
-    } else if (isBedAOccupied || isBedBOccupied) {
-      return "partially-occupied";
-    } else {
-      return "available";
-    }
-  };
-  
   const createRoomButton = (roomNumber: number): React.ReactNode => {
-    const occupancyStatus = getRoomOccupancyStatus(roomNumber);
+    const occupancyStatus = getRoomOccupancyStatus(roomNumber.toString(), selectedBlock, selectedFloor, occupiedBeds);
     return (
       <button
         key={roomNumber}
-        className={`room-button ${occupancyStatus}`}
+        className={`room-button ${occupancyStatus.status.replace(' ', '-').toLowerCase()}`}
         data-room-number={roomNumber}
         onClick={() => onRoomClick(roomNumber.toString())}
-        disabled={occupancyStatus === "fully-occupied"}
+        disabled={occupancyStatus.status === "fully-occupied"}
       >
         {roomNumber}
       </button>
@@ -1120,6 +1111,4 @@ const Phase4AFloorPlan: React.FC<FloorPlanProps> = ({
       </div>
     </div>
   );
-}
-
-export default Phase4AFloorPlan;
+};

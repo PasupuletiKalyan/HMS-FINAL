@@ -908,18 +908,20 @@ const Phase4BLowerFloorPlan: React.FC<FloorPlanProps> = ({
   }
   
   // For floors without SVG, use a grid layout
-  const getRoomOccupancyStatus = (roomNumber: number | string): string => {
+  const getRoomOccupancyStatus = (
+    roomNumber: number | string
+  ): { color: string; status: string } => {
     const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
     const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
     const isBedAOccupied = occupiedBeds[bedAKey] || false;
     const isBedBOccupied = occupiedBeds[bedBKey] || false;
     
     if (isBedAOccupied && isBedBOccupied) {
-      return "fully-occupied";
+      return { color: '#fecaca', status: 'Fully Occupied' }; // Red for fully occupied
     } else if (isBedAOccupied || isBedBOccupied) {
-      return "partially-occupied";
+      return { color: '#fef08a', status: 'Partially Occupied' }; // Yellow for partially occupied
     } else {
-      return "available";
+      return { color: '#bbf7d0', status: 'Available' }; // Green for available
     }
   };
   
@@ -928,10 +930,11 @@ const Phase4BLowerFloorPlan: React.FC<FloorPlanProps> = ({
     return (
       <button
         key={roomNumber}
-        className={`room-button ${occupancyStatus}`}
+        className={`room-button`}
+        style={{ backgroundColor: occupancyStatus.color }}
         data-room-number={roomNumber}
         onClick={() => onRoomClick(roomNumber.toString())}
-        disabled={occupancyStatus === "fully-occupied"}
+        disabled={occupancyStatus.status === "Fully Occupied"}
       >
         {roomNumber}
       </button>

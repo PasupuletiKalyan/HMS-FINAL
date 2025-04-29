@@ -22,11 +22,47 @@ import Phase2ThirdFloorPlan, {
   phase2ThirdFloorConfig
 } from './Phase2ThirdFloor';
 
+// Import the new Phase 2 Sixth Floor component
+import Phase2SixthFloorPlan, {
+  phase2SixthFloorConfig
+} from './Phase2SixthFloor';
+
+// Import the new Phase 2 Seventh Floor component
+import Phase2SeventhFloorPlan, {
+  phase2SeventhFloorConfig
+} from './Phase2SeventhFloor';
+
+// Import the new Phase 2 Eighth Floor component
+import Phase2EighthFloorPlan, {
+  phase2EighthFloorConfig
+} from './Phase2EighthFloor';
+
+// Import the new Phase 2 Ninth Floor component
+import Phase2NinthFloorPlan, {
+  phase2NinthFloorConfig
+} from './Phase2NinthFloor';
+
+// Import the new Phase 2 Tenth Floor component
+import Phase2TenthFloorPlan, {
+  phase2TenthFloorConfig
+} from './Phase2TenthFloor';
+
+// Import the new Phase 2 Eleventh Floor component
+import Phase2EleventhFloorPlan, {
+  phase2EleventhFloorConfig
+} from './Phase2EleventhFloor';
+
+// Import the new Phase 2 Twelfth Floor component
+import Phase2TwelfthFloorPlan, {
+  phase2TwelfthFloorConfig
+} from './Phase2TwelfthFloor';
+
 import Phase2Part5FloorPlan, { 
   phase2Part5Config 
 } from './Phase2Part5';
 
-import Phase3NorthWingFloorPlan, { 
+import { 
+  Phase3NorthWingFloorPlan, 
   phase3NorthWingConfig,
   phase3NorthWingGroundFloorSvgString 
 } from './Phase3NorthWing';
@@ -35,7 +71,8 @@ import Phase3SouthWingFloorPlan, {
   phase3SouthWingConfig 
 } from './Phase3SouthWing';
 
-import Phase4AFloorPlan, { 
+import { 
+  Phase4AFloorPlan,
   phase4AConfig,
   phase4AGroundFloorSvgString 
 } from './Phase4A';
@@ -155,6 +192,34 @@ export {
   // Phase 2 Third Floor specific component
   Phase2ThirdFloorPlan,
   phase2ThirdFloorConfig,
+
+  // Phase 2 Sixth Floor specific component
+  Phase2SixthFloorPlan,
+  phase2SixthFloorConfig,
+
+  // Phase 2 Seventh Floor specific component
+  Phase2SeventhFloorPlan,
+  phase2SeventhFloorConfig,
+
+  // Phase 2 Eighth Floor specific component
+  Phase2EighthFloorPlan,
+  phase2EighthFloorConfig,
+
+  // Phase 2 Ninth Floor specific component
+  Phase2NinthFloorPlan,
+  phase2NinthFloorConfig,
+
+  // Phase 2 Tenth Floor specific component
+  Phase2TenthFloorPlan,
+  phase2TenthFloorConfig,
+
+  // Phase 2 Eleventh Floor specific component
+  Phase2EleventhFloorPlan,
+  phase2EleventhFloorConfig,
+
+  // Phase 2 Twelfth Floor specific component
+  Phase2TwelfthFloorPlan,
+  phase2TwelfthFloorConfig,
   
   // Phase 2 Part 5
   Phase2Part5FloorPlan,

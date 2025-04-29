@@ -3,7 +3,14 @@ import {
   Phase1FloorPlan,
   Phase1EBlockFloorPlan,
   Phase2FloorPlan,
-  Phase2ThirdFloorPlan, // Added the new Phase 2 Third Floor component
+  Phase2ThirdFloorPlan, 
+  Phase2SixthFloorPlan, 
+  Phase2SeventhFloorPlan,
+  Phase2EighthFloorPlan, 
+  Phase2NinthFloorPlan,
+  Phase2TenthFloorPlan,
+  Phase2EleventhFloorPlan,
+  Phase2TwelfthFloorPlan,
   Phase2Part5FloorPlan,
   Phase3NorthWingFloorPlan,
   Phase3SouthWingFloorPlan,
@@ -21,7 +28,14 @@ import {
   phase1Config,
   phase1EBlockConfig,
   phase2Config,
-  phase2ThirdFloorConfig, // Added the missing configuration
+  phase2ThirdFloorConfig,
+  phase2SixthFloorConfig,
+  phase2SeventhFloorConfig,
+  phase2EighthFloorConfig,
+  phase2NinthFloorConfig,
+  phase2TenthFloorConfig,
+  phase2EleventhFloorConfig,
+  phase2TwelfthFloorConfig,
   phase2Part5Config,
   phase3NorthWingConfig,
   phase3SouthWingConfig,
@@ -91,6 +105,13 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     "Phase 1 E Block": phase1EBlockConfig,
     "Phase 2": phase2Config,
     "Phase 2 Third Floor": phase2ThirdFloorConfig,
+    "Phase 2 Sixth Floor": phase2SixthFloorConfig,
+    "Phase 2 Seventh Floor": phase2SeventhFloorConfig,
+    "Phase 2 Eighth Floor": phase2EighthFloorConfig, // Added the new Eighth Floor
+    "Phase 2 Ninth Floor": phase2NinthFloorConfig,
+    "Phase 2 Tenth Floor": phase2TenthFloorConfig,
+    "Phase 2 Eleventh Floor": phase2EleventhFloorConfig,
+    "Phase 2 Twelfth Floor": phase2TwelfthFloorConfig,
     "Phase 2 Part 5": phase2Part5Config,
     "Phase 3 North Wing": phase3NorthWingConfig,
     "Phase 3 South Wing": phase3SouthWingConfig,
@@ -254,6 +275,76 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
       case 'Phase 2 Third Floor': // Render the new Phase 2 Third Floor
         return (
           <Phase2ThirdFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Phase 2 Sixth Floor': // Render the new Phase 2 Sixth Floor
+        return (
+          <Phase2SixthFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Phase 2 Seventh Floor': // Render the new Phase 2 Seventh Floor
+        return (
+          <Phase2SeventhFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Phase 2 Eighth Floor': // Render the new Phase 2 Eighth Floor
+        return (
+          <Phase2EighthFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Phase 2 Ninth Floor': // Render the new Phase 2 Ninth Floor
+        return (
+          <Phase2NinthFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Phase 2 Tenth Floor': // Render the new Phase 2 Tenth Floor
+        return (
+          <Phase2TenthFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Phase 2 Eleventh Floor': // Render the new Phase 2 Eleventh Floor
+        return (
+          <Phase2EleventhFloorPlan
+            floor={selectedFloor}
+            onRoomClick={handleRoomClick}
+            occupiedBeds={occupiedBeds}
+            selectedBlock={selectedBlock}
+            selectedFloor={selectedFloor}
+          />
+        );
+      case 'Phase 2 Twelfth Floor': // Render the new Phase 2 Twelfth Floor
+        return (
+          <Phase2TwelfthFloorPlan
             floor={selectedFloor}
             onRoomClick={handleRoomClick}
             occupiedBeds={occupiedBeds}
@@ -472,6 +563,13 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
             <option value="Phase 1 E Block">Phase 1 E Block</option>
             <option value="Phase 2">Phase 2</option>
             <option value="Phase 2 Third Floor">Phase 2 Third Floor</option>
+            <option value="Phase 2 Sixth Floor">Phase 2 Sixth Floor</option>
+            <option value="Phase 2 Seventh Floor">Phase 2 Seventh Floor</option>
+            <option value="Phase 2 Eighth Floor">Phase 2 Eighth Floor</option>
+            <option value="Phase 2 Ninth Floor">Phase 2 Ninth Floor</option>
+            <option value="Phase 2 Tenth Floor">Phase 2 Tenth Floor</option>
+            <option value="Phase 2 Eleventh Floor">Phase 2 Eleventh Floor</option>
+            <option value="Phase 2 Twelfth Floor">Phase 2 Twelfth Floor</option>
             <option value="Phase 2 Part 5">Phase 2 Part 5</option>
             <option value="Phase 3 North Wing">Phase 3 North Wing</option>
             <option value="Phase 3 South Wing">Phase 3 South Wing</option>

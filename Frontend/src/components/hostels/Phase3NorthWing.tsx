@@ -15,6 +15,28 @@ export const phase3NorthWingConfig: Record<string, FloorConfig> = {
   "9th Floor": { start: 901, end: 935, exceptions: [] }
 };
 
+// Function to determine room occupancy status
+export const getRoomOccupancyStatus = (
+  roomNumber: string,
+  selectedBlock: string,
+  selectedFloor: string,
+  occupiedBeds: Record<string, boolean>
+) => {
+  const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
+  const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
+  
+  const isOccupiedA = occupiedBeds[bedAKey] || false;
+  const isOccupiedB = occupiedBeds[bedBKey] || false;
+  
+  if (isOccupiedA && isOccupiedB) {
+    return { color: '#fecaca', status: 'Fully Occupied' }; // Red for fully occupied
+  } else if (isOccupiedA || isOccupiedB) {
+    return { color: '#fef08a', status: 'Partially Occupied' }; // Yellow for partially occupied
+  } else {
+    return { color: '#bbf7d0', status: 'Available' }; // Green for available
+  }
+};
+
 // SVG String for Phase 3 North Wing Ground Floor
 export const phase3NorthWingGroundFloorSvgString = `
   <svg viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
@@ -551,7 +573,6 @@ export const phase3NorthWingHigherFloorSvgString = `
       <text x="200" y="285" fontSize="8" textAnchor="middle" fontFamily="Inter, sans-serif">Stairs</text>
     </g>
     
-
     <!-- Lift Area -->
     <g data-common-area="LiftArea">
       <rect x="320" y="260" width="60" height="50" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1.5" />
@@ -846,10 +867,6 @@ export const phase3NorthWing8thFloorSvgString = `
     
     <!-- Horizontal corridor between WS and rooms -->
     <text x="135" y="340" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
-        
-    <!-- Corridor arrows -->
-    <line x1="125" y1="330" x2="105" y2="330" style="stroke:#a0a0a0;stroke-width:1.5;" marker-end="url(#arrowhead-left)" />
-    <line x1="145" y1="330" x2="165" y2="330" style="stroke:#a0a0a0;stroke-width:1.5;" marker-end="url(#arrowhead-right)" />
     
     <!-- Arrow markers definition -->
     <defs>
@@ -1014,7 +1031,7 @@ export const phase3NorthWing9thFloorSvgString = `
 `;
 
 // Component for rendering Phase 3 North Wing SVG
-const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({ 
+export const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({ 
   floor, 
   onRoomClick, 
   occupiedBeds, 
@@ -1039,30 +1056,15 @@ const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
       const roomElements = container.querySelectorAll('g[data-room-number]');
       roomElements.forEach(roomElement => {
         const roomNumber = roomElement.getAttribute('data-room-number') || '';
-        const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
-        const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
-        const isBedAOccupied = occupiedBeds[bedAKey] || false;
-        const isBedBOccupied = occupiedBeds[bedBKey] || false;
+        const { color } = getRoomOccupancyStatus(roomNumber, selectedBlock, selectedFloor, occupiedBeds);
         
         const rect = roomElement.querySelector('rect');
         if (rect) {
-          if (isBedAOccupied && isBedBOccupied) {
-            // Fully occupied
-            rect.setAttribute('fill', '#fecaca'); // Red-200
-            rect.setAttribute('stroke', '#ef4444'); // Red-500
-          } else if (isBedAOccupied || isBedBOccupied) {
-            // Partially occupied
-            rect.setAttribute('fill', '#fef08a'); // Yellow-200
-            rect.setAttribute('stroke', '#eab308'); // Yellow-500
-          } else {
-            // Available
-            rect.setAttribute('fill', '#bbf7d0'); // Green-200
-            rect.setAttribute('stroke', '#22c55e'); // Green-500
-          }
+          rect.setAttribute('fill', color);
         }
       });
       
-      // Event handler using delegation
+      // Event handler usingdelegation
       const handleClick = (event: MouseEvent) => {
         const targetGroup = (event.target as Element).closest('g[data-room-number]');
         if (targetGroup) {
@@ -1102,26 +1104,11 @@ const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
       const roomElements = container.querySelectorAll('g[data-room-number]');
       roomElements.forEach(roomElement => {
         const roomNumber = roomElement.getAttribute('data-room-number') || '';
-        const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
-        const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
-        const isBedAOccupied = occupiedBeds[bedAKey] || false;
-        const isBedBOccupied = occupiedBeds[bedBKey] || false;
+        const { color } = getRoomOccupancyStatus(roomNumber, selectedBlock, selectedFloor, occupiedBeds);
         
         const rect = roomElement.querySelector('rect');
         if (rect) {
-          if (isBedAOccupied && isBedBOccupied) {
-            // Fully occupied
-            rect.setAttribute('fill', '#fecaca'); // Red-200
-            rect.setAttribute('stroke', '#ef4444'); // Red-500
-          } else if (isBedAOccupied || isBedBOccupied) {
-            // Partially occupied
-            rect.setAttribute('fill', '#fef08a'); // Yellow-200
-            rect.setAttribute('stroke', '#eab308'); // Yellow-500
-          } else {
-            // Available
-            rect.setAttribute('fill', '#bbf7d0'); // Green-200
-            rect.setAttribute('stroke', '#22c55e'); // Green-500
-          }
+          rect.setAttribute('fill', color);
         }
       });
       
@@ -1165,26 +1152,11 @@ const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
       const roomElements = container.querySelectorAll('g[data-room-number]');
       roomElements.forEach(roomElement => {
         const roomNumber = roomElement.getAttribute('data-room-number') || '';
-        const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
-        const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
-        const isBedAOccupied = occupiedBeds[bedAKey] || false;
-        const isBedBOccupied = occupiedBeds[bedBKey] || false;
+        const { color } = getRoomOccupancyStatus(roomNumber, selectedBlock, selectedFloor, occupiedBeds);
         
         const rect = roomElement.querySelector('rect');
         if (rect) {
-          if (isBedAOccupied && isBedBOccupied) {
-            // Fully occupied
-            rect.setAttribute('fill', '#fecaca'); // Red-200
-            rect.setAttribute('stroke', '#ef4444'); // Red-500
-          } else if (isBedAOccupied || isBedBOccupied) {
-            // Partially occupied
-            rect.setAttribute('fill', '#fef08a'); // Yellow-200
-            rect.setAttribute('stroke', '#eab308'); // Yellow-500
-          } else {
-            // Available
-            rect.setAttribute('fill', '#bbf7d0'); // Green-200
-            rect.setAttribute('stroke', '#22c55e'); // Green-500
-          }
+          rect.setAttribute('fill', color);
         }
       });
       
@@ -1248,26 +1220,10 @@ const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
         roomElement.setAttribute('data-room-number', floorRoomNumber);
         
         // Apply occupancy colors
-        const bedAKey = `${selectedBlock}_${selectedFloor}_${floorRoomNumber}_A`;
-        const bedBKey = `${selectedBlock}_${selectedFloor}_${floorRoomNumber}_B`;
-        const isBedAOccupied = occupiedBeds[bedAKey] || false;
-        const isBedBOccupied = occupiedBeds[bedBKey] || false;
-        
+        const { color } = getRoomOccupancyStatus(floorRoomNumber, selectedBlock, selectedFloor, occupiedBeds);
         const rect = roomElement.querySelector('rect');
         if (rect) {
-          if (isBedAOccupied && isBedBOccupied) {
-            // Fully occupied
-            rect.setAttribute('fill', '#fecaca'); // Red-200
-            rect.setAttribute('stroke', '#ef4444'); // Red-500
-          } else if (isBedAOccupied || isBedBOccupied) {
-            // Partially occupied
-            rect.setAttribute('fill', '#fef08a'); // Yellow-200
-            rect.setAttribute('stroke', '#eab308'); // Yellow-500
-          } else {
-            // Available
-            rect.setAttribute('fill', '#bbf7d0'); // Green-200
-            rect.setAttribute('stroke', '#22c55e'); // Green-500
-          }
+          rect.setAttribute('fill', color);
         }
       });
       
@@ -1321,26 +1277,10 @@ const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
         roomElement.setAttribute('data-room-number', originalRoomNumber);
         
         // Apply occupancy colors
-        const bedAKey = `${selectedBlock}_${selectedFloor}_${originalRoomNumber}_A`;
-        const bedBKey = `${selectedBlock}_${selectedFloor}_${originalRoomNumber}_B`;
-        const isBedAOccupied = occupiedBeds[bedAKey] || false;
-        const isBedBOccupied = occupiedBeds[bedBKey] || false;
-        
+        const { color } = getRoomOccupancyStatus(originalRoomNumber, selectedBlock, selectedFloor, occupiedBeds);
         const rect = roomElement.querySelector('rect');
         if (rect) {
-          if (isBedAOccupied && isBedBOccupied) {
-            // Fully occupied
-            rect.setAttribute('fill', '#fecaca'); // Red-200
-            rect.setAttribute('stroke', '#ef4444'); // Red-500
-          } else if (isBedAOccupied || isBedBOccupied) {
-            // Partially occupied
-            rect.setAttribute('fill', '#fef08a'); // Yellow-200
-            rect.setAttribute('stroke', '#eab308'); // Yellow-500
-          } else {
-            // Available
-            rect.setAttribute('fill', '#bbf7d0'); // Green-200
-            rect.setAttribute('stroke', '#22c55e'); // Green-500
-          }
+          rect.setAttribute('fill', color);
         }
       });
       
@@ -1394,26 +1334,10 @@ const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
         roomElement.setAttribute('data-room-number', originalRoomNumber);
         
         // Apply occupancy colors
-        const bedAKey = `${selectedBlock}_${selectedFloor}_${originalRoomNumber}_A`;
-        const bedBKey = `${selectedBlock}_${selectedFloor}_${originalRoomNumber}_B`;
-        const isBedAOccupied = occupiedBeds[bedAKey] || false;
-        const isBedBOccupied = occupiedBeds[bedBKey] || false;
-        
+        const { color } = getRoomOccupancyStatus(originalRoomNumber, selectedBlock, selectedFloor, occupiedBeds);
         const rect = roomElement.querySelector('rect');
         if (rect) {
-          if (isBedAOccupied && isBedBOccupied) {
-            // Fully occupied
-            rect.setAttribute('fill', '#fecaca'); // Red-200
-            rect.setAttribute('stroke', '#ef4444'); // Red-500
-          } else if (isBedAOccupied || isBedBOccupied) {
-            // Partially occupied
-            rect.setAttribute('fill', '#fef08a'); // Yellow-200
-            rect.setAttribute('stroke', '#eab308'); // Yellow-500
-          } else {
-            // Available
-            rect.setAttribute('fill', '#bbf7d0'); // Green-200
-            rect.setAttribute('stroke', '#22c55e'); // Green-500
-          }
+          rect.setAttribute('fill', color);
         }
       });
       
@@ -1451,7 +1375,7 @@ const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
   }
   
   // For other floors (3rd-7th), use a simple list view
-  const getRoomOccupancyStatus = (roomNumber: number | string): string => {
+  const getOccupancyClassName = (roomNumber: number | string): string => {
     const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
     const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
     const isBedAOccupied = occupiedBeds[bedAKey] || false;
@@ -1467,7 +1391,7 @@ const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
   };
   
   const createRoomButton = (roomNumber: number): React.ReactNode => {
-    const occupancyStatus = getRoomOccupancyStatus(roomNumber);
+    const occupancyStatus = getOccupancyClassName(roomNumber);
     return (
       <button
         key={roomNumber}
@@ -1496,5 +1420,3 @@ const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
     </div>
   );
 };
-
-export default Phase3NorthWingFloorPlan;

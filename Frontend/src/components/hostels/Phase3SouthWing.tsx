@@ -140,18 +140,27 @@ const Phase3SouthWingFloorPlan: React.FC<FloorPlanProps> = ({
   }
   
   // For other floors, use the grid layout
-  const getRoomOccupancyStatus = (roomNumber: number | string): string => {
-    const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
-    const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
-    const isBedAOccupied = occupiedBeds[bedAKey] || false;
-    const isBedBOccupied = occupiedBeds[bedBKey] || false;
+  const getRoomOccupancyStatus = (
+    roomNumber: number | string,
+    blockName?: string,
+    floorName?: string,
+    bedsOccupied?: Record<string, boolean>
+  ): { color: string; status: string } => {
+    const block = blockName || selectedBlock;
+    const floor = floorName || selectedFloor;
+    const beds = bedsOccupied || occupiedBeds;
+    
+    const bedAKey = `${block}_${floor}_${roomNumber}_A`;
+    const bedBKey = `${block}_${floor}_${roomNumber}_B`;
+    const isBedAOccupied = beds[bedAKey] || false;
+    const isBedBOccupied = beds[bedBKey] || false;
     
     if (isBedAOccupied && isBedBOccupied) {
-      return "fully-occupied";
+      return { color: '#fecaca', status: 'Fully Occupied' }; // Red for fully occupied
     } else if (isBedAOccupied || isBedBOccupied) {
-      return "partially-occupied";
+      return { color: '#fef08a', status: 'Partially Occupied' }; // Yellow for partially occupied
     } else {
-      return "available";
+      return { color: '#bbf7d0', status: 'Available' }; // Green for available
     }
   };
   
@@ -160,10 +169,10 @@ const Phase3SouthWingFloorPlan: React.FC<FloorPlanProps> = ({
     return (
       <button
         key={roomNumber}
-        className={`room-button ${occupancyStatus}`}
+        className={`room-button ${occupancyStatus.status.toLowerCase().replace(' ', '-')}`}
         data-room-number={roomNumber}
         onClick={() => onRoomClick(roomNumber.toString())}
-        disabled={occupancyStatus === "fully-occupied"}
+        disabled={occupancyStatus.status === "fully-occupied"}
       >
         {roomNumber}
       </button>

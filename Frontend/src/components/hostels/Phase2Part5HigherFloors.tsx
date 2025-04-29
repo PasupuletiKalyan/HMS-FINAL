@@ -86,18 +86,18 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
   const startY = spacing;
 
   // Function to get room occupancy status
-  const getRoomOccupancyStatus = (roomNumber: number): string => {
+  const getRoomOccupancyStatus = (roomNumber: number) => {
     const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
     const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
     const isBedAOccupied = occupiedBeds[bedAKey] || false;
     const isBedBOccupied = occupiedBeds[bedBKey] || false;
     
     if (isBedAOccupied && isBedBOccupied) {
-      return '#fecaca'; // Light red for fully occupied
+      return { color: '#fecaca', status: 'Fully Occupied' }; // Red for fully occupied
     } else if (isBedAOccupied || isBedBOccupied) {
-      return '#fef08a'; // Light yellow for partially occupied
+      return { color: '#fef08a', status: 'Partially Occupied' }; // Yellow for partially occupied
     } else {
-      return '#bbf7d0'; // Light green for available
+      return { color: '#bbf7d0', status: 'Available' }; // Green for available
     }
   };
 
@@ -115,7 +115,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}61`, 
       roomNumber: parseInt(`${roomPrefix}61`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}61`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}61`)).color,
       onClick: () => onRoomClick(`${roomPrefix}61`)
     },
     { 
@@ -126,7 +126,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}60`, 
       roomNumber: parseInt(`${roomPrefix}60`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}60`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}60`)).color,
       onClick: () => onRoomClick(`${roomPrefix}60`)
     },
     { 
@@ -137,7 +137,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}59`, 
       roomNumber: parseInt(`${roomPrefix}59`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}59`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}59`)).color,
       onClick: () => onRoomClick(`${roomPrefix}59`)
     },
     { 
@@ -148,7 +148,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}58`, 
       roomNumber: parseInt(`${roomPrefix}58`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}58`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}58`)).color,
       onClick: () => onRoomClick(`${roomPrefix}58`)
     },
     { 
@@ -159,7 +159,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}57`, 
       roomNumber: parseInt(`${roomPrefix}57`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}57`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}57`)).color,
       onClick: () => onRoomClick(`${roomPrefix}57`)
     },
     { 
@@ -170,7 +170,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}56`, 
       roomNumber: parseInt(`${roomPrefix}56`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}56`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}56`)).color,
       onClick: () => onRoomClick(`${roomPrefix}56`)
     },
     { id: 'Lifts', x: column1X, y: startY + 6 * (roomHeight + spacing), width: roomWidth, height: roomHeight, label: 'Lifts', fillColor: '#D3D3D3' }, // Light grey
@@ -186,7 +186,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}46`, 
       roomNumber: parseInt(`${roomPrefix}46`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}46`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}46`)).color,
       onClick: () => onRoomClick(`${roomPrefix}46`)
     },
     { 
@@ -197,7 +197,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}47`, 
       roomNumber: parseInt(`${roomPrefix}47`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}47`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}47`)).color,
       onClick: () => onRoomClick(`${roomPrefix}47`)
     },
     { 
@@ -208,7 +208,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}48`, 
       roomNumber: parseInt(`${roomPrefix}48`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}48`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}48`)).color,
       onClick: () => onRoomClick(`${roomPrefix}48`)
     },
     { 
@@ -219,7 +219,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}49`, 
       roomNumber: parseInt(`${roomPrefix}49`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}49`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}49`)).color,
       onClick: () => onRoomClick(`${roomPrefix}49`)
     },
     { 
@@ -230,7 +230,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}50`, 
       roomNumber: parseInt(`${roomPrefix}50`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}50`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}50`)).color,
       onClick: () => onRoomClick(`${roomPrefix}50`)
     },
     { 
@@ -241,7 +241,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}51`, 
       roomNumber: parseInt(`${roomPrefix}51`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}51`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}51`)).color,
       onClick: () => onRoomClick(`${roomPrefix}51`)
     },
     { 
@@ -252,7 +252,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}52`, 
       roomNumber: parseInt(`${roomPrefix}52`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}52`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}52`)).color,
       onClick: () => onRoomClick(`${roomPrefix}52`)
     },
     { 
@@ -263,7 +263,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}53`, 
       roomNumber: parseInt(`${roomPrefix}53`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}53`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}53`)).color,
       onClick: () => onRoomClick(`${roomPrefix}53`)
     },
     { 
@@ -274,7 +274,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}54`, 
       roomNumber: parseInt(`${roomPrefix}54`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}54`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}54`)).color,
       onClick: () => onRoomClick(`${roomPrefix}54`)
     },
     { id: 'Balco', x: column2X, y: startY + 9 * (roomHeight + spacing) + spacing, width: roomWidth, height: roomHeight * 2, label: 'Balcony', fillColor: '#D3D3D3' }, // Light grey
@@ -286,7 +286,7 @@ const Phase2Part5HigherFloors: React.FC<Phase2Part5HigherFloorsProps> = ({
       height: roomHeight, 
       label: `${roomPrefix}55`, 
       roomNumber: parseInt(`${roomPrefix}55`),
-      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}55`)),
+      fillColor: getRoomOccupancyStatus(parseInt(`${roomPrefix}55`)).color,
       onClick: () => onRoomClick(`${roomPrefix}55`)
     },
   ];
