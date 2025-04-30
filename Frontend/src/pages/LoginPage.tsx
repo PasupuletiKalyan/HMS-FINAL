@@ -23,21 +23,34 @@ const LoginPage: React.FC = () => {
       console.log("🔍 Server Response:", response.data);
 
       if (response.data.success) {
-        const { role, name, userId } = response.data;
+        const { role, name, userId, applicationNo } = response.data;
         console.log("✅ User Logged In:", name);
 
-        // Store user details in localStorage
-        localStorage.setItem("userName", name);
-        localStorage.setItem("userRole", role);
-        localStorage.setItem("userId", userId);
+        // Clear any existing user data first
+        localStorage.clear();
+        
+        // Create a session key based on role to prevent interference between roles
+        const sessionKey = `user_${role}_${Date.now()}`;
+        
+        // Store user details in localStorage with role-specific keys
+        localStorage.setItem(`${role}_userName`, name);
+        localStorage.setItem(`${role}_userId`, userId);
+        localStorage.setItem("currentRole", role);
+        localStorage.setItem("userRole", role); // Add this line to store role explicitly
+        localStorage.setItem("sessionKey", sessionKey);
+        
+        // Store application number only for students
+        if (role === "student" && applicationNo) {
+          localStorage.setItem("applicationNo", applicationNo);
+        }
 
-        console.log("📌 Stored in Localstorage:", localStorage.getItem("userName"));
+        console.log("📌 Stored in Localstorage:", localStorage.getItem(`${role}_userName`));
 
         setTimeout(() => {
           if (role === "student") {
             navigate("/student-dashboard");
           } else if (role === "warden") {
-            navigate("/warden-dashboard"); // Consistent warden redirect
+            navigate("/warden-dashboard"); 
           } else if (role === "admin") {
             navigate("/admin-dashboard");
           } else {

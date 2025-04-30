@@ -5,6 +5,24 @@ const studentSchema = new mongoose.Schema({
   name: String,
   roomNo: String,
   email: String,
+  documentVerification: {
+    antiRagging: {
+      type: Boolean,
+      default: false
+    },
+    antiDrug: {
+      type: Boolean,
+      default: false
+    },
+    keysHandedOver: {
+      type: Boolean,
+      default: false
+    },
+    verifiedAt: {
+      type: Date,
+      default: null
+    }
+  }
 });
 
 module.exports = mongoose.model("Student", studentSchema);

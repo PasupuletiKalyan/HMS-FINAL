@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Phase1FloorPlan,
   Phase1EBlockFloorPlan,
@@ -96,6 +96,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
   const [selectedBlock, setSelectedBlock] = useState<string>('');
   const [selectedFloor, setSelectedFloor] = useState<string>('');
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
   const [showWarningModal, setShowWarningModal] = useState<boolean>(false);
   const [modalRoomInfo, setModalRoomInfo] = useState<ModalRoomInfo>({ 
@@ -104,6 +105,58 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     floor: '', 
     bed: null 
   });
+
+  // Load booking data from localStorage when component mounts
+  useEffect(() => {
+    // Load occupied beds from localStorage
+    const userRole = localStorage.getItem("userRole") || "student";
+    const userId = localStorage.getItem(`${userRole}_userId`);
+    
+    // Make occupied beds list specific to the user
+    const savedOccupiedBeds = localStorage.getItem(`occupiedBeds_${userId}`);
+    if (savedOccupiedBeds) {
+      try {
+        const parsedBeds = JSON.parse(savedOccupiedBeds);
+        setOccupiedBeds(parsedBeds);
+      } catch (error) {
+        console.error('Error parsing occupied beds from localStorage:', error);
+      }
+    } else {
+      // Reset occupied beds for new user
+      setOccupiedBeds({});
+    }
+
+    // Load current user booking from localStorage with a user-specific key
+    const bookingKey = `${userRole}_${userId}_userBooking`;
+    const savedUserBooking = localStorage.getItem(bookingKey);
+    if (savedUserBooking) {
+      try {
+        setCurrentUserBooking(JSON.parse(savedUserBooking));
+      } catch (error) {
+        console.error('Error parsing user booking from localStorage:', error);
+      }
+    }
+  }, [setOccupiedBeds, setCurrentUserBooking]);
+
+  // Save booking data to localStorage whenever it changes
+  useEffect(() => {
+    const userRole = localStorage.getItem("userRole") || "student";
+    const userId = localStorage.getItem(`${userRole}_userId`);
+    if (userId) {
+      localStorage.setItem(`occupiedBeds_${userId}`, JSON.stringify(occupiedBeds));
+    }
+  }, [occupiedBeds]);
+
+  useEffect(() => {
+    if (currentUserBooking) {
+      const userRole = localStorage.getItem("userRole") || "student";
+      const userId = localStorage.getItem(`${userRole}_userId`);
+      if (userId) {
+        const bookingKey = `${userRole}_${userId}_userBooking`;
+        localStorage.setItem(bookingKey, JSON.stringify(currentUserBooking));
+      }
+    }
+  }, [currentUserBooking]);
   
   const hostelData = {
     "Phase 1": phase1Config,
@@ -199,10 +252,24 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
 
   // Handle bed click
   const handleBedClick = (bed: string): void => {
+    // Check if the bed is already occupied
+    if (isBedOccupied(modalRoomInfo.number, bed)) {
+      return; // Don't allow selecting an occupied bed
+    }
+    
     setModalRoomInfo(prev => ({
       ...prev,
       bed: bed
     }));
+  };
+
+  // Handle proceeding to booking confirmation
+  const handleProceedToConfirmation = (): void => {
+    if (!modalRoomInfo.bed) return;
+    
+    // Close the selection modal and open the confirmation modal
+    setShowModal(false);
+    setShowConfirmationModal(true);
   };
 
   // Handle booking confirmation
@@ -210,7 +277,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     if (!modalRoomInfo.bed) return;
     // If user already has a booking, don't allow another one
     if (currentUserBooking) {
-      setShowModal(false);
+      setShowConfirmationModal(false);
       setShowWarningModal(true);
       return;
     } 
@@ -229,14 +296,32 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
       roomKey: roomKey
     });
         
-    setShowModal(false);
+    setShowConfirmationModal(false);
     setShowSuccessModal(true);
   };
 
   // Check if bed is occupied
   const isBedOccupied = (room: string, bed: string): boolean => {
-    const roomKey = `${modalRoomInfo.block}_${modalRoomInfo.floor}_${room}_${bed}`;
+    const roomKey = `${selectedBlock}_${selectedFloor}_${room}_${bed}`;
     return occupiedBeds[roomKey] || false;
+  };
+
+  // New function to get available beds for a room
+  const getAvailableBedsForRoom = (roomNumber: string): string[] => {
+    const availableBeds: string[] = [];
+    
+    const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
+    const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
+    
+    if (!occupiedBeds[bedAKey]) {
+      availableBeds.push('A');
+    }
+    
+    if (!occupiedBeds[bedBKey]) {
+      availableBeds.push('B');
+    }
+    
+    return availableBeds;
   };
 
   // Render floor plan content
@@ -526,6 +611,17 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     padding: '0.25rem 0.5rem',
     boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
     boxSizing: 'border-box'
+  };
+
+  // Get current date formatted
+  const getCurrentDate = (): string => {
+    const date = new Date();
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
   };
 
   // ... rest of the component stays the same (modals, etc.) ...
@@ -916,12 +1012,164 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
                   </p>
                   <button 
                     className="confirm-booking-btn"
-                    onClick={handleConfirmBooking}
+                    onClick={handleProceedToConfirmation}
                   >
-                    Confirm Booking
+                    Continue
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* BookMyShow-style Confirmation Modal */}
+      {showConfirmationModal && (
+        <div className="modal confirmation-modal" onClick={() => setShowConfirmationModal(false)}>
+          <div className="modal-content confirmation-content" onClick={e => e.stopPropagation()}>
+            <span className="modal-close-btn" onClick={() => setShowConfirmationModal(false)}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6 6 18"/>
+                <path d="m6 6 12 12"/>
+              </svg>
+            </span>
+            
+            <h2 className="confirmation-title">Confirm Your Booking</h2>
+            
+            <div className="booking-summary" style={{
+              backgroundColor: '#f7f7f7', 
+              borderRadius: '8px',
+              padding: '16px',
+              margin: '16px 0',
+              border: '1px solid #e5e7eb'
+            }}>
+              <div className="booking-header" style={{
+                borderBottom: '1px solid #e5e7eb',
+                marginBottom: '12px',
+                paddingBottom: '8px',
+                display: 'flex',
+                justifyContent: 'space-between'
+              }}>
+                <div>
+                  <h3 style={{ margin: '0 0 4px 0', color: '#1f2937' }}>Hostel Bed Booking</h3>
+                  <p style={{ margin: '0', fontSize: '14px', color: '#6b7280' }}>{getCurrentDate()}</p>
+                </div>
+                <div style={{
+                  backgroundColor: '#4f46e5',
+                  color: 'white',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  alignSelf: 'flex-start'
+                }}>
+                  BOOKING
+                </div>
+              </div>
+              
+              <div className="booking-details" style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '12px',
+                marginBottom: '16px'
+              }}>
+                <div className="detail-column">
+                  <div className="detail-item" style={{ marginBottom: '8px' }}>
+                    <p style={{ margin: '0', fontSize: '12px', color: '#6b7280' }}>Block</p>
+                    <p style={{ margin: '0', fontWeight: '500', color: '#1f2937' }}>{modalRoomInfo.block}</p>
+                  </div>
+                  <div className="detail-item" style={{ marginBottom: '8px' }}>
+                    <p style={{ margin: '0', fontSize: '12px', color: '#6b7280' }}>Floor</p>
+                    <p style={{ margin: '0', fontWeight: '500', color: '#1f2937' }}>{modalRoomInfo.floor}</p>
+                  </div>
+                </div>
+                <div className="detail-column">
+                  <div className="detail-item" style={{ marginBottom: '8px' }}>
+                    <p style={{ margin: '0', fontSize: '12px', color: '#6b7280' }}>Room</p>
+                    <p style={{ margin: '0', fontWeight: '500', color: '#1f2937' }}>{modalRoomInfo.number}</p>
+                  </div>
+                  <div className="detail-item" style={{ marginBottom: '8px' }}>
+                    <p style={{ margin: '0', fontSize: '12px', color: '#6b7280' }}>Bed</p>
+                    <p style={{ margin: '0', fontWeight: '500', color: '#1f2937' }}>{modalRoomInfo.bed}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="selected-info" style={{
+                backgroundColor: '#f3f4f6',
+                border: '1px dashed #d1d5db',
+                padding: '12px',
+                borderRadius: '6px',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  backgroundColor: '#bbf7d0',
+                  marginBottom: '8px'
+                }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+                <p style={{ margin: '4px 0 0 0', fontWeight: '500', color: '#374151' }}>
+                  Room {modalRoomInfo.number}, Bed {modalRoomInfo.bed} selected
+                </p>
+              </div>
+            </div>
+            
+            <div className="important-note" style={{
+              backgroundColor: '#fff7ed',
+              border: '1px solid #fed7aa',
+              borderRadius: '6px',
+              padding: '12px',
+              marginBottom: '16px'
+            }}>
+              <p style={{ margin: '0', fontSize: '14px', color: '#9a3412' }}>
+                <strong>Important:</strong> Once confirmed, this booking cannot be changed without contacting the hostel administration.
+              </p>
+            </div>
+            
+            <div className="confirmation-actions" style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: '12px'
+            }}>
+              <button
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: '6px',
+                  border: '1px solid #d1d5db',
+                  backgroundColor: '#f9fafb',
+                  color: '#4b5563',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  flex: '1'
+                }}
+                onClick={() => setShowConfirmationModal(false)}
+              >
+                Back
+              </button>
+              <button
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  backgroundColor: '#4f46e5',
+                  color: 'white',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  flex: '1'
+                }}
+                onClick={handleConfirmBooking}
+              >
+                Confirm Booking
+              </button>
             </div>
           </div>
         </div>

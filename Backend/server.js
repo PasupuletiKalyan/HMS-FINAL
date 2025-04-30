@@ -1,8 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const User = require("./models/User");
+const User = require("./models/user"); // Fixed case sensitivity issue in import
 const studentFormRoutes = require("./routes/studentFormRoutes");
+const complaintRoutes = require("./routes/complaintRoutes");
+const studentProgressRoutes = require("./routes/studentProgressRoutes");
+const wardenRoutes = require("./routes/wardenRoutes");
 // Load environment variables
 require('dotenv').config();
 
@@ -51,6 +54,15 @@ app.post("/api/login", async (req, res) => {
 
 // Form Routes
 app.use("/api/form", studentFormRoutes);
+
+// Complaint Routes
+app.use("/api/complaints", complaintRoutes);
+
+// Student Progress Routes
+app.use("/api/progress", studentProgressRoutes);
+
+// Warden Routes
+app.use("/api/warden", wardenRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => {

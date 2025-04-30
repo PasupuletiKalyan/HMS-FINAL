@@ -47,3 +47,55 @@ export interface HostelFloorPlanViewerProps {
   setOccupiedBeds: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   navigateToBookingPage: () => void;
 }
+
+// Utility function to get room occupancy status
+export const getRoomOccupancyStatus = (
+  roomNumber: string | number,
+  occupiedBeds: Record<string, boolean>,
+  selectedBlock: string,
+  selectedFloor: string
+): string => {
+  // Special case for Warden Room (33)
+  if (roomNumber === 33 || roomNumber === "33") {
+    return "fully-occupied"; // Mark Warden Room as unbookable
+  }
+  
+  const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
+  const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
+  
+  const isBedAOccupied = occupiedBeds[bedAKey] || false;
+  const isBedBOccupied = occupiedBeds[bedBKey] || false;
+  
+  if (isBedAOccupied && isBedBOccupied) {
+    return "fully-occupied"; // Both beds occupied
+  } else if (isBedAOccupied || isBedBOccupied) {
+    return "partially-occupied"; // Only one bed occupied
+  } else {
+    return "available"; // No beds occupied
+  }
+};
+
+// Utility function to get room fill color based on occupancy status
+export const getRoomFillColor = (
+  roomNumber: string | number,
+  occupiedBeds: Record<string, boolean>,
+  selectedBlock: string,
+  selectedFloor: string
+): string => {
+  // Special case for Warden Room (33)
+  if (roomNumber === 33 || roomNumber === "33") {
+    return "#d8b4fe"; // Purple for warden room
+  }
+  
+  const status = getRoomOccupancyStatus(roomNumber, occupiedBeds, selectedBlock, selectedFloor);
+  
+  switch (status) {
+    case "fully-occupied":
+      return "#fca5a5"; // Red for fully occupied
+    case "partially-occupied":
+      return "#fde047"; // Yellow for partially occupied
+    case "available":
+    default:
+      return "#86efac"; // Green for available
+  }
+};

@@ -12,8 +12,8 @@ interface BookingInfo {
 
 interface CurrentBookingPageProps {
   currentUserBooking: BookingInfo | null;
-  onCancelBooking: () => void;
-  navigateToFloorPlan: () => void;
+  onCancelBooking?: () => void;
+  navigateToFloorPlan?: () => void;
 }
 
 const CurrentBookingPage: React.FC<CurrentBookingPageProps> = ({ 
@@ -26,9 +26,11 @@ const CurrentBookingPage: React.FC<CurrentBookingPageProps> = ({
       <div className="no-booking-container">
         <h2>No Active Booking</h2>
         <p>You don't have any active hostel bookings.</p>
-        <button onClick={navigateToFloorPlan} className="return-btn">
-          Return to Floor Plan
-        </button>
+        {navigateToFloorPlan && (
+          <button onClick={navigateToFloorPlan} className="return-btn">
+            Return to Floor Plan
+          </button>
+        )}
       </div>
     );
   }
@@ -60,20 +62,27 @@ const CurrentBookingPage: React.FC<CurrentBookingPageProps> = ({
             <span className="info-label">Bed:</span>
             <span className="info-value">{currentUserBooking.bed}</span>
           </div>
-          <div className="info-row">
-            <span className="info-label">Booking Date:</span>
-            <span className="info-value">{new Date().toLocaleDateString()}</span>
-          </div>
         </div>
         
-        <div className="booking-actions">
-          <button className="cancel-booking-btn" onClick={onCancelBooking}>
-            Cancel Booking
-          </button>
-          <button onClick={navigateToFloorPlan} className="return-btn">
-            Back to Floor Plan
-          </button>
+        <div className="booking-note" style={{
+          backgroundColor: "#fff3f3",
+          padding: "15px",
+          borderRadius: "8px",
+          marginTop: "20px",
+          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+          borderLeft: "5px solid #e53935"
+        }}>
+          <p style={{ margin: "5px 0", fontWeight: "500" }}><strong>Note:</strong> Please report to the hostel office with your booking details for key collection.</p>
+          <p style={{ margin: "5px 0" }}>Your room booking has been confirmed and is valid for the current academic year.</p>
         </div>
+        
+        {navigateToFloorPlan && (
+          <div className="booking-actions">
+            <button onClick={navigateToFloorPlan} className="return-btn">
+              Back to Floor Plan
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

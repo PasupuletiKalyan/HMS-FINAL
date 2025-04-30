@@ -31,20 +31,7 @@ const CurrentBookingPage: React.FC<CurrentBookingPageProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // Handle cancellation of booking
-  const handleCancelBooking = () => {
-    if (currentUserBooking) {
-      // Remove the bed from occupied beds
-      setOccupiedBeds(prev => {
-        const newOccupiedBeds = { ...prev };
-        delete newOccupiedBeds[currentUserBooking.roomKey];
-        return newOccupiedBeds;
-      });
-      
-      // Clear the current user booking
-      setCurrentUserBooking(null);
-    }
-  };
+  // Cancel booking functionality removed since students should only book once
 
   return (
     <div className="current-booking-page">
@@ -74,12 +61,7 @@ const CurrentBookingPage: React.FC<CurrentBookingPageProps> = ({
                 </div>
               </div>
               
-              <button 
-                className="cancel-booking-btn"
-                onClick={handleCancelBooking}
-              >
-                Cancel Booking
-              </button>
+              {/* Cancel booking button removed since students can only book once */}
             </div>
             
             <div className="actions-container">
@@ -89,12 +71,7 @@ const CurrentBookingPage: React.FC<CurrentBookingPageProps> = ({
               >
                 Back to Dashboard
               </button>
-              <button 
-                className="back-to-booking-btn"
-                onClick={() => navigate('/hostel-booking')}
-              >
-                View Other Rooms
-              </button>
+              {/* "View Other Rooms" button removed as requested */}
             </div>
           </div>
         ) : (

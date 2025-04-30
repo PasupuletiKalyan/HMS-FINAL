@@ -62,13 +62,23 @@ type StudentBooking = {
   booking: BookingInfo;
 };
 
+// Update the Complaint type to match our database model
 type Complaint = {
-  id: number;
+  _id: string;
+  applicationNo: string;
   studentName: string;
-  roomNumber: string;
-  complaint: string;
-  phase: string; // Added phase property
-  status: 'Pending' | 'Resolved';
+  subject: string;
+  description: string;
+  priority: string;
+  roomDetails: {
+    block: string;
+    floor: string;
+    roomNumber: string;
+  } | null;
+  status: 'Pending' | 'In Progress' | 'Resolved' | 'Closed';
+  wardenResponse?: string;
+  date: string;
+  createdAt: string;
 };
 
 const createEmptyTotals = (): Omit<FloorData, 'floorNumber'> => ({
@@ -304,10 +314,18 @@ const WardenDashboard: React.FC = () => {
   const [studentApplicationNumber, setStudentApplicationNumber] = useState<string>("");
   const [showStudentInput, setShowStudentInput] = useState<boolean>(false);
   const [studentBookings, setStudentBookings] = useState<StudentBooking[]>([]);
+  const [studentSearchQuery, setStudentSearchQuery] = useState<string>("");
+  const [studentDetails, setStudentDetails] = useState<any>(null);
+  const [isLoadingStudent, setIsLoadingStudent] = useState<boolean>(false);
+  const [documentVerification, setDocumentVerification] = useState({
+    antiRagging: false,
+    antiDrug: false,
+    keysHandedOver: false
+  });
   const [complaints, setComplaints] = useState<Complaint[]>([
-    { id: 1, studentName: "Om Sai Vikranth", roomNumber: "12-27", complaint: "AC Not Working", phase: "Phase 2", status: "Pending" },
-    { id: 2, studentName: "Mohana Krishna", roomNumber: "12-31", complaint: "Smell From Washroom Spreading all over corridor", phase: "Phase 2", status: "Pending" },
-    { id: 3, studentName: "SJ Satwik", roomNumber: "9-27", complaint: "Flickering light in room", phase: "Phase 2", status: "Resolved" },
+    { _id: "1", applicationNo: "123", studentName: "Om Sai Vikranth", subject: "AC Not Working", description: "AC in my room is not working since last week.", priority: "High", roomDetails: { block: "A", floor: "1", roomNumber: "101" }, status: "Pending", date: "2023-10-01", createdAt: "2023-10-01T10:00:00Z" },
+    { _id: "2", applicationNo: "124", studentName: "Mohana Krishna", subject: "Washroom Issue", description: "Smell From Washroom Spreading all over corridor", priority: "Medium", roomDetails: { block: "A", floor: "1", roomNumber: "102" }, status: "Pending", date: "2023-10-02", createdAt: "2023-10-02T11:00:00Z" },
+    { _id: "3", applicationNo: "125", studentName: "SJ Satwik", subject: "Light Flickering", description: "Flickering light in room", priority: "Low", roomDetails: { block: "B", floor: "2", roomNumber: "201" }, status: "Resolved", date: "2023-10-03", createdAt: "2023-10-03T12:00:00Z" },
   ]);
   const navigate = useNavigate();
 
@@ -412,7 +430,7 @@ const WardenDashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    const storedWarden = localStorage.getItem("userName");
+    const storedWarden = localStorage.getItem("warden_userName");
     if (storedWarden) {
       setWardenName(storedWarden);
     }
@@ -681,7 +699,7 @@ const WardenDashboard: React.FC = () => {
             <td><input type="number" value={('totals' in editData ? editData.totals.totalNSBeds : editData.totalNSBeds)} onChange={e => setEditData({...editData, ...('totals' in editData ? {totals: {...editData.totals, totalNSBeds: +e.target.value}} : {totalNSBeds: +e.target.value})})} /></td>
             <td><input type="number" value={('totals' in editData ? editData.totals.studentBedsAvailable : editData.studentBedsAvailable)} onChange={e => setEditData({...editData, ...('totals' in editData ? {totals: {...editData.totals, studentBedsAvailable: +e.target.value}} : {studentBedsAvailable: +e.target.value})})} /></td>
             <td><input type="number" value={('totals' in editData ? editData.totals.occupiedBeds : editData.occupiedBeds)} onChange={e => setEditData({...editData, ...('totals' in editData ? {totals: {...editData.totals, occupiedBeds: +e.target.value}} : {occupiedBeds: +e.target.value})})} /></td>
-            <td>{('totals' in editData ? editData.totals.emptyBeds : editData.emptyBeds)}</td>
+            <td><input type="number" value={('totals' in editData ? editData.totals.emptyBeds : editData.emptyBeds)} onChange={e => setEditData({...editData, ...('totals' in editData ? {totals: {...editData.totals, emptyBeds: +e.target.value}} : {emptyBeds: +e.target.value})})} /></td>
           </>
         )}
         <td>
@@ -1035,10 +1053,68 @@ const WardenDashboard: React.FC = () => {
     );
   };
 
-  const markAsResolved = (id: number) => {
+  // Add useEffect to fetch complaints when component mounts
+  useEffect(() => {
+    fetchComplaints();
+  }, [selectedMenu]);
+
+  // Function to fetch complaints from the server
+  const fetchComplaints = async () => {
+    if (selectedMenu !== "Maintenance Complaints") return;
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/complaints');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.complaints) {
+          setComplaints(data.complaints);
+        }
+      } else {
+        console.error('Failed to fetch complaints');
+      }
+    } catch (error) {
+      console.error('Error fetching complaints:', error);
+    }
+  };
+
+  // Function to update complaint status
+  const updateComplaintStatus = async (id: string, newStatus: 'Pending' | 'In Progress' | 'Resolved' | 'Closed', response?: string) => {
+    try {
+      const updateData: {status: string, wardenResponse?: string} = { status: newStatus };
+      if (response) {
+        updateData.wardenResponse = response;
+      }
+      
+      const res = await fetch(`http://localhost:5000/api/complaints/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+      
+      if (res.ok) {
+        // Update local state with new status
+        setComplaints(prev => 
+          prev.map(complaint => 
+            complaint._id === id ? { ...complaint, status: newStatus, wardenResponse: response || complaint.wardenResponse } : complaint
+          )
+        );
+        alert(`Complaint has been marked as ${newStatus}`);
+      } else {
+        const errorData = await res.json();
+        alert(`Failed to update complaint status: ${errorData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error updating complaint status:', error);
+      alert('An error occurred while updating the complaint');
+    }
+  };
+
+  const markAsResolved = (id: string) => {
     setComplaints(prev =>
       prev.map(complaint =>
-        complaint.id === id ? { ...complaint, status: "Resolved" } : complaint
+        complaint._id === id ? { ...complaint, status: "Resolved" } : complaint
       )
     );
   };
@@ -1050,49 +1126,473 @@ const WardenDashboard: React.FC = () => {
           <thead>
             <tr>
               <th>Student Name</th>
-              <th>Room Number</th>
-              <th>Complaint</th>
-              <th>Phase</th>
+              <th>Application No.</th>
+              <th>Room Details</th>
+              <th>Subject</th>
+              <th>Priority</th>
+              <th>Date</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {complaints.map(complaint => (
-              <tr key={complaint.id}>
-                <td>{complaint.studentName}</td>
-                <td>{complaint.roomNumber}</td>
-                <td>{complaint.complaint}</td>
-                <td>{complaint.phase}</td>
-                <td>
-                  <span className={`status-badge ${complaint.status.toLowerCase()}`}>
-                    {complaint.status}
-                  </span>
-                </td>
-                <td>
-                  {complaint.status === "Pending" && (
+            {complaints.length > 0 ? (
+              complaints.map(complaint => (
+                <tr key={complaint._id}>
+                  <td>{complaint.studentName}</td>
+                  <td>{complaint.applicationNo}</td>
+                  <td>
+                    {complaint.roomDetails ? 
+                      `${complaint.roomDetails.block}-${complaint.roomDetails.floor}-${complaint.roomDetails.roomNumber}` : 
+                      'Not assigned'}
+                  </td>
+                  <td>{complaint.subject}</td>
+                  <td>
+                    <span className={`priority-badge ${complaint.priority.toLowerCase()}`}>
+                      {complaint.priority}
+                    </span>
+                  </td>
+                  <td>{new Date(complaint.date).toLocaleDateString()}</td>
+                  <td>
+                    <span className={`status-badge ${complaint.status.toLowerCase().replace(' ', '-')}`}>
+                      {complaint.status}
+                    </span>
+                  </td>
+                  <td>
+                    {complaint.status === "Pending" && (
+                      <button
+                        className="action-btn resolve"
+                        onClick={() => updateComplaintStatus(complaint._id, "Resolved")}
+                      >
+                        Resolve
+                      </button>
+                    )}
+                    {complaint.status === "In Progress" && (
+                      <button
+                        className="action-btn resolve"
+                        onClick={() => updateComplaintStatus(complaint._id, "Resolved")}
+                      >
+                        Resolve
+                      </button>
+                    )}
+                    {complaint.status === "Resolved" && (
+                      <button
+                        className="action-btn close"
+                        onClick={() => updateComplaintStatus(complaint._id, "Closed")}
+                      >
+                        Close
+                      </button>
+                    )}
+                    
                     <button
-                      className="resolve-btn"
-                      onClick={() => markAsResolved(complaint.id)}
+                      className="action-btn view"
+                      onClick={() => alert(`Description: ${complaint.description}`)}
                     >
-                      Mark as Resolved
+                      View Details
                     </button>
-                  )}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={8} style={{ textAlign: 'center', padding: '20px' }}>
+                  No complaints found
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
+      </div>
+      <div className="status-legend" style={{ marginTop: '20px', display: 'flex', gap: '15px', justifyContent: 'center' }}>
+        <div className="legend-item">
+          <span className="status-badge pending"></span> Pending
+        </div>
+        <div className="legend-item">
+          <span className="status-badge in-progress"></span> In Progress
+        </div>
+        <div className="legend-item">
+          <span className="status-badge resolved"></span> Resolved
+        </div>
+        <div className="legend-item">
+          <span className="status-badge closed"></span> Closed
+        </div>
       </div>
     </div>
   );
 
+  // Function to search for student by application number
+  const searchStudent = async () => {
+    if (!studentSearchQuery.trim()) {
+      alert('Please enter an application number to search');
+      return;
+    }
+    
+    setIsLoadingStudent(true);
+    try {
+      const response = await fetch(`http://localhost:5000/api/warden/student/${studentSearchQuery.trim()}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setStudentDetails(data.studentDetails);
+          
+          // Set document verification state from response
+          if (data.studentDetails.documentVerification) {
+            setDocumentVerification({
+              antiRagging: data.studentDetails.documentVerification.antiRagging || false,
+              antiDrug: data.studentDetails.documentVerification.antiDrug || false,
+              keysHandedOver: data.studentDetails.documentVerification.keysHandedOver || false
+            });
+          }
+        } else {
+          setStudentDetails(null);
+          alert('No student found with that application number');
+        }
+      } else {
+        setStudentDetails(null);
+        alert('Error fetching student data');
+      }
+    } catch (error) {
+      console.error('Error searching for student:', error);
+      alert('Failed to search for student. Please try again.');
+    } finally {
+      setIsLoadingStudent(false);
+    }
+  };
+
+  // Function to submit document verification
+  const submitDocumentVerification = async () => {
+    if (!studentDetails) return;
+    
+    const confirmMsg = 'This will mark the following documents as received:\n' + 
+      (documentVerification.antiRagging ? '✓ Anti-Ragging Declaration\n' : '✗ Anti-Ragging Declaration\n') +
+      (documentVerification.antiDrug ? '✓ Anti-Drug Declaration\n' : '✗ Anti-Drug Declaration\n') +
+      (documentVerification.keysHandedOver ? '✓ Room Keys Handed Over\n' : '✗ Room Keys Handed Over\n') +
+      '\nDo you want to proceed?';
+      
+    if (!window.confirm(confirmMsg)) return;
+    
+    try {
+      const response = await fetch(`http://localhost:5000/api/warden/student/${studentSearchQuery}/verify-documents`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(documentVerification),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          alert('Document verification updated successfully');
+          // Update student details with new verification status
+          setStudentDetails((prev: any) => ({
+            ...prev,
+            documentVerification: data.documentVerification
+          }));
+        } else {
+          alert('Failed to update document verification');
+        }
+      } else {
+        alert('Error updating document verification');
+      }
+    } catch (error) {
+      console.error('Error submitting document verification:', error);
+      alert('Failed to submit document verification. Please try again.');
+    }
+  };
+
   return (
     <div className="dashboard-container">
+      {/* TOP NAVIGATION BAR */}
+      <div className="dashboard-top-nav">
+        <div className="profile-section-top">
+          <img src={collegeLogo} alt="College Logo" className="college-logo-top" />
+        </div>
+        <ul className="top-menu">
+          <li
+            className={`top-menu-item ${selectedMenu === "Overview" ? "active" : ""}`}
+            onClick={() => setSelectedMenu("Overview")}
+          >
+            Room Overview
+          </li>
+          <li
+            className={`top-menu-item ${selectedMenu === "Room Allotment" ? "active" : ""}`}
+            onClick={() => setSelectedMenu("Room Allotment")}
+          >
+            Room Allotment
+          </li>
+          <li
+            className={`top-menu-item ${selectedMenu === "Student Search" ? "active" : ""}`}
+            onClick={() => setSelectedMenu("Student Search")}
+          >
+            Student Search
+          </li>
+          <li
+            className={`top-menu-item ${selectedMenu === "Maintenance Complaints" ? "active" : ""}`}
+            onClick={() => setSelectedMenu("Maintenance Complaints")}
+          >
+            Complaints
+          </li>
+        </ul>
+        <div className="profile-button-container" ref={profileRef}>
+          <button
+            className="profile-clickable"
+            onClick={() => setShowProfileDropdown((prev) => !prev)}
+          >
+            <div className="profile-circle">
+              <span>{wardenName.charAt(0)}</span>
+            </div>
+            <p className="profile-name">{wardenName}</p>
+          </button>
+          {showProfileDropdown && (
+            <div className="profile-dropdown">
+              <ul>
+                <li onClick={() => navigate("/change-password")}>
+                  Change Password
+                </li>
+                <li onClick={handleLogout}>
+                  Logout
+                </li>
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="dashboard-content">
         <h1>{selectedMenu}</h1>
         {selectedMenu === "Overview" && renderOverviewContent()}
         {selectedMenu === "Room Allotment" && renderRoomAllotmentContent()}
+        {selectedMenu === "Student Search" && (
+          <div className="student-search-container">
+            <div className="search-box" style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              maxWidth: '600px',
+              margin: '0 auto 30px',
+              padding: '20px'
+            }}>
+              <input
+                type="text"
+                placeholder="Enter Student Application Number"
+                value={studentSearchQuery}
+                onChange={(e) => setStudentSearchQuery(e.target.value)}
+                className="search-input"
+                style={{
+                  width: '70%',
+                  padding: '12px',
+                  borderRadius: '4px 0 0 4px',
+                  border: '1px solid #ccc',
+                  fontSize: '16px',
+                  height: '45px'
+                }}
+              />
+              <button 
+                onClick={searchStudent} 
+                className="search-button"
+                disabled={isLoadingStudent}
+                style={{
+                  width: '30%',
+                  padding: '12px',
+                  backgroundColor: '#c23535',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '0 4px 4px 0',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  height: '45px'
+                }}
+              >
+                {isLoadingStudent ? 'Searching...' : 'Search'}
+              </button>
+            </div>
+            
+            {studentDetails && (
+              <div className="student-details-container">
+                <div className="student-header">
+                  <h2>Student Details</h2>
+                  <div className="completion-status">
+                    <div className={`status-item ${studentDetails.progress.formCompleted ? 'completed' : 'pending'}`}>
+                      <span className="status-label">Form</span>
+                      <span className="status-icon">{studentDetails.progress.formCompleted ? '✓' : '✗'}</span>
+                    </div>
+                    <div className={`status-item ${studentDetails.progress.paymentCompleted ? 'completed' : 'pending'}`}>
+                      <span className="status-label">Payment</span>
+                      <span className="status-icon">{studentDetails.progress.paymentCompleted ? '✓' : '✗'}</span>
+                    </div>
+                    <div className={`status-item ${studentDetails.progress.roomBooked ? 'completed' : 'pending'}`}>
+                      <span className="status-label">Room Booking</span>
+                      <span className="status-icon">{studentDetails.progress.roomBooked ? '✓' : '✗'}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {studentDetails.formData && (
+                  <div className="form-details">
+                    <h3>Personal Information</h3>
+                    <div className="form-grid">
+                      <div className="form-item">
+                        <label>Name</label>
+                        <p>{studentDetails.formData.student_name || 'Not provided'}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Application Number</label>
+                        <p>{studentDetails.formData.applicationNo || studentSearchQuery}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Admission Number</label>
+                        <p>{studentDetails.formData.admission_no || 'Not provided'}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Email</label>
+                        <p>{studentDetails.formData.student_email || 'Not provided'}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Phone</label>
+                        <p>{studentDetails.formData.phone_number || 'Not provided'}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Programme</label>
+                        <p>{studentDetails.formData.programme || 'Not provided'}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>School</label>
+                        <p>{studentDetails.formData.school || 'Not provided'}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Batch</label>
+                        <p>{studentDetails.formData.batch || 'Not provided'}</p>
+                      </div>
+                      
+                      <div className="form-item">
+                        <label>Father's Name</label>
+                        <p>{studentDetails.formData.father_name || 'Not provided'}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Father's Mobile</label>
+                        <p>{studentDetails.formData.father_mobile || 'Not provided'}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Mother's Name</label>
+                        <p>{studentDetails.formData.mother_name || 'Not provided'}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Mother's Mobile</label>
+                        <p>{studentDetails.formData.mother_mobile || 'Not provided'}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Emergency Contact</label>
+                        <p>{studentDetails.formData.emergency_contact || 'Not provided'}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Date of Birth</label>
+                        <p>{studentDetails.formData.dob ? new Date(studentDetails.formData.dob).toLocaleDateString() : 'Not provided'}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Blood Group</label>
+                        <p>{studentDetails.formData.blood_group || 'Not provided'}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Nationality</label>
+                        <p>{studentDetails.formData.nationality || 'Not provided'}</p>
+                      </div>
+                    </div>
+                    
+                    <h3>Address & Medical Information</h3>
+                    <div className="form-grid">
+                      <div className="form-item full-width">
+                        <label>Permanent Address</label>
+                        <p>{studentDetails.formData.permanent_address || 'Not provided'}</p>
+                      </div>
+                      <div className="form-item full-width">
+                        <label>Medical History</label>
+                        <p>{studentDetails.formData.medical_history || 'None'}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {studentDetails.bookingDetails && (
+                  <div className="booking-details">
+                    <h3>Room Details</h3>
+                    <div className="form-grid">
+                      <div className="form-item">
+                        <label>Block</label>
+                        <p>{studentDetails.bookingDetails.block}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Floor</label>
+                        <p>{studentDetails.bookingDetails.floor}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Room Number</label>
+                        <p>{studentDetails.bookingDetails.roomNumber}</p>
+                      </div>
+                      <div className="form-item">
+                        <label>Bed</label>
+                        <p>{studentDetails.bookingDetails.bed}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="document-verification">
+                  <h3>Document Verification</h3>
+                  <div className="verification-form">
+                    <div className="verification-item">
+                      <input
+                        type="checkbox"
+                        id="anti-ragging"
+                        checked={documentVerification.antiRagging}
+                        onChange={(e) => setDocumentVerification(prev => ({...prev, antiRagging: e.target.checked}))}
+                      />
+                      <label htmlFor="anti-ragging">Anti-Ragging Declaration Received</label>
+                    </div>
+                    <div className="verification-item">
+                      <input
+                        type="checkbox"
+                        id="anti-drug"
+                        checked={documentVerification.antiDrug}
+                        onChange={(e) => setDocumentVerification(prev => ({...prev, antiDrug: e.target.checked}))}
+                      />
+                      <label htmlFor="anti-drug">Anti-Drug Declaration Received</label>
+                    </div>
+                    <div className="verification-item">
+                      <input
+                        type="checkbox"
+                        id="keys-handed"
+                        checked={documentVerification.keysHandedOver}
+                        onChange={(e) => setDocumentVerification(prev => ({...prev, keysHandedOver: e.target.checked}))}
+                      />
+                      <label htmlFor="keys-handed">Room Keys Handed Over</label>
+                    </div>
+                    
+                    <button 
+                      onClick={submitDocumentVerification}
+                      className="submit-verification-btn"
+                    >
+                      Update Verification Status
+                    </button>
+                  </div>
+                  
+                  {studentDetails.documentVerification && studentDetails.documentVerification.verifiedAt && (
+                    <div className="verification-timestamp">
+                      <p>Last verified: {new Date(studentDetails.documentVerification.verifiedAt).toLocaleString()}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {!studentDetails && studentSearchQuery && !isLoadingStudent && (
+              <div className="no-results">
+                <p>No student found with application number: {studentSearchQuery}</p>
+              </div>
+            )}
+          </div>
+        )}
         {selectedMenu === "Maintenance Complaints" && renderComplaintsContent()}
       </div>
 

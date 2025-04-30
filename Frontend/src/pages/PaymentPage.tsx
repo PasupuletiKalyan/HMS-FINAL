@@ -63,18 +63,57 @@ const PaymentPage: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validateForm()) {
-      alert("Payment successful!");
-      // Store payment completion in localStorage
-      localStorage.setItem("paymentCompleted", "true");
-      // Store the completed step
-      const completedSteps = JSON.parse(localStorage.getItem("completedSteps") || "[]");
-      completedSteps.push(2); // Mark payment (step 2) as completed
-      localStorage.setItem("completedSteps", JSON.stringify(completedSteps));
-      // Navigate back to dashboard
-      navigate("/student-dashboard");
+      try {
+        // Get the application number from localStorage
+        const applicationNumber = localStorage.getItem("applicationNo");
+        
+        if (!applicationNumber) {
+          alert("Application number not found. Please log in again.");
+          navigate("/login");
+          return;
+        }
+        
+        // Call API to update payment status in the database
+        const response = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/payment`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            completedAt: new Date().toISOString()
+          }),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            // Store payment completion in localStorage
+            localStorage.setItem("paymentCompleted", "true");
+            
+            // Store the completed step
+            const completedSteps = JSON.parse(localStorage.getItem("completedSteps") || "[]");
+            if (!completedSteps.includes(2)) {
+              completedSteps.push(2); // Mark payment (step 2) as completed
+              localStorage.setItem("completedSteps", JSON.stringify(completedSteps));
+            }
+            
+            alert("Payment successful!");
+            // Navigate directly to the hostel booking page
+            navigate("/hostel-booking");
+          } else {
+            alert("There was an error processing your payment. Please try again.");
+          }
+        } else {
+          const errorData = await response.json();
+          alert(errorData.message || "Failed to process payment. Please try again later.");
+        }
+      } catch (error) {
+        console.error("Error processing payment:", error);
+        alert("An error occurred while processing your payment. Please check your connection and try again.");
+      }
     }
   };
 
