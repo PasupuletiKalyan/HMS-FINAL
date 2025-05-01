@@ -10,8 +10,26 @@ router.get('/student/:applicationNo', async (req, res) => {
   try {
     const { applicationNo } = req.params;
     
-    // Fetch student form data
-    const formData = await StudentForm.findOne({ applicationNo });
+    // Search for form data using either applicationNo or admission_no
+    const formData = await StudentForm.findOne({
+      $or: [
+        { applicationNo },
+        { admission_no: applicationNo }
+      ]
+    });
+    
+    // If form was found, ensure both fields are synced
+    if (formData) {
+      if (formData.applicationNo !== formData.admission_no) {
+        if (!formData.applicationNo && formData.admission_no) {
+          await StudentForm.findByIdAndUpdate(formData._id, { applicationNo: formData.admission_no });
+          formData.applicationNo = formData.admission_no;
+        } else if (formData.applicationNo && !formData.admission_no) {
+          await StudentForm.findByIdAndUpdate(formData._id, { admission_no: formData.applicationNo });
+          formData.admission_no = formData.applicationNo;
+        }
+      }
+    }
     
     // Fetch progress data
     const progressData = await StudentProgress.findOne({ applicationNo });
@@ -20,7 +38,12 @@ router.get('/student/:applicationNo', async (req, res) => {
     const student = await Student.findOne({ applicationNo });
     let bookingDetails = null;
     
-    if (student && student.roomNo) {
+    // First check if booking details exist in StudentProgress (added during booking process)
+    if (progressData && progressData.roomBooked && progressData.bookingDetails) {
+      bookingDetails = progressData.bookingDetails;
+    }
+    // If not found in progress data, check if student has a roomNo (older method)
+    else if (student && student.roomNo) {
       // Parse room number to extract block, floor, etc.
       const roomData = await Hostel.findOne({ roomNo: student.roomNo });
       if (roomData) {
@@ -75,7 +98,8 @@ router.post('/student/:applicationNo/verify-documents', async (req, res) => {
         $set: { 
           'documentVerification.antiRagging': antiRagging,
           'documentVerification.antiDrug': antiDrug,
-          'documentVerification.keysHandedOver': keysHandedOver
+          'documentVerification.keysHandedOver': keysHandedOver,
+          'documentVerification.verifiedAt': new Date()
         }
       },
       { new: true, upsert: true }

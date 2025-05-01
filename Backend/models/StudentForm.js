@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const studentFormSchema = new mongoose.Schema({
+  applicationNo: String,  // Added applicationNo field for consistent identification
   admission_no: String,
   hall_ticket_no: String,
   batch: String,

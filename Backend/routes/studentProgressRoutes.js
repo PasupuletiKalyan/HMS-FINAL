@@ -1,17 +1,38 @@
 const express = require("express");
 const router = express.Router();
 const StudentProgress = require("../models/StudentProgress");
+const StudentForm = require("../models/StudentForm"); // Added for cross-referencing
+
+// Helper function to check both applicationNo and admission_no
+async function findStudentIdentifier(applicationNo) {
+  // Check if a form exists with either field
+  const form = await StudentForm.findOne({
+    $or: [
+      { applicationNo },
+      { admission_no: applicationNo }
+    ]
+  });
+  
+  // If form exists, use the identifier that exists in the form
+  if (form) {
+    return form.applicationNo || form.admission_no;
+  }
+  
+  // Otherwise use the original input
+  return applicationNo;
+}
 
 // Get progress for a specific student
 router.get("/:applicationNo", async (req, res) => {
   try {
     const { applicationNo } = req.params;
+    const identifier = await findStudentIdentifier(applicationNo);
     
     // Find or create student progress
-    let progress = await StudentProgress.findOne({ applicationNo });
+    let progress = await StudentProgress.findOne({ applicationNo: identifier });
     
     if (!progress) {
-      progress = new StudentProgress({ applicationNo });
+      progress = new StudentProgress({ applicationNo: identifier });
       await progress.save();
     }
     
@@ -32,9 +53,10 @@ router.get("/:applicationNo", async (req, res) => {
 router.post("/:applicationNo/form", async (req, res) => {
   try {
     const { applicationNo } = req.params;
+    const identifier = await findStudentIdentifier(applicationNo);
     
     const progress = await StudentProgress.findOneAndUpdate(
-      { applicationNo },
+      { applicationNo: identifier },
       { 
         formCompleted: true,
         $addToSet: { completedSteps: 1 },
@@ -60,9 +82,10 @@ router.post("/:applicationNo/form", async (req, res) => {
 router.post("/:applicationNo/payment", async (req, res) => {
   try {
     const { applicationNo } = req.params;
+    const identifier = await findStudentIdentifier(applicationNo);
     
     // Check if form is completed first
-    const studentProgress = await StudentProgress.findOne({ applicationNo });
+    const studentProgress = await StudentProgress.findOne({ applicationNo: identifier });
     if (!studentProgress || !studentProgress.formCompleted) {
       return res.status(400).json({ 
         success: false, 
@@ -71,7 +94,7 @@ router.post("/:applicationNo/payment", async (req, res) => {
     }
     
     const progress = await StudentProgress.findOneAndUpdate(
-      { applicationNo },
+      { applicationNo: identifier },
       { 
         paymentCompleted: true,
         $addToSet: { completedSteps: 2 },
@@ -97,10 +120,11 @@ router.post("/:applicationNo/payment", async (req, res) => {
 router.post("/:applicationNo/booking", async (req, res) => {
   try {
     const { applicationNo } = req.params;
+    const identifier = await findStudentIdentifier(applicationNo);
     const { bookingDetails } = req.body;
     
     // Check if form and payment are completed first
-    const studentProgress = await StudentProgress.findOne({ applicationNo });
+    const studentProgress = await StudentProgress.findOne({ applicationNo: identifier });
     if (!studentProgress || !studentProgress.formCompleted || !studentProgress.paymentCompleted) {
       return res.status(400).json({ 
         success: false, 
@@ -109,7 +133,7 @@ router.post("/:applicationNo/booking", async (req, res) => {
     }
     
     const progress = await StudentProgress.findOneAndUpdate(
-      { applicationNo },
+      { applicationNo: identifier },
       { 
         roomBooked: true,
         bookingDetails: bookingDetails, // Store the booking details
@@ -136,9 +160,10 @@ router.post("/:applicationNo/booking", async (req, res) => {
 router.delete("/:applicationNo/reset", async (req, res) => {
   try {
     const { applicationNo } = req.params;
+    const identifier = await findStudentIdentifier(applicationNo);
     
     await StudentProgress.findOneAndUpdate(
-      { applicationNo },
+      { applicationNo: identifier },
       { 
         formCompleted: false,
         paymentCompleted: false,

@@ -20,9 +20,17 @@ interface BookingInfo {
 
 interface StudentDashboardProps {
   currentUserBooking: BookingInfo | null;
+  setCurrentUserBooking: React.Dispatch<React.SetStateAction<BookingInfo | null>>;
+  occupiedBeds: Record<string, boolean>;
+  setOccupiedBeds: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
 }
 
-const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking: propCurrentUserBooking }) => {
+const StudentDashboard: React.FC<StudentDashboardProps> = ({
+  currentUserBooking: propCurrentUserBooking,
+  setCurrentUserBooking,
+  occupiedBeds,
+  setOccupiedBeds
+}) => {
   const [selectedSection, setSelectedSection] = useState("Dashboard"); // Track the selected section
   const [showProfileDropdown, setShowProfileDropdown] = useState(false); // Track profile dropdown visibility
   const [currentStep, setCurrentStep] = useState<number>(1); // Track the current step (1, 2, or 3)
@@ -181,9 +189,21 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking:
 
   const handleFormSubmit2 = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    
+    // Get all form data
+    const formData = new FormData(e.target as HTMLFormElement);
+    const formValues: {[key: string]: string} = {};
+    
+    // Convert FormData to regular object
+    formData.forEach((value, key) => {
+      formValues[key] = value.toString();
+    });
+    
+    // Add applicationNo to form data
+    formValues.applicationNo = applicationNumber;
+    
     // Validate phone numbers
-    const phoneFields = ["phone_number", "father_mobile", "mother_mobile", "emergency_contact"];
+    const phoneFields = ["student_mobile", "father_mobile", "mother_mobile", "emergency_contact"];
     for (const field of phoneFields) {
       const input = (e.target as HTMLFormElement)[field] as HTMLInputElement;
       if (!/^\d{10}$/.test(input.value)) {
@@ -199,30 +219,43 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking:
 
     if (confirmSubmission) {
       try {
-        // Call API to mark form as completed for this student
-        const response = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/form`, {
+        // First, save the form data
+        const formResponse = await fetch('http://localhost:5000/api/form', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formValues),
+        });
+        
+        if (!formResponse.ok) {
+          const errorData = await formResponse.json();
+          throw new Error(errorData.error || "Form submission failed");
+        }
+        
+        // After form is saved, update the progress
+        const progressResponse = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/form`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            // Form data could be saved here if needed
             completedAt: new Date().toISOString()
           }),
         });
 
-        if (response.ok) {
-          const data = await response.json();
+        if (progressResponse.ok) {
+          const data = await progressResponse.json();
           if (data.success) {
             alert("Form submitted successfully!");
             setShowForm(false);
             setCompletedSteps(prev => [...prev, 1]); // Update local state
             setCurrentStep(2); // Move to the next step
           } else {
-            alert("There was an error submitting the form. Please try again.");
+            alert("There was an error updating your progress. Please try again.");
           }
         } else {
-          alert("Failed to submit form. Please try again later.");
+          alert("Failed to update progress. Please try again later.");
         }
       } catch (error) {
         console.error("Error submitting form:", error);
@@ -617,7 +650,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking:
 
                   {/* Phone Number Fields */}
                   <div className="form-group">
-                    <label>Phone Number</label>
+                    <label>Student Mobile</label>
                     <div className="phone-number-container" style={{ display: "flex", alignItems: "center" }}>
                       <select
                         name="country_code"
@@ -639,8 +672,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking:
                       </select>
                       <input
                         type="tel"
-                        name="phone_number"
-                        placeholder="Enter your phone number"
+                        name="student_mobile"
+                        placeholder="Enter your mobile number"
                         maxLength={10}
                         required
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -648,7 +681,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking:
                         }
                       />
                     </div>
-                    {errors.phone_number && <p className="error-message">{errors.phone_number}</p>} {/* Show error */}
+                    {errors.student_mobile && <p className="error-message">{errors.student_mobile}</p>}
                   </div>
 
                   <div className="form-group">

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/WardenDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
-import defaultProfilePic from "../assets/default-profile-pic.jpg";
 import HostelFloorPlanViewer from "../components/HostelFloorPlanViewer"; // Add this import
 
 type Student = {
@@ -1270,10 +1269,14 @@ const WardenDashboard: React.FC = () => {
     setStudentDetails(null); // Clear previous student details
     
     try {
+      console.log(`Searching for student with application number: ${studentSearchQuery.trim()}`);
       const response = await fetch(`http://localhost:5000/api/warden/student/${studentSearchQuery.trim()}`);
+      
+      console.log('Response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
+        console.log('API response data:', data);
         
         // Check if API call was successful
         if (data.success) {
@@ -1296,10 +1299,13 @@ const WardenDashboard: React.FC = () => {
           }
         } else {
           // No student found - keep studentDetails as null
+          console.log('API call successful but no student found');
           setStudentDetails(null);
         }
       } else {
         // API error - keep studentDetails as null
+        const errorText = await response.text();
+        console.error('API error response:', errorText);
         setStudentDetails(null);
       }
     } catch (error) {
@@ -1685,174 +1691,171 @@ const WardenDashboard: React.FC = () => {
                   </div>
                 </div>
                 
-                {/* Student photo and basic info section */}
+                {/* Student photo and basic info section - Streamlined, side-by-side layout */}
                 <div className="student-profile-section" style={{
                   display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '20px',
+                  flexDirection: 'column',
+                  gap: '15px',
                   marginBottom: '20px',
-                  padding: '15px',
+                  padding: '20px',
                   backgroundColor: '#f9f9f9',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                 }}>
-                  {/* Profile Photo */}
-                  <div className="profile-photo-container" style={{
-                    width: '120px',
-                    height: '120px',
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                    border: '3px solid #c23535',
-                    flexShrink: 0
-                  }}>
-                    <img
-                      src={studentDetails.profilePhoto ? `http://localhost:5000${studentDetails.profilePhoto}` : defaultProfilePic}
-                      alt="Student Profile"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover'
-                      }}
-                    />
-                  </div>
-
-                  {/* Quick info */}
-                  <div style={{flex: 1}}>
-                    <h3 style={{margin: '0 0 10px 0', color: '#333'}}>
-                      {studentDetails.formData?.student_name || 'Student Name'}
-                    </h3>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(2, 1fr)',
-                      gap: '10px'
+                  <div style={{display: 'flex', alignItems: 'flex-start', gap: '20px'}}>
+                    {/* Profile Photo */}
+                    <div className="profile-photo-container" style={{
+                      width: '150px',
+                      height: '150px',
+                      borderRadius: '50%',
+                      overflow: 'hidden',
+                      border: '3px solid #c23535',
+                      flexShrink: 0
                     }}>
-                      <div>
-                        <strong>Application Number:</strong>
-                        <p style={{margin: '0'}}>{studentDetails.formData?.applicationNo || studentSearchQuery}</p>
-                      </div>
-                      <div>
-                        <strong>Admission Number:</strong>
-                        <p style={{margin: '0'}}>{studentDetails.formData?.admission_no || 'Not provided'}</p>
-                      </div>
-                      <div>
-                        <strong>Programme:</strong>
-                        <p style={{margin: '0'}}>{studentDetails.formData?.programme || 'Not provided'}</p>
-                      </div>
-                      <div>
-                        <strong>School:</strong>
-                        <p style={{margin: '0'}}>{studentDetails.formData?.school || 'Not provided'}</p>
+                      {studentDetails.profilePhoto ? (
+                        <img
+                          src={`http://localhost:5000${studentDetails.profilePhoto}?t=${new Date().getTime()}`}
+                          alt="Student Profile"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover'
+                          }}
+                        />
+                      ) : (
+                        <div style={{
+                          width: '100%',
+                          height: '100%',
+                          backgroundColor: '#e0e0e0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '40px',
+                          color: '#666'
+                        }}>
+                          {studentDetails.formData?.student_name ? 
+                            studentDetails.formData.student_name.charAt(0).toUpperCase() :
+                            '?'}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Primary student info - Name and Application Number */}
+                    <div style={{flex: 1}}>
+                      <h2 style={{margin: '0 0 10px 0', color: '#333', fontSize: '24px', fontWeight: 'bold'}}>
+                        {studentDetails.formData?.student_name || 'Student Name'}
+                      </h2>
+                      
+                      <div style={{
+                        padding: '8px 12px',
+                        backgroundColor: '#f0f0f0',
+                        borderRadius: '4px',
+                        marginBottom: '10px'
+                      }}>
+                        <strong>Application Number:</strong> {studentDetails.formData?.applicationNo || studentDetails.formData?.admission_no || studentSearchQuery}
                       </div>
                     </div>
                   </div>
-                </div>
-                
-                {studentDetails.formData && (
-                  <div className="form-details">
-                    <h3>Hostel Form Details</h3>
-                    <div className="form-grid">
-                      <div className="form-item">
-                        <label>Name</label>
-                        <p>{studentDetails.formData.student_name || 'Not provided'}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Application Number</label>
-                        <p>{studentDetails.formData.applicationNo || studentSearchQuery}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Admission Number</label>
-                        <p>{studentDetails.formData.admission_no || 'Not provided'}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Email</label>
-                        <p>{studentDetails.formData.student_email || 'Not provided'}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Phone</label>
-                        <p>{studentDetails.formData.phone_number || 'Not provided'}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Programme</label>
-                        <p>{studentDetails.formData.programme || 'Not provided'}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>School</label>
-                        <p>{studentDetails.formData.school || 'Not provided'}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Batch</label>
-                        <p>{studentDetails.formData.batch || 'Not provided'}</p>
-                      </div>
-                      
-                      <div className="form-item">
-                        <label>Father's Name</label>
-                        <p>{studentDetails.formData.father_name || 'Not provided'}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Father's Mobile</label>
-                        <p>{studentDetails.formData.father_mobile || 'Not provided'}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Mother's Name</label>
-                        <p>{studentDetails.formData.mother_name || 'Not provided'}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Mother's Mobile</label>
-                        <p>{studentDetails.formData.mother_mobile || 'Not provided'}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Emergency Contact</label>
-                        <p>{studentDetails.formData.emergency_contact || 'Not provided'}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Date of Birth</label>
-                        <p>{studentDetails.formData.dob ? new Date(studentDetails.formData.dob).toLocaleDateString() : 'Not provided'}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Blood Group</label>
-                        <p>{studentDetails.formData.blood_group || 'Not provided'}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Nationality</label>
-                        <p>{studentDetails.formData.nationality || 'Not provided'}</p>
-                      </div>
+                  
+                  {/* Essential contact information in a row */}
+                  <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '15px',
+                    justifyContent: 'space-between'
+                  }}>
+                    {/* Student Mobile */}
+                    <div style={{
+                      flex: '1 0 30%',
+                      minWidth: '200px',
+                      padding: '15px',
+                      backgroundColor: '#e8f4fd',
+                      borderRadius: '8px',
+                      border: '1px solid #bbdefb'
+                    }}>
+                      <h4 style={{margin: '0 0 8px 0', color: '#1976d2'}}>Student Mobile</h4>
+                      <p style={{margin: 0, fontSize: '16px', fontWeight: 'bold'}}>{studentDetails.formData?.student_mobile || 'Not provided'}</p>
                     </div>
                     
-                    <h3>Address & Medical Information</h3>
-                    <div className="form-grid">
-                      <div className="form-item full-width">
-                        <label>Permanent Address</label>
-                        <p>{studentDetails.formData.permanent_address || 'Not provided'}</p>
-                      </div>
-                      <div className="form-item full-width">
-                        <label>Medical History</label>
-                        <p>{studentDetails.formData.medical_history || 'None'}</p>
-                      </div>
+                    {/* Father Details */}
+                    <div style={{
+                      flex: '1 0 30%',
+                      minWidth: '200px',
+                      padding: '15px',
+                      backgroundColor: '#e8f5e9',
+                      borderRadius: '8px',
+                      border: '1px solid #c8e6c9'
+                    }}>
+                      <h4 style={{margin: '0 0 8px 0', color: '#2e7d32'}}>Father Details</h4>
+                      <p style={{margin: 0, fontSize: '16px'}}>
+                        <strong>{studentDetails.formData?.father_name || 'Not provided'}</strong><br />
+                        {studentDetails.formData?.father_mobile || 'Contact not provided'}
+                      </p>
+                    </div>
+                    
+                    {/* Emergency Contact */}
+                    <div style={{
+                      flex: '1 0 30%',
+                      minWidth: '200px',
+                      padding: '15px',
+                      backgroundColor: '#fff3e0',
+                      borderRadius: '8px',
+                      border: '1px solid #ffe0b2'
+                    }}>
+                      <h4 style={{margin: '0 0 8px 0', color: '#e65100'}}>Emergency Contact</h4>
+                      <p style={{margin: 0, fontSize: '16px', fontWeight: 'bold'}}>{studentDetails.formData?.emergency_contact || 'Not provided'}</p>
                     </div>
                   </div>
-                )}
-                
-                {studentDetails.bookingDetails && (
-                  <div className="booking-details">
-                    <h3>Current Room Details</h3>
-                    <div className="form-grid">
-                      <div className="form-item">
-                        <label>Block</label>
-                        <p>{studentDetails.bookingDetails.block}</p>
+                  
+                  {/* Room booking details */}
+                  <div style={{
+                    padding: '15px',
+                    backgroundColor: studentDetails.bookingDetails ? '#e8f5e9' : '#fff3e0',
+                    borderRadius: '8px',
+                    border: `1px solid ${studentDetails.bookingDetails ? '#c8e6c9' : '#ffe0b2'}`,
+                    marginTop: '5px'
+                  }}>
+                    <h4 style={{
+                      margin: '0 0 10px 0', 
+                      color: studentDetails.bookingDetails ? '#2e7d32' : '#e65100',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span>{studentDetails.bookingDetails ? '🏠' : '⚠️'}</span>
+                      Room Details
+                    </h4>
+                    
+                    {studentDetails.bookingDetails ? (
+                      <div style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '20px'
+                      }}>
+                        <div style={{flex: '1 0 20%', minWidth: '150px'}}>
+                          <strong style={{fontSize: '14px', color: '#555'}}>Block</strong>
+                          <p style={{margin: '4px 0 0 0', fontSize: '18px', fontWeight: 'bold'}}>{studentDetails.bookingDetails.block}</p>
+                        </div>
+                        <div style={{flex: '1 0 20%', minWidth: '150px'}}>
+                          <strong style={{fontSize: '14px', color: '#555'}}>Floor</strong>
+                          <p style={{margin: '4px 0 0 0', fontSize: '18px', fontWeight: 'bold'}}>{studentDetails.bookingDetails.floor}</p>
+                        </div>
+                        <div style={{flex: '1 0 20%', minWidth: '150px'}}>
+                          <strong style={{fontSize: '14px', color: '#555'}}>Room Number</strong>
+                          <p style={{margin: '4px 0 0 0', fontSize: '18px', fontWeight: 'bold'}}>{studentDetails.bookingDetails.roomNumber}</p>
+                        </div>
+                        <div style={{flex: '1 0 20%', minWidth: '150px'}}>
+                          <strong style={{fontSize: '14px', color: '#555'}}>Bed</strong>
+                          <p style={{margin: '4px 0 0 0', fontSize: '18px', fontWeight: 'bold'}}>{studentDetails.bookingDetails.bed}</p>
+                        </div>
                       </div>
-                      <div className="form-item">
-                        <label>Floor</label>
-                        <p>{studentDetails.bookingDetails.floor}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Room Number</label>
-                        <p>{studentDetails.bookingDetails.roomNumber}</p>
-                      </div>
-                      <div className="form-item">
-                        <label>Bed</label>
-                        <p>{studentDetails.bookingDetails.bed}</p>
-                      </div>
-                    </div>
+                    ) : (
+                      <p style={{margin: '0', fontSize: '16px'}}>
+                        <strong>No room booking found.</strong> This student has not been assigned a room yet.
+                      </p>
+                    )}
                   </div>
-                )}
+                </div>
                 
                 <div className="document-verification">
                   <h3>Document Verification</h3>
