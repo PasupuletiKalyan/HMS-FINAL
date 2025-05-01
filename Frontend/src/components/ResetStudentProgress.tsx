@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 /**
  * Component to reset student progress (form filling and payment status)
  * This is primarily for testing purposes
  */
 const ResetStudentProgress: React.FC = () => {
-  const resetAllProgress = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  // Reset local storage for current user
+  const resetLocalProgress = () => {
     // Clear form completion status
     localStorage.removeItem('formCompleted');
     
@@ -14,9 +18,85 @@ const ResetStudentProgress: React.FC = () => {
     
     // Clear completed steps array
     localStorage.removeItem('completedSteps');
+
+    // Clear any booking information
+    const userRole = localStorage.getItem("userRole") || "student";
+    const userId = localStorage.getItem(`${userRole}_userId`);
+    if (userId) {
+      localStorage.removeItem(`${userRole}_${userId}_userBooking`);
+      localStorage.removeItem(`occupiedBeds_${userId}`);
+    }
     
-    alert('All student progress has been reset successfully! The page will now reload.');
-    window.location.reload();
+    setMessage('Local progress reset successfully! The page will now reload.');
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+  };
+
+  // Reset progress for all students in the database
+  const resetAllStudentsProgress = async () => {
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      "WARNING: This will reset all students' progress, including form submissions, payments, and room bookings. This action cannot be undone. Are you sure you want to proceed?"
+    );
+    
+    if (!confirmed) return;
+    
+    setIsLoading(true);
+    setMessage(null);
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/progress/reset/all', {
+        method: 'DELETE',
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setMessage(`✅ ${data.message}`);
+        // Also clear local storage
+        resetLocalProgress();
+      } else {
+        setMessage(`❌ Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Error resetting all student progress:', error);
+      setMessage('❌ Failed to connect to the server. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Reset all occupied beds
+  const resetAllOccupiedBeds = async () => {
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      "WARNING: This will clear all bed bookings in the system. This action cannot be undone. Are you sure you want to proceed?"
+    );
+    
+    if (!confirmed) return;
+    
+    setIsLoading(true);
+    setMessage(null);
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/occupied-beds', {
+        method: 'DELETE',
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setMessage(`✅ ${data.message}`);
+      } else {
+        setMessage(`❌ Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Error resetting all occupied beds:', error);
+      setMessage('❌ Failed to connect to the server. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -29,24 +109,72 @@ const ResetStudentProgress: React.FC = () => {
     }}>
       <h3 style={{ marginBottom: '15px', color: '#dc3545' }}>Administration Tools</h3>
       <p style={{ marginBottom: '15px' }}>
-        Use the button below to reset all student progress (form filling and payment status).
+        Use these buttons to reset student progress (form filling, payment status, and room bookings).
         <br />
         <strong>Warning:</strong> This will clear all progress and cannot be undone.
       </p>
-      <button
-        onClick={resetAllProgress}
-        style={{
-          backgroundColor: '#dc3545',
-          color: 'white',
-          border: 'none',
+      
+      <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+        <button
+          onClick={resetLocalProgress}
+          style={{
+            backgroundColor: '#f0ad4e',
+            color: 'white',
+            border: 'none',
+            padding: '10px 15px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+          disabled={isLoading}
+        >
+          Reset Current User Progress
+        </button>
+        
+        <button
+          onClick={resetAllStudentsProgress}
+          style={{
+            backgroundColor: '#dc3545',
+            color: 'white',
+            border: 'none',
+            padding: '10px 15px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Resetting...' : 'Reset ALL Students Progress'}
+        </button>
+
+        <button
+          onClick={resetAllOccupiedBeds}
+          style={{
+            backgroundColor: '#dc3545',
+            color: 'white',
+            border: 'none',
+            padding: '10px 15px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Resetting...' : 'Reset ALL Occupied Beds'}
+        </button>
+      </div>
+      
+      {message && (
+        <div style={{
           padding: '10px 15px',
+          backgroundColor: message.includes('❌') ? '#f8d7da' : '#d4edda',
+          color: message.includes('❌') ? '#721c24' : '#155724',
           borderRadius: '4px',
-          cursor: 'pointer',
-          fontWeight: 'bold'
-        }}
-      >
-        Reset All Progress
-      </button>
+          marginTop: '10px'
+        }}>
+          {message}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,36 +1,36 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
+// Define floor schema for nested documents
 const floorSchema = new mongoose.Schema({
-  floorNumber: String,
-  totalRooms: Number,
-  totalBeds: Number,
-  warden: Number,
-  staff: Number,
-  hk: Number,
-  guest: Number,
-  others: Number,
-  totalNSBeds: Number,
-  studentBedsAvailable: Number,
-  occupiedBeds: Number,
-  emptyBeds: Number,
+  floorNumber: { type: String, required: true },
+  totalRooms: { type: Number, required: true },
+  totalBeds: { type: Number, required: true },
+  studentBedsAvailable: { type: Number, required: true },
+  warden: { type: Number, default: 0 },
+  staff: { type: Number, default: 0 },
+  hk: { type: Number, default: 0 },
+  guest: { type: Number, default: 0 },
+  others: { type: Number, default: 0 }
 });
 
+// Main hostel details schema
 const hostelDetailsSchema = new mongoose.Schema({
-  type: { type: String, required: true },
-  blockName: { type: String, required: true },
-  totalRooms: Number,
-  totalBeds: Number,
-  warden: Number,
-  staff: Number,
-  hk: Number,
-  guest: Number,
-  others: Number,
-  totalNSBeds: Number,
-  studentBedsAvailable: Number,
-  occupiedBeds: Number,
-  emptyBeds: Number,
+  blockName: { type: String, required: true, unique: true },
+  type: { type: String, required: true, enum: ['Boys', 'Girls'] },
+  totalRooms: { type: Number, required: true },
+  totalBeds: { type: Number, required: true },
+  studentBedsAvailable: { type: Number, required: true },
   floors: [floorSchema],
-  totals: floorSchema,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("HostelDetails", hostelDetailsSchema);
+// Pre-save hook to update timestamps
+hostelDetailsSchema.pre('save', function(next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
+const HostelDetails = mongoose.model('HostelDetails', hostelDetailsSchema);
+
+module.exports = HostelDetails;

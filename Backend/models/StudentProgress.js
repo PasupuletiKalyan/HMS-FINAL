@@ -18,6 +18,17 @@ const studentProgressSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  bookingDetails: {
+    block: String,
+    floor: String,
+    roomNumber: String,
+    bed: String,
+    roomKey: String,
+    bookingDate: {
+      type: Date,
+      default: Date.now
+    }
+  },
   completedSteps: {
     type: [Number],
     default: []

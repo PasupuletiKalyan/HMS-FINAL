@@ -294,22 +294,18 @@ const initialBoysHostelData = {
 const WardenDashboard: React.FC = () => {
   const [selectedMenu, setSelectedMenu] = useState("Overview");
   const [searchTerm, setSearchTerm] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedBlock, setSelectedBlock] = useState<string | null>(null);
-  const [studentData, setStudentData] = useState<Student[]>([]);
-  const [filteredRoomData, setFilteredRoomData] = useState<Student[]>([]);
-  const [roomSearchTerm, setRoomSearchTerm] = useState("");
+  // Remove all unused variables
+  // const [studentData, setStudentData] = useState<Student[]>([]);
+  // const [roomSearchTerm, setRoomSearchTerm] = useState("");
   const [wardenName, setWardenName] = useState("Warden");
-  const [applicationNumber, setApplicationNumber] = useState<string | null>(null);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [summaryView, setSummaryView] = useState<'summary' | 'girls' | 'boys'>('summary');
   const [hostelSummary, setHostelSummary] = useState<HostelSummary[]>([]);
-  const [isEditing, setIsEditing] = useState(false);
+  // const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<EditableData | null>(null);
   const [girlsHostelData, setGirlsHostelData] = useState(initialGirlsHostelData);
   const [boysHostelData, setBoysHostelData] = useState(initialBoysHostelData);
-  const [currentAllocation, setCurrentAllocation] = useState<BookingInfo | null>(null);
   const [occupiedBeds, setOccupiedBeds] = useState<{[key: string]: boolean}>({});
   const [studentApplicationNumber, setStudentApplicationNumber] = useState<string>("");
   const [showStudentInput, setShowStudentInput] = useState<boolean>(false);
@@ -434,6 +430,14 @@ const WardenDashboard: React.FC = () => {
     if (storedWarden) {
       setWardenName(storedWarden);
     }
+
+    // Fetch initial statistics
+    fetchHostelStatistics();
+
+    // Set up an interval to periodically update the statistics
+    const intervalId = setInterval(fetchHostelStatistics, 10000); // Fetch every 10 seconds
+
+    return () => clearInterval(intervalId); // Clean up on component unmount
   }, []);
 
   useEffect(() => {
@@ -441,10 +445,11 @@ const WardenDashboard: React.FC = () => {
       try {
         const response = await fetch("/api/warden/application-number");
         const data = await response.json();
-        setApplicationNumber(data.applicationNumber);
+        // Commented out unused state setter
+        // setApplicationNumber(data.applicationNumber);
       } catch (error) {
         console.error("Error fetching application number:", error);
-        setApplicationNumber("Unavailable");
+        // setApplicationNumber("Unavailable");
       }
     };
 
@@ -484,23 +489,28 @@ const WardenDashboard: React.FC = () => {
   };
 
   const handleSuggestionClick = (blockName: string) => {
-    setSelectedBlock(blockName);
-    setShowSuggestions(false);
+    // setSelectedBlock(blockName);
+    // setShowSuggestions(false);
     setSearchTerm(blockName);
     setSelectedSuggestionIndex(-1);
 
-    setStudentData([]);
-    setFilteredRoomData([]);
-    setRoomSearchTerm("");
+    // setStudentData([]);
+    // setFilteredRoomData([]);
+    // setRoomSearchTerm("");
   };
 
+  // Commented out unused function
+  /*
   const handleRoomSearch = () => {
     const results = studentData.filter((s) =>
       s.room.toLowerCase() === roomSearchTerm.toLowerCase()
     );
     setFilteredRoomData(results);
   };
+  */
 
+  // Commented out unused function
+  /*
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") {
       setSelectedSuggestionIndex((prev) =>
@@ -512,11 +522,12 @@ const WardenDashboard: React.FC = () => {
       handleSuggestionClick(filteredSuggestions[selectedSuggestionIndex].name);
     }
   };
+  */
 
   const handleClickOutside = (e: MouseEvent) => {
     const target = e.target as HTMLElement;
     if (!target.closest(".search-container")) {
-      setShowSuggestions(false);
+      // setShowSuggestions(false);
       setSelectedSuggestionIndex(-1);
     }
 
@@ -531,7 +542,7 @@ const WardenDashboard: React.FC = () => {
   }, []);
 
   const handleEdit = (data: EditableData) => {
-    setIsEditing(true);
+    // setIsEditing(true);
     setEditData({ ...data }); // Create a copy of the data
   };
 
@@ -577,7 +588,7 @@ const WardenDashboard: React.FC = () => {
           });
         }
       }
-      setIsEditing(false);
+      // setIsEditing(false);
       setEditData(null);
     } catch (error) {
       console.error('Error updating data:', error);
@@ -586,7 +597,7 @@ const WardenDashboard: React.FC = () => {
   };
 
   const handleCancelEdit = () => {
-    setIsEditing(false);
+    // setIsEditing(false);
     setEditData(null);
   };
 
@@ -613,7 +624,7 @@ const WardenDashboard: React.FC = () => {
       ]);
   
       // Clear the current allocation and student number for next booking
-      setCurrentAllocation(null);
+      // setCurrentAllocation(null);
       setShowStudentInput(false);
       setStudentApplicationNumber("");
       
@@ -1111,6 +1122,8 @@ const WardenDashboard: React.FC = () => {
     }
   };
 
+  // Commented out unused function
+  /*
   const markAsResolved = (id: string) => {
     setComplaints(prev =>
       prev.map(complaint =>
@@ -1118,6 +1131,7 @@ const WardenDashboard: React.FC = () => {
       )
     );
   };
+  */
 
   const renderComplaintsContent = () => (
     <div className="complaints-container">
@@ -1228,11 +1242,15 @@ const WardenDashboard: React.FC = () => {
     }
     
     setIsLoadingStudent(true);
+    setStudentDetails(null); // Clear previous student details
+    
     try {
       const response = await fetch(`http://localhost:5000/api/warden/student/${studentSearchQuery.trim()}`);
       
       if (response.ok) {
         const data = await response.json();
+        
+        // Check if API call was successful
         if (data.success) {
           setStudentDetails(data.studentDetails);
           
@@ -1243,18 +1261,25 @@ const WardenDashboard: React.FC = () => {
               antiDrug: data.studentDetails.documentVerification.antiDrug || false,
               keysHandedOver: data.studentDetails.documentVerification.keysHandedOver || false
             });
+          } else {
+            // Reset verification checkboxes if no verification data
+            setDocumentVerification({
+              antiRagging: false,
+              antiDrug: false,
+              keysHandedOver: false
+            });
           }
         } else {
+          // No student found - keep studentDetails as null
           setStudentDetails(null);
-          alert('No student found with that application number');
         }
       } else {
+        // API error - keep studentDetails as null
         setStudentDetails(null);
-        alert('Error fetching student data');
       }
     } catch (error) {
       console.error('Error searching for student:', error);
-      alert('Failed to search for student. Please try again.');
+      setStudentDetails(null);
     } finally {
       setIsLoadingStudent(false);
     }
@@ -1299,6 +1324,203 @@ const WardenDashboard: React.FC = () => {
     } catch (error) {
       console.error('Error submitting document verification:', error);
       alert('Failed to submit document verification. Please try again.');
+    }
+  };
+
+  // Add a type interface for block data in statistics
+  interface BlockStatistics {
+    blockName: string;
+    floors: Record<string, {
+      totalRooms: number;
+      totalBeds: number;
+      studentBedsAvailable: number;
+      occupiedBeds: number;
+    }>;
+    totalRooms: number;
+    totalBeds: number;
+    nonStudentBeds: number;
+    studentBedsAvailable: number;
+    occupiedBeds: number;
+  }
+
+  // Create an index signature for boysHostelData
+  type BoysHostelData = {
+    [key: string]: {
+      blockName: string;
+      floors: FloorData[];
+      totals: Omit<FloorData, "floorNumber">;
+    }
+  }
+
+  const fetchHostelStatistics = async () => {
+    try {
+      // Real API call to get statistics from the backend
+      const response = await fetch('http://localhost:5000/api/hostels/statistics/all');
+      if (!response.ok) {
+        throw new Error('Failed to fetch hostel statistics');
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Format the data for our frontend
+        let formattedData;
+        
+        if (summaryView === 'summary') {
+          // For all blocks summary, transform to match our frontend format
+          formattedData = data.statistics.allBlocks.map((block: BlockStatistics) => ({
+            id: block.blockName,
+            blockName: block.blockName,
+            totalRooms: block.totalRooms,
+            occupiedRooms: Math.ceil(block.occupiedBeds / 2), // Assuming 2 beds per room
+            totalStudents: block.occupiedBeds,
+            maintenanceRooms: Math.ceil(block.nonStudentBeds / 2), // Assuming 2 beds per room
+            type: block.blockName.includes('Phase 3') || ['Aravali', 'Ajanta', 'Himalaya', 'Shivalik', 'Vindhya', 'Nilgiri', 'Satpura', 'Kailash'].includes(block.blockName) ? 'Girls' as const : 'Boys' as const
+          }));
+          setHostelSummary(formattedData);
+        } 
+        else if (summaryView === 'girls') {
+          // Process girls hostel data
+          const girlsBlocks = data.statistics.girlsHostels as BlockStatistics[];
+          
+          // Process dorms (blocks named Aravali, Ajanta, etc.)
+          const dormBlocks = girlsBlocks.filter((block: BlockStatistics) => 
+            ['Aravali', 'Ajanta', 'Himalaya', 'Shivalik', 'Vindhya', 
+             'Nilgiri', 'Satpura', 'Kailash'].includes(block.blockName)
+          );
+          
+          const dorms = dormBlocks.map((block: BlockStatistics) => ({
+            name: block.blockName,
+            totals: {
+              totalRooms: block.totalRooms,
+              totalBeds: block.totalBeds,
+              warden: 1,
+              staff: 2,
+              hk: 3,
+              guest: 2,
+              others: 1,
+              totalNSBeds: block.nonStudentBeds,
+              studentBedsAvailable: block.studentBedsAvailable,
+              occupiedBeds: block.occupiedBeds,
+              emptyBeds: block.studentBedsAvailable - block.occupiedBeds
+            }
+          }));
+          
+          // Process Phase 3 blocks
+          const phase3Blocks = girlsBlocks.filter((block: BlockStatistics) => 
+            block.blockName.startsWith('Phase 3')
+          ).map((block: BlockStatistics) => {
+            // Extract floor data
+            const floors = Object.entries(block.floors).map(([floorName, floorData]) => ({
+              floorNumber: floorName,
+              totalRooms: floorData.totalRooms,
+              totalBeds: floorData.totalBeds,
+              warden: 1,
+              staff: 1,
+              hk: 1,
+              guest: 1,
+              others: 0,
+              totalNSBeds: floorData.totalBeds - floorData.studentBedsAvailable,
+              studentBedsAvailable: floorData.studentBedsAvailable,
+              occupiedBeds: floorData.occupiedBeds,
+              emptyBeds: floorData.studentBedsAvailable - floorData.occupiedBeds
+            }));
+            
+            return {
+              blockName: block.blockName,
+              floors: floors,
+              totals: {
+                totalRooms: block.totalRooms,
+                totalBeds: block.totalBeds,
+                warden: 1,
+                staff: 2,
+                hk: 3,
+                guest: 2,
+                others: 1,
+                totalNSBeds: block.nonStudentBeds,
+                studentBedsAvailable: block.studentBedsAvailable,
+                occupiedBeds: block.occupiedBeds,
+                emptyBeds: block.studentBedsAvailable - block.occupiedBeds
+              }
+            };
+          });
+          
+          setGirlsHostelData({ 
+            dorms: dorms.length > 0 ? dorms : initialGirlsHostelData.dorms,
+            phase3Blocks: phase3Blocks.length > 0 ? phase3Blocks : initialGirlsHostelData.phase3Blocks
+          });
+        } 
+        else if (summaryView === 'boys') {
+          // Process boys hostel data
+          const boysBlocks = data.statistics.boysHostels as BlockStatistics[];
+          
+          // Create new boys hostel data object
+          const newBoysHostelData = { ...initialBoysHostelData } as BoysHostelData;
+          
+          // Update each block with its real data
+          boysBlocks.forEach((block: BlockStatistics) => {
+            let targetBlock = '';
+            
+            if (block.blockName === 'Phase 1') {
+              targetBlock = 'phase1';
+            } else if (block.blockName === 'E-wing') {
+              targetBlock = 'eWing';
+            } else if (block.blockName === 'Phase 2') {
+              targetBlock = 'phase2';
+            } else if (block.blockName === 'Phase 2- part 5') {
+              targetBlock = 'phase2Part5';
+            } else if (block.blockName === 'Phase 4') {
+              targetBlock = 'phase4';
+            }
+            
+            if (targetBlock && newBoysHostelData[targetBlock]) {
+              // Extract floor data
+              const floors = Object.entries(block.floors).map(([floorName, floorData]) => ({
+                floorNumber: floorName,
+                totalRooms: floorData.totalRooms,
+                totalBeds: floorData.totalBeds,
+                warden: 1,
+                staff: 1,
+                hk: 1,
+                guest: 1,
+                others: 0,
+                totalNSBeds: floorData.totalBeds - floorData.studentBedsAvailable,
+                studentBedsAvailable: floorData.studentBedsAvailable,
+                occupiedBeds: floorData.occupiedBeds,
+                emptyBeds: floorData.studentBedsAvailable - floorData.occupiedBeds
+              }));
+              
+              newBoysHostelData[targetBlock] = {
+                blockName: block.blockName,
+                floors: floors.length > 0 ? floors : initialBoysHostelData[targetBlock as keyof typeof initialBoysHostelData].floors,
+                totals: {
+                  totalRooms: block.totalRooms,
+                  totalBeds: block.totalBeds,
+                  warden: 1,
+                  staff: 2,
+                  hk: 3,
+                  guest: 2,
+                  others: 1,
+                  totalNSBeds: block.nonStudentBeds,
+                  studentBedsAvailable: block.studentBedsAvailable,
+                  occupiedBeds: block.occupiedBeds,
+                  emptyBeds: block.studentBedsAvailable - block.occupiedBeds
+                }
+              };
+            }
+          });
+          
+          setBoysHostelData(newBoysHostelData as typeof initialBoysHostelData);
+        }
+      } else {
+        console.error('Error in hostel statistics response:', data.message);
+        // Fallback to dummy data if the API fails
+        fetchHostelSummary();
+      }
+    } catch (error) {
+      console.error('Error fetching hostel statistics:', error);
+      // Fallback to dummy data if the API fails
+      fetchHostelSummary();
     }
   };
 
@@ -1372,7 +1594,7 @@ const WardenDashboard: React.FC = () => {
               alignItems: 'center',
               maxWidth: '600px',
               margin: '0 auto 30px',
-              padding: '20px'
+              height: '45px'
             }}>
               <input
                 type="text"
@@ -1386,7 +1608,14 @@ const WardenDashboard: React.FC = () => {
                   borderRadius: '4px 0 0 4px',
                   border: '1px solid #ccc',
                   fontSize: '16px',
-                  height: '45px'
+                  height: '100%',
+                  boxSizing: 'border-box',
+                  margin: 0
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    searchStudent();
+                  }
                 }}
               />
               <button 
@@ -1402,7 +1631,9 @@ const WardenDashboard: React.FC = () => {
                   borderRadius: '0 4px 4px 0',
                   cursor: 'pointer',
                   fontSize: '16px',
-                  height: '45px'
+                  height: '100%',
+                  boxSizing: 'border-box',
+                  margin: 0
                 }}
               >
                 {isLoadingStudent ? 'Searching...' : 'Search'}
@@ -1431,7 +1662,7 @@ const WardenDashboard: React.FC = () => {
                 
                 {studentDetails.formData && (
                   <div className="form-details">
-                    <h3>Personal Information</h3>
+                    <h3>Hostel Form Details</h3>
                     <div className="form-grid">
                       <div className="form-item">
                         <label>Name</label>
@@ -1516,7 +1747,7 @@ const WardenDashboard: React.FC = () => {
                 
                 {studentDetails.bookingDetails && (
                   <div className="booking-details">
-                    <h3>Room Details</h3>
+                    <h3>Current Room Details</h3>
                     <div className="form-grid">
                       <div className="form-item">
                         <label>Block</label>
@@ -1588,7 +1819,9 @@ const WardenDashboard: React.FC = () => {
             
             {!studentDetails && studentSearchQuery && !isLoadingStudent && (
               <div className="no-results">
-                <p>No student found with application number: {studentSearchQuery}</p>
+                <h3 style={{ color: '#c23535', marginBottom: '10px' }}>Student Not Found</h3>
+                <p>No student found with application number: <strong>{studentSearchQuery}</strong></p>
+                <p style={{ marginTop: '10px' }}>Please check the application number and try again.</p>
               </div>
             )}
           </div>

@@ -3,8 +3,6 @@
 const express = require('express');
 const router = express.Router();
 const hostelController = require('../controllers/hostelController');
-const User = require('../models/User');
-const Booking = require('../models/Booking');
 
 // Get all hostels
 router.get('/', hostelController.getAllHostels);
@@ -27,6 +25,11 @@ router.post('/room-allotment', async (req, res) => {
     const { studentId, block, roomNumber, bed, reason } = req.body;
     const wardenId = req.user.id; // Assuming you have authentication middleware
 
+    // Import models inside the route handler to prevent overwrite errors
+    const User = require('../models/user');
+    // Use OccupiedBed model instead of the missing Booking model
+    const OccupiedBed = require('../models/OccupiedBed');
+
     // Find the student
     const student = await User.findOne({ applicationNo: studentId });
     if (!student) {
@@ -34,7 +37,7 @@ router.post('/room-allotment', async (req, res) => {
     }
 
     // Check if room is available
-    const existingBooking = await Booking.findOne({
+    const existingBooking = await OccupiedBed.findOne({
       block,
       roomNumber,
       bed,
@@ -45,15 +48,16 @@ router.post('/room-allotment', async (req, res) => {
       return res.status(400).json({ message: 'Room/bed is already occupied' });
     }
 
-    // Create new booking
-    const booking = new Booking({
+    // Create new booking using the OccupiedBed model instead
+    const booking = new OccupiedBed({
       userId: student._id,
+      applicationNumber: studentId,
       block,
       roomNumber,
       bed,
       allottedBy: wardenId,
-      allotmentReason: reason,
-      allotmentDate: new Date(),
+      allotmentReason: reason || 'Allotted by warden',
+      date: new Date(),
       status: 'active'
     });
 
@@ -65,5 +69,8 @@ router.post('/room-allotment', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+// Statistics routes
+router.get('/statistics/all', hostelController.getHostelStatistics);
 
 module.exports = router;

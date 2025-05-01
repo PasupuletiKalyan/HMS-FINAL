@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import "../styles/PayFeeStyles.css"; // Import styles for the payment page
 
 const PaymentPage: React.FC = () => {
   const [paymentDetails, setPaymentDetails] = useState({
@@ -11,6 +12,11 @@ const PaymentPage: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const expiryDateRef = useRef<HTMLInputElement>(null); // Reference for expiryDate input
   const navigate = useNavigate(); // Initialize useNavigate
+
+  // Handle back button click - navigate to the dashboard
+  const handleBackClick = () => {
+    navigate("/student-dashboard");
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -101,8 +107,8 @@ const PaymentPage: React.FC = () => {
             }
             
             alert("Payment successful!");
-            // Navigate directly to the hostel booking page
-            navigate("/hostel-booking");
+            // Navigate back to the dashboard instead of directly to the hostel booking page
+            navigate("/student-dashboard");
           } else {
             alert("There was an error processing your payment. Please try again.");
           }
@@ -170,9 +176,14 @@ const PaymentPage: React.FC = () => {
           />
           {errors.cardHolderName && <p className="error-message">{errors.cardHolderName}</p>}
         </div>
-        <button type="submit" className="submit-button">
-          Pay Now
-        </button>
+        <div className="button-container">
+          <button type="button" className="back-button" onClick={handleBackClick}>
+            Back to Dashboard
+          </button>
+          <button type="submit" className="submit-button">
+            Pay Now
+          </button>
+        </div>
       </form>
     </div>
   );

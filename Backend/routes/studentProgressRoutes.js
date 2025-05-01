@@ -97,6 +97,7 @@ router.post("/:applicationNo/payment", async (req, res) => {
 router.post("/:applicationNo/booking", async (req, res) => {
   try {
     const { applicationNo } = req.params;
+    const { bookingDetails } = req.body;
     
     // Check if form and payment are completed first
     const studentProgress = await StudentProgress.findOne({ applicationNo });
@@ -111,6 +112,7 @@ router.post("/:applicationNo/booking", async (req, res) => {
       { applicationNo },
       { 
         roomBooked: true,
+        bookingDetails: bookingDetails, // Store the booking details
         $addToSet: { completedSteps: 3 },
         updatedAt: Date.now()
       },
@@ -141,6 +143,7 @@ router.delete("/:applicationNo/reset", async (req, res) => {
         formCompleted: false,
         paymentCompleted: false,
         roomBooked: false,
+        bookingDetails: null,
         completedSteps: [],
         updatedAt: Date.now()
       },
@@ -156,6 +159,35 @@ router.delete("/:applicationNo/reset", async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: "Failed to reset progress" 
+    });
+  }
+});
+
+// Reset progress for ALL students (for testing)
+router.delete("/reset/all", async (req, res) => {
+  try {
+    // Update all student progress documents
+    const result = await StudentProgress.updateMany(
+      {}, // Empty filter means all documents
+      { 
+        formCompleted: false,
+        paymentCompleted: false,
+        roomBooked: false,
+        bookingDetails: null,
+        completedSteps: [],
+        updatedAt: Date.now()
+      }
+    );
+    
+    res.status(200).json({ 
+      success: true, 
+      message: `Successfully reset progress for ${result.modifiedCount} students` 
+    });
+  } catch (error) {
+    console.error("Error resetting all student progress:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to reset student progress" 
     });
   }
 });

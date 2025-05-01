@@ -1,11 +1,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const User = require("./models/user"); // Fixed case sensitivity issue in import
+// Remove the User model import from here as it's used in multiple files
+// and should be imported only where needed
 const studentFormRoutes = require("./routes/studentFormRoutes");
 const complaintRoutes = require("./routes/complaintRoutes");
 const studentProgressRoutes = require("./routes/studentProgressRoutes");
 const wardenRoutes = require("./routes/wardenRoutes");
+const occupiedBedRoutes = require("./routes/occupiedBedRoutes"); 
+const hostelRoutes = require("./routes/hostelRoutes"); // Add this for hostel routes
 // Load environment variables
 require('dotenv').config();
 
@@ -30,6 +33,8 @@ app.post("/api/login", async (req, res) => {
   const { identifier, password } = req.body;
 
   try {
+    // Import the User model only in this handler
+    const User = require("./models/user");
     const user = await User.findOne({
       $or: [{ applicationNo: identifier }, { email: identifier }],
       password,
@@ -63,6 +68,12 @@ app.use("/api/progress", studentProgressRoutes);
 
 // Warden Routes
 app.use("/api/warden", wardenRoutes);
+
+// Occupied Beds Routes
+app.use("/api/occupied-beds", occupiedBedRoutes);
+
+// Hostel Routes
+app.use("/api/hostels", hostelRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => {

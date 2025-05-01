@@ -108,34 +108,48 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
 
   // Load booking data from localStorage when component mounts
   useEffect(() => {
-    // Load occupied beds from localStorage
+    // Load occupied beds from the backend API
+    const fetchOccupiedBeds = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/occupied-beds');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            // Set occupied beds from the backend
+            setOccupiedBeds(data.occupiedBeds);
+          }
+        } else {
+          console.error('Failed to fetch occupied beds');
+        }
+      } catch (error) {
+        console.error('Error fetching occupied beds:', error);
+      }
+    };
+    
+    // Load booking data from localStorage when component mounts
     const userRole = localStorage.getItem("userRole") || "student";
     const userId = localStorage.getItem(`${userRole}_userId`);
     
-    // Make occupied beds list specific to the user
-    const savedOccupiedBeds = localStorage.getItem(`occupiedBeds_${userId}`);
-    if (savedOccupiedBeds) {
-      try {
-        const parsedBeds = JSON.parse(savedOccupiedBeds);
-        setOccupiedBeds(parsedBeds);
-      } catch (error) {
-        console.error('Error parsing occupied beds from localStorage:', error);
-      }
-    } else {
-      // Reset occupied beds for new user
-      setOccupiedBeds({});
-    }
-
-    // Load current user booking from localStorage with a user-specific key
-    const bookingKey = `${userRole}_${userId}_userBooking`;
-    const savedUserBooking = localStorage.getItem(bookingKey);
-    if (savedUserBooking) {
-      try {
-        setCurrentUserBooking(JSON.parse(savedUserBooking));
-      } catch (error) {
-        console.error('Error parsing user booking from localStorage:', error);
+    if (userId) {
+      // Load current user booking from localStorage
+      const bookingKey = `${userRole}_${userId}_userBooking`;
+      const savedUserBooking = localStorage.getItem(bookingKey);
+      if (savedUserBooking) {
+        try {
+          setCurrentUserBooking(JSON.parse(savedUserBooking));
+        } catch (error) {
+          console.error('Error parsing user booking from localStorage:', error);
+        }
       }
     }
+    
+    // Fetch all occupied beds from backend
+    fetchOccupiedBeds();
+    
+    // Set up interval to refresh occupied beds every 5 seconds
+    const intervalId = setInterval(fetchOccupiedBeds, 5000);
+    
+    return () => clearInterval(intervalId);
   }, [setOccupiedBeds, setCurrentUserBooking]);
 
   // Save booking data to localStorage whenever it changes
@@ -273,7 +287,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
   };
 
   // Handle booking confirmation
-  const handleConfirmBooking = (): void => {
+  const handleConfirmBooking = async (): Promise<void> => {
     if (!modalRoomInfo.bed) return;
     // If user already has a booking, don't allow another one
     if (currentUserBooking) {
@@ -282,22 +296,114 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
       return;
     } 
     const roomKey = `${modalRoomInfo.block}_${modalRoomInfo.floor}_${modalRoomInfo.number}_${modalRoomInfo.bed}`;
-    // Set the bed as occupied
-    setOccupiedBeds(prev => ({
-      ...prev,
-      [roomKey]: true
-    }));
-    // Save the current user's booking
-    setCurrentUserBooking({
+    
+    // Create booking object
+    const bookingInfo = {
       block: modalRoomInfo.block,
       floor: modalRoomInfo.floor,
       roomNumber: modalRoomInfo.number,
       bed: modalRoomInfo.bed as string,
       roomKey: roomKey
-    });
+    };
+    
+    try {
+      const applicationNumber = localStorage.getItem("applicationNo");
+      if (!applicationNumber) {
+        console.error("Application number not found in localStorage");
+        return;
+      }
+      
+      // 1. Save to the OccupiedBeds collection in the database
+      const occupiedBedResponse = await fetch('http://localhost:5000/api/occupied-beds', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bedKey: roomKey,
+          block: modalRoomInfo.block,
+          floor: modalRoomInfo.floor,
+          roomNumber: modalRoomInfo.number,
+          bed: modalRoomInfo.bed,
+          applicationNo: applicationNumber
+        }),
+      });
+      
+      if (!occupiedBedResponse.ok) {
+        const errorData = await occupiedBedResponse.json();
+        console.error("Error marking bed as occupied:", errorData.message);
         
-    setShowConfirmationModal(false);
-    setShowSuccessModal(true);
+        // If the bed is already occupied, refresh the occupied beds data
+        if (errorData.message === "This bed is already occupied") {
+          // Refresh occupied beds from server
+          const refreshResponse = await fetch('http://localhost:5000/api/occupied-beds');
+          if (refreshResponse.ok) {
+            const refreshData = await refreshResponse.json();
+            if (refreshData.success) {
+              setOccupiedBeds(refreshData.occupiedBeds);
+            }
+          }
+          
+          alert("This bed has just been booked by another student. Please select a different bed.");
+          setShowConfirmationModal(false);
+          return;
+        }
+      }
+      
+      // 2. Set the bed as occupied in local state
+      setOccupiedBeds(prev => ({
+        ...prev,
+        [roomKey]: true
+      }));
+      
+      // 3. Save the current user's booking
+      setCurrentUserBooking(bookingInfo);
+      
+      // 4. Update the booking status in the student progress
+      const progressResponse = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/booking`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookingDetails: bookingInfo,
+          completedAt: new Date().toISOString()
+        }),
+      });
+
+      if (progressResponse.ok) {
+        const data = await progressResponse.json();
+        if (data.success) {
+          // Update completedSteps in localStorage
+          const completedSteps = JSON.parse(localStorage.getItem("completedSteps") || "[]");
+          if (!completedSteps.includes(3)) {
+            completedSteps.push(3); // Mark booking (step 3) as completed
+            localStorage.setItem("completedSteps", JSON.stringify(completedSteps));
+          }
+        } else {
+          console.error("Error updating booking status in backend:", data.message);
+        }
+      } else {
+        console.error("Failed to update booking status in backend");
+      }
+      
+      // 5. Refresh hostel statistics to update warden dashboard
+      try {
+        // This fetch doesn't need to return anything to the client
+        // It just triggers the backend to recalculate statistics
+        await fetch('http://localhost:5000/api/hostels/statistics/all');
+      } catch (err) {
+        console.error("Error refreshing hostel statistics:", err);
+        // Non-blocking error - continue with booking process
+      }
+      
+      setShowConfirmationModal(false);
+      setShowSuccessModal(true);
+      
+    } catch (error) {
+      console.error("Error during booking process:", error);
+      alert("There was an error with your booking. Please try again.");
+    }
   };
 
   // Check if bed is occupied

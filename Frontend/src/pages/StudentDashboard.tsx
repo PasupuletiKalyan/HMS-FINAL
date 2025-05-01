@@ -21,12 +21,14 @@ interface StudentDashboardProps {
   currentUserBooking: BookingInfo | null;
 }
 
-const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking }) => {
+const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking: propCurrentUserBooking }) => {
   const [selectedSection, setSelectedSection] = useState("Dashboard"); // Track the selected section
   const [showProfileDropdown, setShowProfileDropdown] = useState(false); // Track profile dropdown visibility
   const [currentStep, setCurrentStep] = useState<number>(1); // Track the current step (1, 2, or 3)
   const [showForm, setShowForm] = useState(false); // Track whether the form is displayed
   const [showPaymentForm, setShowPaymentForm] = useState(false); // Track payment form visibility
+  // Add state to track booking details locally
+  const [localCurrentUserBooking, setLocalCurrentUserBooking] = useState<BookingInfo | null>(propCurrentUserBooking);
   const [paymentDetails, setPaymentDetails] = useState({
     cardNumber: "",
     expiryDate: "",
@@ -90,6 +92,29 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking 
               // Set completed steps from backend data
               setCompletedSteps(data.progress.completedSteps || []);
               
+              // Check for booking details and set currentUserBooking if exists
+              if (data.progress.roomBooked && data.progress.bookingDetails) {
+                // Create a BookingInfo object from the backend data
+                const bookingFromBackend: BookingInfo = {
+                  block: data.progress.bookingDetails.block,
+                  floor: data.progress.bookingDetails.floor,
+                  roomNumber: data.progress.bookingDetails.roomNumber,
+                  bed: data.progress.bookingDetails.bed,
+                  roomKey: data.progress.bookingDetails.roomKey
+                };
+                
+                // Save to localStorage for frontend persistence
+                const userRole = localStorage.getItem("userRole") || "student";
+                const userId = localStorage.getItem(`${userRole}_userId`);
+                if (userId) {
+                  const bookingKey = `${userRole}_${userId}_userBooking`;
+                  localStorage.setItem(bookingKey, JSON.stringify(bookingFromBackend));
+                }
+                
+                // Set the booking in our local state
+                setLocalCurrentUserBooking(bookingFromBackend);
+              }
+              
               // Set current step based on progress
               if (data.progress.roomBooked) {
                 setCurrentStep(3);
@@ -116,7 +141,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking 
     };
     
     fetchStudentProgress();
-  }, [applicationNumber]);
+  }, [applicationNumber, setLocalCurrentUserBooking]);
 
   const handleStepClick = (step: number) => {
     // Check if previous steps are completed
@@ -770,18 +795,18 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking 
           {/* My Booking Section */}
           {selectedSection === "My Booking" && (
             <div className="my-booking-section">
-              {currentUserBooking ? (
+              {localCurrentUserBooking ? (
                 <div className="booking-details">
                   <h2>Your Current Booking</h2>
-                  <p><strong>Block:</strong> {currentUserBooking.block}</p>
-                  <p><strong>Floor:</strong> {currentUserBooking.floor}</p>
-                  <p><strong>Room Number:</strong> {currentUserBooking.roomNumber}</p>
-                  <p><strong>Bed:</strong> {currentUserBooking.bed}</p>
-                  {currentUserBooking.allottedBy && (
+                  <p><strong>Block:</strong> {localCurrentUserBooking.block}</p>
+                  <p><strong>Floor:</strong> {localCurrentUserBooking.floor}</p>
+                  <p><strong>Room Number:</strong> {localCurrentUserBooking.roomNumber}</p>
+                  <p><strong>Bed:</strong> {localCurrentUserBooking.bed}</p>
+                  {localCurrentUserBooking.allottedBy && (
                     <>
-                      <p><strong>Allotted By:</strong> {currentUserBooking.allottedBy}</p>
-                      <p><strong>Allotment Date:</strong> {new Date(currentUserBooking.allotmentDate!).toLocaleDateString()}</p>
-                      <p><strong>Reason:</strong> {currentUserBooking.allotmentReason}</p>
+                      <p><strong>Allotted By:</strong> {localCurrentUserBooking.allottedBy}</p>
+                      <p><strong>Allotment Date:</strong> {new Date(localCurrentUserBooking.allotmentDate!).toLocaleDateString()}</p>
+                      <p><strong>Reason:</strong> {localCurrentUserBooking.allotmentReason}</p>
                     </>
                   )}
                   <p><strong>Note:</strong> Please collect your room key from the hostel office.</p>
