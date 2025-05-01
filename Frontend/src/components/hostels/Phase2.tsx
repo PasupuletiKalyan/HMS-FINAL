@@ -947,16 +947,23 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
     return rooms;
   };
   
+  // Helper function to create a consistent SVG container without its own scrollbar
+  const SVGContainer = ({ children }: { children: React.ReactNode }) => (
+    <div className="no-scroll" style={{ width: '100%', height: 'auto' }}>
+      {children}
+    </div>
+  );
+  
   return (
     <div 
       style={{ 
         position: 'relative', 
         width: '100%', 
-        height: '600px',
+        height: '80vh', // Changed from 600px to 80vh for better responsiveness
         backgroundColor: '#f7fafc',
         border: '1px solid #e2e8f0',
         borderRadius: '8px',
-        overflow: 'auto',
+        overflow: 'auto', // Single scrollbar here
         padding: '10px'
       }}
     >
@@ -967,36 +974,24 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
           textAlign: 'center', 
           fontWeight: 'bold',
           borderRadius: '4px',
-          marginBottom: '10px' 
+          marginBottom: '10px',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1
         }}
       >
         Phase 2 - {floor}
       </div>
       
       {floor === "Ground Floor" 
-        ? renderGroundFloorLayout() 
+        ? <SVGContainer>{renderGroundFloorLayout()}</SVGContainer>
         : floor === "1st Floor" 
-          ? renderFirstFloorLayout()
+          ? <SVGContainer>{renderFirstFloorLayout()}</SVGContainer>
           : floor === "2nd Floor"
-            ? renderSecondFloorLayout()
-            : renderPhase2Layout()
+            ? <SVGContainer>{renderSecondFloorLayout()}</SVGContainer>
+            : <div className="no-scroll" style={{ position: 'relative', minHeight: '400px' }}>{renderPhase2Layout()}</div>
       }
       
-      {/* Legend */}
-      <div style={{ position: 'absolute', bottom: '10px', right: '10px', display: 'flex', gap: '10px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', fontSize: '12px' }}>
-          <div style={{ width: '15px', height: '15px', backgroundColor: '#bbf7d0', marginRight: '5px', border: '1px solid #22c55e' }}></div>
-          <span>Available</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', fontSize: '12px' }}>
-          <div style={{ width: '15px', height: '15px', backgroundColor: '#fef08a', marginRight: '5px', border: '1px solid #eab308' }}></div>
-          <span>Partially Occupied</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', fontSize: '12px' }}>
-          <div style={{ width: '15px', height: '15px', backgroundColor: '#fecaca', marginRight: '5px', border: '1px solid #ef4444' }}></div>
-          <span>Fully Occupied</span>
-        </div>
-      </div>
     </div>
   );
 };

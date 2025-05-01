@@ -4,18 +4,35 @@
     padding: 0;
     box-sizing: border-box;
     font-family: Arial, sans-serif;
-  }
+}
   
-  body {
+html {
+    overflow-x: hidden; /* Hide horizontal scrollbar on html element */
+}
+
+body {
     background-color: #f4f4f4;
     color: #333;
-  }
-  a {
+    overflow-y: auto; /* Only allow vertical scrollbar on body */
+    overflow-x: hidden; /* Hide horizontal scrollbar on body */
+}
+
+/* Use this class on containers that need horizontal scrolling */
+.scroll-x {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* Remove scrollbars from inner containers */
+.no-scroll {
+    overflow: hidden;
+}
+
+a {
     text-decoration: none;
     color: inherit;
-  }
+}
   
-  button {
+button {
     cursor: pointer;
-  }
-  
+}
