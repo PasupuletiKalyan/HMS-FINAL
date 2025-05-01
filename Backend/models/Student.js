@@ -5,6 +5,10 @@ const studentSchema = new mongoose.Schema({
   name: String,
   roomNo: String,
   email: String,
+  profilePhoto: {
+    type: String,
+    default: null
+  },
   documentVerification: {
     antiRagging: {
       type: Boolean,

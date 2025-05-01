@@ -47,7 +47,9 @@ router.get('/student/:applicationNo', async (req, res) => {
         antiRagging: false,
         antiDrug: false,
         keysHandedOver: false
-      }
+      },
+      // Include profile photo if available
+      profilePhoto: student?.profilePhoto || null
     };
     
     res.json({ success: true, studentDetails });

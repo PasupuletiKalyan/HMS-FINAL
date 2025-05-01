@@ -4,6 +4,7 @@ const cors = require("cors");
 // Remove the User model import from here as it's used in multiple files
 // and should be imported only where needed
 const studentFormRoutes = require("./routes/studentFormRoutes");
+const studentRoutes = require("./routes/studentRoutes"); // Add this for student routes
 const complaintRoutes = require("./routes/complaintRoutes");
 const studentProgressRoutes = require("./routes/studentProgressRoutes");
 const wardenRoutes = require("./routes/wardenRoutes");
@@ -59,6 +60,9 @@ app.post("/api/login", async (req, res) => {
 
 // Form Routes
 app.use("/api/form", studentFormRoutes);
+
+// Student Routes
+app.use("/api/students", studentRoutes);
 
 // Complaint Routes
 app.use("/api/complaints", complaintRoutes);

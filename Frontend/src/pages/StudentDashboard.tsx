@@ -4,6 +4,7 @@ import "../styles/StudentDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
 import defaultProfilePic from "../assets/default-profile-pic.jpg";
 import ResetStudentProgress from "../components/ResetStudentProgress"; // Import the reset component
+import ProfilePhotoUploader from "../components/ProfilePhotoUploader"; // Import our new component
 
 // Define proper BookingInfo interface instead of using 'any'
 interface BookingInfo {
@@ -66,7 +67,12 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking:
   const profileRef = useRef<HTMLDivElement | null>(null); // Reference for the profile dropdown
   const userName = localStorage.getItem("student_userName") || "Student";
   const applicationNumber = localStorage.getItem("applicationNo") || "N/A"; // Use actual application number from login
-  const profilePic = localStorage.getItem("profilePic") || defaultProfilePic; // Use default image if no profile picture is available
+  const [profilePic, setProfilePic] = useState<string>(localStorage.getItem("profilePic") || defaultProfilePic); // Use default image if no profile picture is available
+
+  // Handle profile photo updates
+  const handleProfilePhotoUpdate = (photoUrl: string) => {
+    setProfilePic(photoUrl);
+  };
 
   // Close the profile dropdown when clicking outside
   useEffect(() => {
@@ -389,6 +395,9 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking:
                   </p>
                 </div>
                 <ul>
+                  <li onClick={() => setSelectedSection("Profile")}>
+                    Profile Photo
+                  </li>
                   <li onClick={() => navigate("/change-password")}>
                     Change Password
                   </li>
@@ -1393,6 +1402,93 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking:
                     <p>You haven't submitted any complaints yet.</p>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+          
+          {/* Profile Section - New section for profile photo management */}
+          {selectedSection === "Profile" && (
+            <div className="profile-section">
+              <h2>Profile Settings</h2>
+              
+              <div className="profile-container" style={{
+                maxWidth: '800px',
+                margin: '0 auto',
+                padding: '20px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+              }}>
+                <div className="profile-header" style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '30px',
+                  padding: '15px',
+                  backgroundColor: '#f9f9f9',
+                  borderRadius: '8px'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    flex: '1'
+                  }}>
+                    <h3 style={{color: '#333', marginBottom: '20px'}}>Personal Information</h3>
+                    <div style={{
+                      width: '100%',
+                      maxWidth: '400px'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        margin: '10px 0',
+                        padding: '10px',
+                        backgroundColor: '#f0f0f0',
+                        borderRadius: '5px'
+                      }}>
+                        <strong>Name:</strong>
+                        <span>{userName}</span>
+                      </div>
+                      
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        margin: '10px 0',
+                        padding: '10px',
+                        backgroundColor: '#f0f0f0',
+                        borderRadius: '5px'
+                      }}>
+                        <strong>Application Number:</strong>
+                        <span>{applicationNumber}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Profile Photo Uploader Component */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  marginBottom: '30px'
+                }}>
+                  <ProfilePhotoUploader 
+                    applicationNumber={applicationNumber} 
+                    onPhotoUpdate={handleProfilePhotoUpdate}
+                  />
+                </div>
+                
+                <div style={{
+                  marginTop: '30px',
+                  padding: '15px',
+                  backgroundColor: '#f9f9f9',
+                  borderRadius: '8px',
+                  textAlign: 'center'
+                }}>
+                  <p style={{color: '#666'}}>
+                    Your profile photo will be visible to wardens and administrators.
+                    Please upload a clear, recent photo of yourself.
+                  </p>
+                </div>
               </div>
             </div>
           )}

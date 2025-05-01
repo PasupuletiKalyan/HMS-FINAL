@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/WardenDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
+import defaultProfilePic from "../assets/default-profile-pic.jpg";
 import HostelFloorPlanViewer from "../components/HostelFloorPlanViewer"; // Add this import
 
 type Student = {
@@ -1680,6 +1681,66 @@ const WardenDashboard: React.FC = () => {
                     <div className={`status-item ${studentDetails.progress.roomBooked ? 'completed' : 'pending'}`}>
                       <span className="status-label">Room Booking</span>
                       <span className="status-icon">{studentDetails.progress.roomBooked ? '✓' : '✗'}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Student photo and basic info section */}
+                <div className="student-profile-section" style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '20px',
+                  marginBottom: '20px',
+                  padding: '15px',
+                  backgroundColor: '#f9f9f9',
+                  borderRadius: '8px'
+                }}>
+                  {/* Profile Photo */}
+                  <div className="profile-photo-container" style={{
+                    width: '120px',
+                    height: '120px',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    border: '3px solid #c23535',
+                    flexShrink: 0
+                  }}>
+                    <img
+                      src={studentDetails.profilePhoto ? `http://localhost:5000${studentDetails.profilePhoto}` : defaultProfilePic}
+                      alt="Student Profile"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                      }}
+                    />
+                  </div>
+
+                  {/* Quick info */}
+                  <div style={{flex: 1}}>
+                    <h3 style={{margin: '0 0 10px 0', color: '#333'}}>
+                      {studentDetails.formData?.student_name || 'Student Name'}
+                    </h3>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(2, 1fr)',
+                      gap: '10px'
+                    }}>
+                      <div>
+                        <strong>Application Number:</strong>
+                        <p style={{margin: '0'}}>{studentDetails.formData?.applicationNo || studentSearchQuery}</p>
+                      </div>
+                      <div>
+                        <strong>Admission Number:</strong>
+                        <p style={{margin: '0'}}>{studentDetails.formData?.admission_no || 'Not provided'}</p>
+                      </div>
+                      <div>
+                        <strong>Programme:</strong>
+                        <p style={{margin: '0'}}>{studentDetails.formData?.programme || 'Not provided'}</p>
+                      </div>
+                      <div>
+                        <strong>School:</strong>
+                        <p style={{margin: '0'}}>{studentDetails.formData?.school || 'Not provided'}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
