@@ -68,52 +68,48 @@ const Phase2NinthFloorPlan: React.FC<FloorPlanProps> = ({
 
     // Row 2 (middle row)
     { id: '911', x: 10, y: 10 + 2 * (roomH + vGap), width: roomW, height: roomH, type: 'room' },
-    { id: 'Stairs_Top_L', x: 10 + roomW + hGap, y: 10 + 2 * (roomH + vGap), width: roomW * 1.5, height: roomH, type: 'common', label: 'Stairs' },
+    { id: 'Stairs_Top_L', x: 60 + roomW + hGap, y: 10 + 3 * (roomH + vGap), width:40, height: roomH, type: 'common', label: 'Stairs' },
     { id: '923', x: 10 + roomW + hGap + roomW * 1.5 + hGap, y: 10 + 2 * (roomH + vGap), width: roomW, height: roomH, type: 'room' },
     { id: '922', x: 10 + 2 * (roomW + hGap) + roomW * 1.5 + hGap, y: 10 + 2 * (roomH + vGap), width: roomW, height: roomH, type: 'room' },
     { id: '921', x: 10 + 3 * (roomW + hGap) + roomW * 1.5 + hGap, y: 10 + 2 * (roomH + vGap), width: roomW, height: roomH, type: 'room' },
     { id: 'WS_Top_L', x: 10 + 4 * (roomW + hGap) + roomW * 1.5 + hGap, y: 10 + 2 * (roomH + vGap), width: roomW * 1.5, height: roomH, type: 'common', label: 'WS' },
-    { id: 'Stairs_Top_M1', x: 10 + 4 * (roomW + hGap) + 3 * roomW + 2 * hGap, y: 10 + 2 * (roomH + vGap), width: roomW * 1.5, height: roomH, type: 'common', label: 'Stairs' },
+    { id: 'Stairs_Top_M1', x: 10 + 4 * (roomW + hGap) + 3 * roomW + 2 * hGap, y: 10 + 2 * (roomH + vGap), width: 40, height: roomH, type: 'common', label: 'Stairs' },
     { id: 'Lifts_Top_M1', x: 10 + 4 * (roomW + hGap) + 4.5 * roomW + 3 * hGap, y: 10 + 2 * (roomH + vGap), width: roomW * 1.5, height: roomH, type: 'common', label: 'Lifts' },
     { id: 'WR', x: 10 + 4 * (roomW + hGap) + 6 * roomW + 4 * hGap, y: 10 + 2 * (roomH + vGap), width: roomW * 1.5, height: roomH, type: 'common', label: 'WR' },
     { id: '943', x: 10 + 14 * (roomW + hGap), y: 10 + 2 * (roomH + vGap), width: roomW, height: roomH, type: 'room' },
     { id: 'WS_Top_R', x: 10 + 15 * (roomW + hGap) + hGap, y: 10 + 2 * (roomH + vGap), width: roomW * 1.5, height: roomH, type: 'common', label: 'WS' },
-    { id: 'Stairs_Top_M2', x: 10 + 15 * (roomW + hGap) + roomW * 1.5 + 2 * hGap, y: 10 + 2 * (roomH + vGap), width: roomW * 1.5, height: roomH, type: 'common', label: 'Stairs' },
-    { id: 'Lifts_Top_R', x: 10 + 15 * (roomW + hGap) + roomW * 3 + 3 * hGap, y: 10 + 2 * (roomH + vGap), width: roomW * 1.5, height: roomH, type: 'common', label: 'Lifts' },
-    { id: '940', x: 10 + 15 * (roomW + hGap) + roomW * 4.5 + 4 * hGap, y: 10 + 2 * (roomH + vGap), width: roomW, height: roomH, type: 'room' },
+    { id: 'Stairs_Top_M2', x: 10 + 15 * (roomW + hGap) + roomW * 1.5 + 2 * hGap, y: 10 + 2 * (roomH + vGap), width: 20, height: roomH, type: 'common', label: 'Stairs' },
+    { id: 'Lifts_Top_R', x: 10 + 14 * (roomW + hGap) + roomW * 3 + 3 * hGap, y: 10 + 2 * (roomH + vGap), width: roomW * 1.5, height: roomH, type: 'common', label: 'Lifts' },
+    { id: '940', x: 10 + 16 * (roomW + hGap) + roomW * 4.5 + 4 * hGap, y: 10 + 2 * (roomH + vGap), width: roomW, height: roomH, type: 'room' },
 
     // Left Vertical Section
     { id: '910', x: 10, y: 10 + 3 * (roomH + vGap), width: roomW, height: roomH, type: 'room' },
-    { id: 'WS_Left_1', x: 10, y: 10 + 4 * (roomH + vGap), width: roomW, height: roomH, type: 'common', label: 'WS' },
+    { id: 'WS_Left_1', x: 105, y: 10 + 4 * (roomH + vGap), width: roomW, height: 90, type: 'common', label: 'WS' },
     { id: '909', x: 10, y: 10 + 5 * (roomH + vGap), width: roomW, height: roomH, type: 'room' },
-    { id: 'Balcony_Left', x: 10, y: 10 + 6 * (roomH + vGap), width: roomW, height: roomH/2, type: 'common', label: 'Balco' },
-    { id: '912A', x: 10, y: 10 + 6 * (roomH + vGap) + roomH/2, width: roomW, height: roomH, type: 'room' },
-    { id: '914', x: 10, y: 10 + 7 * (roomH + vGap) + roomH/2, width: roomW, height: roomH, type: 'room' },
+    { id: 'Balcony_Left', x: 10, y: 10 + 6 * (roomH + vGap), width: roomW, height: 90, type: 'common', label: 'Balco' },
+    { id: '912A', x: 105, y: 10 + 6 * (roomH + vGap) + roomH/2, width: roomW, height: roomH, type: 'room' },
+    { id: '914', x: 105, y: 10 + 7 * (roomH + vGap) + roomH/2, width: roomW, height: roomH, type: 'room' },
     
     // Corridor - vertical (left side)
     { id: 'corridor_left', x: 10 + roomW + hGap/2, y: 10 + 8 * (roomH + vGap), width: 15, height: 3 * (roomH + vGap), type: 'corridor' },
     
-    { id: '908', x: 10, y: 10 + 9 * (roomH + vGap) + roomH/2, width: roomW, height: roomH, type: 'room' },
-    { id: '907', x: 10, y: 10 + 10 * (roomH + vGap) + roomH/2, width: roomW, height: roomH, type: 'room' },
+    { id: '908', x: 10, y: 10 + 8 * (roomH + vGap) + roomH/2, width: roomW, height: roomH, type: 'room' },
+    { id: '907', x: 10, y: 10 + 9 * (roomH + vGap) + roomH/2, width: roomW, height: roomH, type: 'room' },
     
     // Gap in the layout
-    { id: 'Lifts_Left', x: 10, y: 10 + 12 * (roomH + vGap), width: roomW, height: roomH * 1.5, type: 'common', label: 'Lifts' },
+    { id: 'Lifts_Left', x: 105, y: 10 + 14 * (roomH + vGap), width: roomW, height: roomH * 1.5, type: 'common', label: 'Lifts' },
     { id: '905', x: 10, y: 10 + 13 * (roomH + vGap) + roomH * 0.5, width: roomW, height: roomH, type: 'room' },
-    
-    // Corridor - vertical (left bottom)
-    { id: 'corridor_left_bottom', x: 10 + roomW + hGap/2, y: 10 + 14 * (roomH + vGap), width: 15, height: 6 * (roomH + vGap) + roomH, type: 'corridor' },
-    
-    { id: 'Stairs_Left', x: 10, y: 10 + 15 * (roomH + vGap) + roomH * 0.5, width: roomW, height: roomH * 1.5, type: 'common', label: 'Stairs' },
-    { id: '904', x: 10, y: 10 + 16 * (roomH + vGap) + roomH, width: roomW, height: roomH, type: 'room' },
-    { id: '903', x: 10, y: 10 + 17 * (roomH + vGap) + roomH, width: roomW, height: roomH, type: 'room' },
-    { id: 'WS_Left_2', x: 10, y: 10 + 18 * (roomH + vGap) + roomH, width: roomW, height: roomH, type: 'common', label: 'WS' },
-    { id: '902', x: 10, y: 10 + 19 * (roomH + vGap) + roomH, width: roomW, height: roomH, type: 'room' },
-    { id: '901', x: 10, y: 10 + 20 * (roomH + vGap) + roomH, width: roomW, height: roomH, type: 'room' },
+      
+    { id: 'Stairs_Left', x: 105, y: 10 + 15* (roomH + vGap) + roomH * 0.5, width: roomW, height: roomH * 1.5, type: 'common', label: 'Stairs' },
+    { id: '904', x: 10, y: 10 + 14 * (roomH + vGap) + roomH, width: roomW, height: roomH, type: 'room' },
+    { id: '903', x: 10, y: 10 + 15 * (roomH + vGap) + roomH, width: roomW, height: roomH, type: 'room' },
+    { id: '902', x: 10, y: 10 + 16 * (roomH + vGap) + roomH, width: roomW, height: roomH, type: 'room' },
+    { id: '901', x: 10, y: 10 + 17 * (roomH + vGap) + roomH, width: roomW, height: roomH, type: 'room' },
 
     // Second Vertical Section
     { id: '915', x: 10 + 2 * (roomW + hGap), y: 10 + 9 * (roomH + vGap) + roomH/2, width: roomW, height: roomH, type: 'room' },
     { id: '916', x: 10 + 2 * (roomW + hGap), y: 10 + 10 * (roomH + vGap) + roomH/2, width: roomW, height: roomH, type: 'room' },
-    { id: '906', x: 10 + 2 * (roomW + hGap), y: 10 + 20 * (roomH + vGap) + roomH, width: roomW, height: roomH, type: 'room' },
+    { id: '906', x: 100, y: 10 + 17 * (roomH + vGap) + roomH, width: roomW, height: roomH, type: 'room' },
 
     // Labels for corridors
     { id: 'Corridor_Top_Left', x: 10 + 8 * (roomW + hGap), y: 10 + roomH + vGap + 7.5, label: 'Corridor', type: 'label', rotation: 0 },
