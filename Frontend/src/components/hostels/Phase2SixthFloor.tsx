@@ -65,7 +65,7 @@ const Phase2SixthFloorPlan: React.FC<FloorPlanProps> = ({
     { 
       id: 'vertical_corridor', 
       x: verticalCorridorX, 
-      y: getY(600, 0), 
+      y: getY(100, 0), 
       width: corridorWidth, 
       height: verticalCorridorLength, 
       type: 'corridor'
@@ -96,21 +96,21 @@ const Phase2SixthFloorPlan: React.FC<FloorPlanProps> = ({
     // Column 2 (x=50) - Bottom part aligns with Column 1
     { id: '608', x: 60 + roomW + hGap, y: getY(600, 0), width: roomW, height: roomH, type: 'room' },
     // Middle part aligns with mid-section of Column 1
-    { id: '609', x: -30 + roomW + hGap, y: getY(600, 8), width: roomW, height: roomH, type: 'room' },
-    { id: '610', x: -30 + roomW + hGap, y: getY(600, 9), width: roomW, height: roomH, type: 'room' },
-    { id: '611', x: -30 + roomW + hGap, y: getY(600, 10), width: roomW, height: roomH, type: 'room' },
-    { id: '612', x:-30 + roomW + hGap, y: getY(600, 11), width: roomW, height: roomH, type: 'room' },
-    { id: 'WS_Mid_L', x: 50 + roomW + hGap, y: getY(600, 13) - 5, width: roomW, height: 90, type: 'common', label: 'WS' },
-    { id: '613', x: -30 + roomW + hGap, y: getY(600, 12), width: roomW, height: roomH, type: 'room' },
-    { id: '614', x: -30 + roomW + hGap, y: getY(600, 13), width: roomW, height: roomH, type: 'room' },
-    { id: '615', x: -30 + roomW + hGap, y: getY(600, 14), width: roomW, height: roomH, type: 'room' },
-    { id: '616', x: -30 + roomW + hGap, y: getY(600, 15), width: roomW, height: roomH, type: 'room' }, // Aligns with bottomRowY
+    { id: '609', x: -30 + roomW + hGap, y: getY(600, 9), width: roomW, height: roomH, type: 'room' },
+    { id: '610', x: -30 + roomW + hGap, y: getY(600, 10), width: roomW, height: roomH, type: 'room' },
+    { id: '611', x: -30 + roomW + hGap, y: getY(600, 11), width: roomW, height: roomH, type: 'room' },
+    { id: '612', x:-30 + roomW + hGap, y: getY(600, 12), width: roomW, height: roomH, type: 'room' },
+    { id: 'WS_Mid_L', x: 50 + roomW + hGap, y: getY(600, 14) - 5, width: roomW, height: 90, type: 'common', label: 'WS' },
+    { id: '613', x: -30 + roomW + hGap, y: getY(600, 13), width: roomW, height: roomH, type: 'room' },
+    { id: '614', x: -30 + roomW + hGap, y: getY(600, 14), width: roomW, height: roomH, type: 'room' },
+    { id: '615', x: -30 + roomW + hGap, y: getY(600, 15), width: roomW, height: roomH, type: 'room' },
+    { id: '616', x: -30 + roomW + hGap, y: getY(600, 16), width: roomW, height: roomH, type: 'room' }, // Aligns with bottomRowY
 
     // Column 3 (x=90)
-    { id: '622', x: 10 + 2*(roomW + hGap), y: getY(600, 8), width: roomW, height: roomH, type: 'room' },
-    { id: '621', x: 10 + 2*(roomW + hGap), y: getY(600, 9), width: roomW, height: roomH, type: 'room' },
-    { id: '620', x: 10 + 2*(roomW + hGap), y: getY(600, 10), width: roomW, height: roomH, type: 'room' },
-    { id: '619', x: 10 + 2*(roomW + hGap), y: getY(600, 11), width: roomW, height: roomH, type: 'room' },
+    { id: '622', x: 10 + 2*(roomW + hGap), y: getY(600, 9), width: roomW, height: roomH, type: 'room' },
+    { id: '621', x: 10 + 2*(roomW + hGap), y: getY(600, 10), width: roomW, height: roomH, type: 'room' },
+    { id: '620', x: 10 + 2*(roomW + hGap), y: getY(600, 11), width: roomW, height: roomH, type: 'room' },
+    { id: '619', x: 10 + 2*(roomW + hGap), y: getY(600, 12), width: roomW, height: roomH, type: 'room' },
 
 
     // --- Top Horizontal Section ---
@@ -124,7 +124,7 @@ const Phase2SixthFloorPlan: React.FC<FloorPlanProps> = ({
     { id: 'Lifts_Top_M', x: 300 + 5*(roomW + hGap) , y: getY(650,17)-5, width: 90, height: roomH, type: 'common', label: 'Lifts' },
 
     // Top Row Left Part (aligned with bottom row where possible)
-    { id: '617', x: 10, y: getY(650,18)-5, width: roomW, height: roomH, type: 'room' },
+    { id: '617', x: 10, y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' },
     { id: '618', x: 50 + roomW + hGap, y:getY(650,19)-5, width: roomW, height: roomH, type: 'room' },
     { id: '623', x: 20 + 3*(roomW + hGap), y:getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 623 above 635
     { id: '624', x: 30 + 4*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 624 above 634
