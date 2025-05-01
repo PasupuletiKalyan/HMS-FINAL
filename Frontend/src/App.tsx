@@ -26,6 +26,8 @@ const LocationAwareApp: React.FC = () => {
   const [occupiedBeds, setOccupiedBeds] = useState<Record<string, boolean>>({});
   // Track the current application number to detect user changes
   const [currentApplicationNo, setCurrentApplicationNo] = useState<string | null>(null);
+  // Add state to track completed steps
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
   // Load booking information when the app initializes or location changes
   useEffect(() => {
@@ -40,6 +42,7 @@ const LocationAwareApp: React.FC = () => {
         // Reset state when user changes
         setCurrentUserBooking(null);
         setOccupiedBeds({});
+        setCompletedSteps([]);
         setCurrentApplicationNo(applicationNo);
       }
       
@@ -48,34 +51,51 @@ const LocationAwareApp: React.FC = () => {
           const response = await fetch(`http://localhost:5000/api/progress/${applicationNo}`);
           if (response.ok) {
             const data = await response.json();
-            if (data.success && data.progress.roomBooked && data.progress.bookingDetails) {
-              const bookingFromBackend: BookingInfo = {
-                block: data.progress.bookingDetails.block,
-                floor: data.progress.bookingDetails.floor,
-                roomNumber: data.progress.bookingDetails.roomNumber,
-                bed: data.progress.bookingDetails.bed,
-                roomKey: data.progress.bookingDetails.roomKey
-              };
+            if (data.success) {
+              // Load completed steps from backend
+              setCompletedSteps(data.progress.completedSteps || []);
               
-              // Save to state
-              setCurrentUserBooking(bookingFromBackend);
+              // Store in localStorage for persistence
+              localStorage.setItem("completedSteps", JSON.stringify(data.progress.completedSteps || []));
               
-              // Also save to localStorage with user-specific key
-              if (userId) {
-                const bookingKey = `${userRole}_${userId}_userBooking`;
-                localStorage.setItem(bookingKey, JSON.stringify(bookingFromBackend));
+              // Set form and payment completion flags in localStorage
+              if (data.progress.formCompleted) {
+                localStorage.setItem("formCompleted", "true");
+              }
+              
+              if (data.progress.paymentCompleted) {
+                localStorage.setItem("paymentCompleted", "true");
+              }
+              
+              if (data.progress.roomBooked && data.progress.bookingDetails) {
+                const bookingFromBackend: BookingInfo = {
+                  block: data.progress.bookingDetails.block,
+                  floor: data.progress.bookingDetails.floor,
+                  roomNumber: data.progress.bookingDetails.roomNumber,
+                  bed: data.progress.bookingDetails.bed,
+                  roomKey: data.progress.bookingDetails.roomKey
+                };
                 
-                // Mark this bed as occupied
-                const bedKey = `${bookingFromBackend.block}_${bookingFromBackend.floor}_${bookingFromBackend.roomNumber}_${bookingFromBackend.bed}`;
-                setOccupiedBeds(prev => ({
-                  ...prev,
-                  [bedKey]: true
-                }));
+                // Save to state
+                setCurrentUserBooking(bookingFromBackend);
                 
-                // Save occupied beds to localStorage
-                localStorage.setItem(`occupiedBeds_${userId}`, JSON.stringify({
-                  [bedKey]: true
-                }));
+                // Also save to localStorage with user-specific key
+                if (userId) {
+                  const bookingKey = `${userRole}_${userId}_userBooking`;
+                  localStorage.setItem(bookingKey, JSON.stringify(bookingFromBackend));
+                  
+                  // Mark this bed as occupied
+                  const bedKey = `${bookingFromBackend.block}_${bookingFromBackend.floor}_${bookingFromBackend.roomNumber}_${bookingFromBackend.bed}`;
+                  setOccupiedBeds(prev => ({
+                    ...prev,
+                    [bedKey]: true
+                  }));
+                  
+                  // Save occupied beds to localStorage
+                  localStorage.setItem(`occupiedBeds_${userId}`, JSON.stringify({
+                    [bedKey]: true
+                  }));
+                }
               }
             }
           }
@@ -90,7 +110,7 @@ const LocationAwareApp: React.FC = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<LoginPage />} />
+      <Route path="/" element={<AdminDashboard />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/student-dashboard" element={<StudentDashboard      
         currentUserBooking={currentUserBooking}

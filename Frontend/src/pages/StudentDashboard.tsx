@@ -103,8 +103,12 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
-              // Set completed steps from backend data
-              setCompletedSteps(data.progress.completedSteps || []);
+              // Load completed steps from backend
+              const backendCompletedSteps = data.progress.completedSteps || [];
+              setCompletedSteps(backendCompletedSteps);
+              
+              // Store completed steps in localStorage for consistency
+              localStorage.setItem("completedSteps", JSON.stringify(backendCompletedSteps));
               
               // Check for booking details and set currentUserBooking if exists
               if (data.progress.roomBooked && data.progress.bookingDetails) {
@@ -125,8 +129,9 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   localStorage.setItem(bookingKey, JSON.stringify(bookingFromBackend));
                 }
                 
-                // Set the booking in our local state
+                // Set the booking in our local state and update parent state
                 setLocalCurrentUserBooking(bookingFromBackend);
+                setCurrentUserBooking(bookingFromBackend);
               }
               
               // Set current step based on progress
@@ -134,12 +139,18 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 setCurrentStep(3);
                 // Don't show form since all steps are complete
                 setShowForm(false);
+                // Store in localStorage that all steps are complete
+                localStorage.setItem("formCompleted", "true");
+                localStorage.setItem("paymentCompleted", "true");
               } else if (data.progress.paymentCompleted) {
                 setCurrentStep(3); // Move to hostel booking step
                 setShowForm(false); // Don't show form since payment is complete
+                localStorage.setItem("formCompleted", "true");
+                localStorage.setItem("paymentCompleted", "true");
               } else if (data.progress.formCompleted) {
                 setCurrentStep(2); // Move to payment step
                 setShowForm(false); // Don't show form since it's already completed
+                localStorage.setItem("formCompleted", "true");
               } else {
                 setCurrentStep(1);
                 // Only show form if user clicks on the form button
@@ -155,7 +166,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     };
     
     fetchStudentProgress();
-  }, [applicationNumber, setLocalCurrentUserBooking]);
+  }, [applicationNumber, setCurrentUserBooking]);
 
   const handleStepClick = (step: number) => {
     // Check if previous steps are completed
