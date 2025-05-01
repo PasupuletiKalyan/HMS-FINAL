@@ -826,22 +826,41 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking:
               <h2>Virtual Hostel Tour</h2>
               <div className="tour-info">
                 <p>Experience a 360° view of our hostel facilities before making your decision.</p>
-                <div className="tour-video-container">
-                  <div className="video-placeholder" style={{
-                    background: 'linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%)',
-                    height: '450px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: '8px',
-                    marginTop: '20px'
-                  }}>
-                    <div style={{textAlign: 'center'}}>
-                      <span style={{fontSize: '60px', color: '#c23535'}}>▶</span>
-                      <p style={{marginTop: '15px', color: '#666'}}>Click to start the virtual tour</p>
-                    </div>
-                  </div>
+                
+                {/* Embedded iframe for Mahindra University virtual tour */}
+                <div className="tour-iframe-container" style={{
+                  width: '100%',
+                  height: '600px',
+                  marginTop: '20px',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  overflow: 'hidden'
+                }}>
+                  <iframe 
+                    src="https://www.mahindrauniversity.edu.in/sites/virtual-tour-of-mu-campus.html" 
+                    title="Mahindra University Virtual Tour"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      border: 'none'
+                    }}
+                    allowFullScreen
+                  ></iframe>
                 </div>
+                
+                <div className="tour-note" style={{
+                  backgroundColor: '#f7f7f7',
+                  padding: '15px',
+                  borderRadius: '8px',
+                  marginTop: '20px',
+                  textAlign: 'center'
+                }}>
+                  <p style={{fontWeight: 'bold', color: '#c23535'}}>
+                    Note: Navigate through the virtual tour using your mouse or touchscreen. 
+                    Click on hotspots to move between locations.
+                  </p>
+                </div>
+                
                 <div className="tour-highlights" style={{marginTop: '30px'}}>
                   <h3>Tour Highlights</h3>
                   <ul style={{

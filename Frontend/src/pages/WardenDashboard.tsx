@@ -608,6 +608,28 @@ const WardenDashboard: React.FC = () => {
     }
   
     try {
+      // Make API call to allocate room in the backend
+      const response = await fetch('http://localhost:5000/api/hostels/allot-room', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          studentId: studentApplicationNumber,
+          block: booking.block,
+          roomNumber: booking.roomNumber,
+          bed: booking.bed,
+          floor: booking.floor,
+          wardenId: localStorage.getItem('warden_userId') || 'unknown',
+          reason: 'Allocated by warden'
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to allocate room');
+      }
+
       // Update occupied beds
       setOccupiedBeds(prev => ({
         ...prev,
@@ -624,7 +646,6 @@ const WardenDashboard: React.FC = () => {
       ]);
   
       // Clear the current allocation and student number for next booking
-      // setCurrentAllocation(null);
       setShowStudentInput(false);
       setStudentApplicationNumber("");
       
@@ -632,7 +653,7 @@ const WardenDashboard: React.FC = () => {
       alert(`Room successfully allocated to student ${studentApplicationNumber}`);
     } catch (error) {
       console.error('Error allocating room:', error);
-      alert('Failed to allocate room. Please try again.');
+      alert(`Failed to allocate room: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -853,7 +874,10 @@ const WardenDashboard: React.FC = () => {
               currentUserBooking={null}
               setCurrentUserBooking={(booking: BookingInfo | null) => {
                 if (booking) {
-                  handleRoomAllocation(booking);
+                  // Process the booking only when it has a complete room and bed selection
+                  if (booking.bed && booking.roomNumber && booking.block && booking.floor) {
+                    handleRoomAllocation(booking);
+                  }
                 }
               }}
               occupiedBeds={occupiedBeds}
