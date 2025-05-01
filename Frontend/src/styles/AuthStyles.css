@@ -5,7 +5,6 @@
   align-items: center;
   height: 100vh;
   width: 100vw;
-  overflow: hidden;
   background: linear-gradient(135deg, #d32f2f, #b71c1c);
 }
 
@@ -31,18 +30,54 @@
   background: rgba(255, 255, 255, 1);
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-  z-index: 2;
-  width: 400px; /* Ensures a fixed width */
+  width: 400px;
+  min-height: 500px;
+  z-index: 2; /* Above video */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
-
-/* Removed hover scaling for auth box */
-/*
-.auth-box:hover {
-  transform: scale(1.02);
+/* Additional spacing and styling for the content */
+.auth-content {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
 }
-*/
+
+/* Change the input fields slightly */
+.auth-input {
+  width: 100%;
+  padding: 15px;
+  margin-top: 10px;
+  border: 1px solid #d32f2f;
+  border-radius: 5px;
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Style the submit buttons */
+.auth-button {
+  width: 100%;
+  background: #d32f2f;
+  color: white;
+  padding: 15px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.3s;
+  margin-top: 10px;
+}
+
+.auth-button:hover {
+  background: #b71c1c;
+  transform: translateY(-2px);
+}
+
+.auth-button:active {
+  transform: translateY(0);
+}
 
 /* Register Box specific adjustments */
 .register-box {
@@ -71,7 +106,6 @@
   display: block; /* Centers the image */
   margin: 0 auto; /* Ensures it's properly aligned */
 }
-
 
 /* Title for the system */
 .title {
@@ -164,10 +198,9 @@ button:active {
 .login-prompt a:hover {
   text-decoration: underline;
 }
-html, body {
-  overflow: hidden; /* Hides all scrollbars */
-  margin: 0;
-  padding: 0;
+
+/* For the auth pages specifically, we need to make sure scrolling is possible */
+.auth-page {
   width: 100%;
   height: 100%;
 }

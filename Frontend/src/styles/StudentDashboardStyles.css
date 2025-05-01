@@ -19,7 +19,7 @@ html {
   color: var(--text-color);
   margin: 0;
   padding: 0;
-  overflow: auto;
+  /* Removed overflow: auto here as it's now controlled by index.css */
 }
 
 /* 🔹 Top Navigation Bar */

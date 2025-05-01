@@ -326,7 +326,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking 
                   // Check if My Booking should be accessible
                   if (item === "My Booking") {
                     if (completedSteps.includes(1) && completedSteps.includes(2)) {
-                      navigate("/current-booking"); // Navigate to CurrentBookingPage
+                      setSelectedSection(item); // Changed to set section instead of navigating
                     } else {
                       alert("Please complete the form submission and fee payment before accessing booking!");
                     }
@@ -784,6 +784,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ currentUserBooking 
                       <p><strong>Reason:</strong> {currentUserBooking.allotmentReason}</p>
                     </>
                   )}
+                  <p><strong>Note:</strong> Please collect your room key from the hostel office.</p>
                 </div>
               ) : (
                 <div className="no-booking-message">
