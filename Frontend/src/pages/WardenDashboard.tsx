@@ -649,11 +649,33 @@ const WardenDashboard: React.FC = () => {
       setShowStudentInput(false);
       setStudentApplicationNumber("");
       
+      // Save the application number temporarily for the next booking process
+      localStorage.setItem("applicationNo", studentApplicationNumber);
+      
       // Show success message
       alert(`Room successfully allocated to student ${studentApplicationNumber}`);
+
+      // Refresh occupied beds from server to make sure UI is in sync
+      try {
+        const refreshResponse = await fetch('http://localhost:5000/api/occupied-beds');
+        if (refreshResponse.ok) {
+          const refreshData = await refreshResponse.json();
+          if (refreshData.success) {
+            setOccupiedBeds(refreshData.occupiedBeds);
+          }
+        }
+      } catch (error) {
+        console.error('Error refreshing occupied beds:', error);
+      }
+
     } catch (error) {
       console.error('Error allocating room:', error);
       alert(`Failed to allocate room: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      // Always clean up the temporary application number from localStorage
+      setTimeout(() => {
+        localStorage.removeItem("applicationNo");
+      }, 1000);
     }
   };
 

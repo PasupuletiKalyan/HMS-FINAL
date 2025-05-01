@@ -146,8 +146,9 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     // Fetch all occupied beds from backend
     fetchOccupiedBeds();
     
-    // Set up interval to refresh occupied beds every 5 seconds
-    const intervalId = setInterval(fetchOccupiedBeds, 5000);
+    // Set up interval to refresh occupied beds less frequently (30 seconds instead of 5)
+    // This helps reduce the flickering issue
+    const intervalId = setInterval(fetchOccupiedBeds, 30000);
     
     return () => clearInterval(intervalId);
   }, [setOccupiedBeds, setCurrentUserBooking]);

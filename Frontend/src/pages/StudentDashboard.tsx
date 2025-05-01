@@ -914,34 +914,17 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   </p>
                 </div>
                 
-                <div className="tour-highlights" style={{marginTop: '30px'}}>
-                  <h3>Tour Highlights</h3>
-                  <ul style={{
-                    listStyleType: 'none',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-                    gap: '15px',
-                    marginTop: '15px'
-                  }}>
-                    { [
-                      { title: 'Room Interiors', desc: 'View sample rooms with different layouts' },
-                      { title: 'Common Areas', desc: 'Explore study spaces and lounges' },
-                      { title: 'Dining Facilities', desc: 'Check out our mess and canteen' },
-                      { title: 'Sports Facilities', desc: 'Tour our sports fields and gym' },
-                      { title: 'Laundry Services', desc: 'View washing and drying equipment' },
-                      { title: 'Security Features', desc: 'Learn about our safety measures' },
-                    ].map((item, index) => (
-                      <li key={index} style={{
-                        padding: '15px',
-                        backgroundColor: '#f9f9f9',
-                        borderRadius: '8px',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                      }}>
-                        <h4 style={{color: '#c23535', marginBottom: '5px'}}>{item.title}</h4>
-                        <p style={{fontSize: '14px', color: '#666'}}>{item.desc}</p>
-                      </li>
-                    ))}
-                  </ul>
+                {/* Credits section */}
+                <div style={{
+                  marginTop: '30px',
+                  padding: '15px',
+                  backgroundColor: '#f9f9f9',
+                  borderRadius: '8px',
+                  textAlign: 'center'
+                }}>
+                  <p style={{fontStyle: 'italic', color: '#555'}}>
+                    Credits: This virtual tour was created by Venkata Rajesh Kumar Tavva
+                  </p>
                 </div>
               </div>
             </div>
