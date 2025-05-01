@@ -122,21 +122,21 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
       // Column 2 (x=50) - Bottom part aligns with Column 1
       { id: '108', x: 60 + roomW + hGap, y: getY(600, 0), width: roomW, height: roomH, type: 'room' },
       // Middle part aligns with mid-section of Column 1
-      { id: '109', x: -30 + roomW + hGap, y: getY(600, 8), width: roomW, height: roomH, type: 'room' },
-      { id: '110', x: -30 + roomW + hGap, y: getY(600, 9), width: roomW, height: roomH, type: 'room' },
-      { id: '111', x: -30 + roomW + hGap, y: getY(600, 10), width: roomW, height: roomH, type: 'room' },
-      { id: '112', x:-30 + roomW + hGap, y: getY(600, 11), width: roomW, height: roomH, type: 'room' },
-      { id: 'WS_Mid_L', x: 50 + roomW + hGap, y: getY(600, 13) - 5, width: roomW, height: 90, type: 'common', label: 'WS' },
-      { id: '113', x: -30 + roomW + hGap, y: getY(600, 12), width: roomW, height: roomH, type: 'room' },
-      { id: '114', x: -30 + roomW + hGap, y: getY(600, 13), width: roomW, height: roomH, type: 'room' },
-      { id: '115', x: -30 + roomW + hGap, y: getY(600, 14), width: roomW, height: roomH, type: 'room' },
-      { id: '116', x: -30 + roomW + hGap, y: getY(600, 15), width: roomW, height: roomH, type: 'room' }, // Aligns with bottomRowY
+      { id: '109', x: -30 + roomW + hGap, y: getY(600, 9), width: roomW, height: roomH, type: 'room' },
+      { id: '110', x: -30 + roomW + hGap, y: getY(600, 10), width: roomW, height: roomH, type: 'room' },
+      { id: '111', x: -30 + roomW + hGap, y: getY(600, 11), width: roomW, height: roomH, type: 'room' },
+      { id: '112', x:-30 + roomW + hGap, y: getY(600, 12), width: roomW, height: roomH, type: 'room' },
+      { id: 'WS_Mid_L', x: 50 + roomW + hGap, y: getY(600, 14) - 5, width: roomW, height: 90, type: 'common', label: 'WS' },
+      { id: '113', x: -30 + roomW + hGap, y: getY(600, 13), width: roomW, height: roomH, type: 'room' },
+      { id: '114', x: -30 + roomW + hGap, y: getY(600, 14), width: roomW, height: roomH, type: 'room' },
+      { id: '115', x: -30 + roomW + hGap, y: getY(600, 15), width: roomW, height: roomH, type: 'room' },
+      { id: '116', x: -30 + roomW + hGap, y: getY(600, 16), width: roomW, height: roomH, type: 'room' }, // Aligns with bottomRowY
 
       // Column 3 (x=90)
-      { id: '122', x: 10 + 2*(roomW + hGap), y: getY(600, 8), width: roomW, height: roomH, type: 'room' },
-      { id: '121', x: 10 + 2*(roomW + hGap), y: getY(600, 9), width: roomW, height: roomH, type: 'room' },
-      { id: '120', x: 10 + 2*(roomW + hGap), y: getY(600, 10), width: roomW, height: roomH, type: 'room' },
-      { id: '119', x: 10 + 2*(roomW + hGap), y: getY(600, 11), width: roomW, height: roomH, type: 'room' },
+      { id: '122', x: 10 + 2*(roomW + hGap), y: getY(600, 9), width: roomW, height: roomH, type: 'room' },
+      { id: '121', x: 10 + 2*(roomW + hGap), y: getY(600, 10), width: roomW, height: roomH, type: 'room' },
+      { id: '120', x: 10 + 2*(roomW + hGap), y: getY(600, 11), width: roomW, height: roomH, type: 'room' },
+      { id: '119', x: 10 + 2*(roomW + hGap), y: getY(600, 12), width: roomW, height: roomH, type: 'room' },
 
 
       // --- Top Horizontal Section ---
@@ -150,7 +150,7 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
       { id: 'Lifts_Top_M', x: 300 + 5*(roomW + hGap) , y: getY(650,17)-5, width: 90, height: roomH, type: 'common', label: 'Lifts' },
 
       // Top Row Left Part (aligned with bottom row where possible)
-      { id: '117', x: 10, y: getY(650,18)-5, width: roomW, height: roomH, type: 'room' },
+      { id: '117', x: 10, y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' },
       { id: '118', x: 50 + roomW + hGap, y:getY(650,19)-5, width: roomW, height: roomH, type: 'room' },
       { id: '123', x: 20 + 3*(roomW + hGap), y:getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 123 above 135
       { id: '124', x: 30 + 4*(roomW + hGap), y: getY(650,19)-5, width: roomW, height: roomH, type: 'room' }, // Aligns 124 above 134
@@ -647,22 +647,22 @@ const Phase2FloorPlan: React.FC<FloorPlanProps> = ({
       { id: '204', x: 10, y: getY(590, 5), width: roomW, height: roomH, type: 'room' },
       { id: 'Lifts_Btm_L', x: 90, y: getY(600, 6) - 5, width: roomW, height: 70, type: 'common', label: 'Lifts' },
       { id: '205', x: 10, y: getY(590, 6), width: roomW, height: roomH, type: 'room' },
-      { id: '207', x: 10, y: getY(590, 7), width: roomW, height: roomH, type: 'room' }, // Skipping 206 based on image
-      { id: '208', x: 10, y: getY(590, 8), width: roomW, height: roomH, type: 'room' },
-      { id: '209', x: 10, y: getY(590, 9), width: roomW, height: roomH, type: 'room' },
-      { id: '210', x: 10, y: getY(590, 10), width: roomW, height: roomH, type: 'room' },
-      { id: '211', x: 10, y: getY(590, 11), width: roomW, height: roomH, type: 'room' },
-      { id: 'WS_Mid_L', x: 90, y: getY(600, 14) - 5, width: roomW, height: 60, type: 'common', label: 'WS' },
-      { id: '212', x: 10, y: getY(590, 12), width: roomW, height: roomH, type: 'room' },
-      { id: 'Bal_Top_L', x: 10, y: getY(570, 15), width: roomW, height: 140, type: 'common', label: 'Bal' }, // Balcony aligns with bottomRowY
+      { id: '207', x: 10, y: getY(590, 8), width: roomW, height: roomH, type: 'room' }, // Skipping 206 based on image
+      { id: '208', x: 10, y: getY(590, 9), width: roomW, height: roomH, type: 'room' },
+      { id: '209', x: 10, y: getY(590, 10), width: roomW, height: roomH, type: 'room' },
+      { id: '210', x: 10, y: getY(590, 11), width: roomW, height: roomH, type: 'room' },
+      { id: '211', x: 10, y: getY(590, 12), width: roomW, height: roomH, type: 'room' },
+      { id: 'WS_Mid_L', x: 90, y: getY(610, 14) - 5, width: roomW, height: 100, type: 'common', label: 'WS' },
+      { id: '212', x: 10, y: getY(590, 13), width: roomW, height: roomH, type: 'room' },
+      { id: 'Bal_Top_L', x: 10, y: getY(570, 15), width: roomW, height: 100, type: 'common', label: 'Bal' }, // Balcony aligns with bottomRowY
       
       // Column 2 (x=50) - Bottom part aligns with Column 1
       { id: '206', x:50 + roomW + hGap, y: getY(600, 0), width: roomW, height: roomH, type: 'room' },
       // Middle part aligns with mid-section of Column 1
-      { id: '218', x: 50 + roomW + hGap, y: getY(600, 9), width: roomW, height: roomH, type: 'room' },
-      { id: '217', x: 50 + roomW + hGap, y: getY(600, 10), width: roomW, height: roomH, type: 'room' },
-      { id: '216', x: 50 + roomW + hGap, y: getY(600, 11), width: roomW, height: roomH, type: 'room' },
-      { id: '215', x: 50 + roomW + hGap, y: getY(600, 12), width: roomW, height: roomH, type: 'room' },
+      { id: '218', x: 50 + roomW + hGap, y: getY(600, 8), width: roomW, height: roomH, type: 'room' },
+      { id: '217', x: 50 + roomW + hGap, y: getY(600, 9), width: roomW, height: roomH, type: 'room' },
+      { id: '216', x: 50 + roomW + hGap, y: getY(600, 10), width: roomW, height: roomH, type: 'room' },
+      { id: '215', x: 50 + roomW + hGap, y: getY(600, 11), width: roomW, height: roomH, type: 'room' },
       { id: 'Stairs_Top_L', x: 50 + roomW + hGap, y: getY(590, 15), width: roomW, height: roomH, type: 'common', label: 'Stairs' }, // Aligns with bottomRowY
       
       // --- Top Horizontal Section ---
