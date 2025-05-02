@@ -345,8 +345,29 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
             }
           }
           
-          alert("This bed has just been booked by another student. Please select a different bed.");
+          // Replace alert with a more user-friendly notification
           setShowConfirmationModal(false);
+          setModalRoomInfo(prev => ({...prev, bed: null}));
+          
+          // Create a notification element that self-removes after a few seconds
+          const notification = document.createElement('div');
+          notification.className = 'booking-notification error';
+          notification.innerHTML = `
+            <div class="notification-content">
+              <div class="notification-icon">⚠️</div>
+              <div class="notification-message">This bed has just been booked by another student. Please select a different bed.</div>
+            </div>
+          `;
+          document.body.appendChild(notification);
+          
+          // Remove notification after 4 seconds
+          setTimeout(() => {
+            notification.classList.add('fade-out');
+            setTimeout(() => {
+              document.body.removeChild(notification);
+            }, 500); // Wait for fade out animation
+          }, 4000);
+          
           return;
         }
       }
@@ -403,7 +424,25 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
       
     } catch (error) {
       console.error("Error during booking process:", error);
-      alert("There was an error with your booking. Please try again.");
+      
+      // Replace alert with a more user-friendly notification
+      const notification = document.createElement('div');
+      notification.className = 'booking-notification error';
+      notification.innerHTML = `
+        <div class="notification-content">
+          <div class="notification-icon">❌</div>
+          <div class="notification-message">There was an error with your booking. Please try again.</div>
+        </div>
+      `;
+      document.body.appendChild(notification);
+      
+      // Remove notification after 4 seconds
+      setTimeout(() => {
+        notification.classList.add('fade-out');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 500); // Wait for fade out animation
+      }, 4000);
     }
   };
 
@@ -411,24 +450,6 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
   const isBedOccupied = (room: string, bed: string): boolean => {
     const roomKey = `${selectedBlock}_${selectedFloor}_${room}_${bed}`;
     return occupiedBeds[roomKey] || false;
-  };
-
-  // New function to get available beds for a room
-  const getAvailableBedsForRoom = (roomNumber: string): string[] => {
-    const availableBeds: string[] = [];
-    
-    const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
-    const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
-    
-    if (!occupiedBeds[bedAKey]) {
-      availableBeds.push('A');
-    }
-    
-    if (!occupiedBeds[bedBKey]) {
-      availableBeds.push('B');
-    }
-    
-    return availableBeds;
   };
 
   // Render floor plan content
@@ -693,6 +714,13 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     );
   };
 
+  // Check if the current room is a single bed room (1214, 1215, 1112A, 1112, 912, 1012, 814)
+  const isSingleBedRoom = (roomNumber: string): boolean => {
+    return roomNumber === '1214' || roomNumber === '1215' || roomNumber === '1112A' || 
+           roomNumber === '1112' || roomNumber === '912' || roomNumber === '1012' ||
+           roomNumber === '814';
+  };
+
   // Check if the current block is one of the new blocks with the RoomLayout
   const isNewBlock = (): boolean => {
     return ["Aravali", "Ajanta", "Himalaya", "Shivalik", "Vindya", "Nilgiri", "Satpura", "Kailash"].includes(modalRoomInfo.block);
@@ -891,25 +919,28 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
                     {isBedOccupied(modalRoomInfo.number, 'A') ? 'Bed A (Occupied)' : 'Select Bed A'}
                   </button>
                   
-                  <button
-                    style={{
-                      backgroundColor: isBedOccupied(modalRoomInfo.number, 'B') ? 
-                        '#fecaca' : modalRoomInfo.bed === 'B' ? 
-                        '#bbf7d0' : '#f9fafb',
-                      border: `1px solid ${isBedOccupied(modalRoomInfo.number, 'B') ? 
-                        '#ef4444' : modalRoomInfo.bed === 'B' ? 
-                        '#22c55e' : '#d1d5db'}`,
-                      padding: '0.5rem 1rem',
-                      borderRadius: '0.375rem',
-                      fontWeight: 500,
-                      cursor: isBedOccupied(modalRoomInfo.number, 'B') ? 'not-allowed' : 'pointer',
-                      opacity: isBedOccupied(modalRoomInfo.number, 'B') ? 0.7 : 1
-                    }}
-                    disabled={isBedOccupied(modalRoomInfo.number, 'B')}
-                    onClick={() => !isBedOccupied(modalRoomInfo.number, 'B') && handleBedClick('B')}
-                  >
-                    {isBedOccupied(modalRoomInfo.number, 'B') ? 'Bed B (Occupied)' : 'Select Bed B'}
-                  </button>
+                  {/* Only display Bed B button for rooms other than 1214 and 1215 */}
+                  {!isSingleBedRoom(modalRoomInfo.number) && (
+                    <button
+                      style={{
+                        backgroundColor: isBedOccupied(modalRoomInfo.number, 'B') ? 
+                          '#fecaca' : modalRoomInfo.bed === 'B' ? 
+                          '#bbf7d0' : '#f9fafb',
+                        border: `1px solid ${isBedOccupied(modalRoomInfo.number, 'B') ? 
+                          '#ef4444' : modalRoomInfo.bed === 'B' ? 
+                          '#22c55e' : '#d1d5db'}`,
+                        padding: '0.5rem 1rem',
+                        borderRadius: '0.375rem',
+                        fontWeight: 500,
+                        cursor: isBedOccupied(modalRoomInfo.number, 'B') ? 'not-allowed' : 'pointer',
+                        opacity: isBedOccupied(modalRoomInfo.number, 'B') ? 0.7 : 1
+                      }}
+                      disabled={isBedOccupied(modalRoomInfo.number, 'B')}
+                      onClick={() => !isBedOccupied(modalRoomInfo.number, 'B') && handleBedClick('B')}
+                    >
+                      {isBedOccupied(modalRoomInfo.number, 'B') ? 'Bed B (Occupied)' : 'Select Bed B'}
+                    </button>
+                  )}
                 </div>
               </div>
             ) : isNewLayoutBlock() ? (
@@ -1094,15 +1125,18 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
                 <div
                   className={`room-item bed-a ${isBedOccupied(modalRoomInfo.number, 'A') ? 'occupied' : ''} ${modalRoomInfo.bed === 'A' ? 'selected' : ''}`}
                   onClick={() => !isBedOccupied(modalRoomInfo.number, 'A') && handleBedClick('A')}
+                  style={isSingleBedRoom(modalRoomInfo.number) ? { left: '50%', transform: 'translateX(-50%)' } : {}}
                 >
                   Bed A
                 </div>
-                <div
-                  className={`room-item bed-b ${isBedOccupied(modalRoomInfo.number, 'B') ? 'occupied' : ''} ${modalRoomInfo.bed === 'B' ? 'selected' : ''}`}
-                  onClick={() => !isBedOccupied(modalRoomInfo.number, 'B') && handleBedClick('B')}
-                >
-                  Bed B
-                </div>
+                {!isSingleBedRoom(modalRoomInfo.number) && (
+                  <div
+                    className={`room-item bed-b ${isBedOccupied(modalRoomInfo.number, 'B') ? 'occupied' : ''} ${modalRoomInfo.bed === 'B' ? 'selected' : ''}`}
+                    onClick={() => !isBedOccupied(modalRoomInfo.number, 'B') && handleBedClick('B')}
+                  >
+                    Bed B
+                  </div>
+                )}
                 <div className="room-item mirror">Mirror</div>
                 <div className="room-item window">Window</div>
                 <div className="room-item entry">Entry</div>

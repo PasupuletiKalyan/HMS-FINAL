@@ -119,6 +119,13 @@ interface RoomLayoutProps {
   onSelectBed?: (bed: string) => void;
 }
 
+// Helper function to check if a room is a single bed room
+const isSingleBedRoom = (roomNumber: string): boolean => {
+  return roomNumber === '1214' || roomNumber === '1215' || roomNumber === '1112A' || 
+         roomNumber === '1112' || roomNumber === '912' || roomNumber === '1012' ||
+         roomNumber === '814';
+};
+
 // Main component to render the SVG room layout
 const RoomLayout: React.FC<RoomLayoutProps> = ({
   bedAOccupied = false,

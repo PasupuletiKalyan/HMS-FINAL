@@ -37,6 +37,19 @@ const Phase2TwelfthFloorPlan: React.FC<FloorPlanProps> = ({
 
   // Helper function to get room occupancy status color
   const getRoomOccupancyStatus = (roomNumber: string): { color: string; status: string } => {
+    // Special case for single bed rooms
+    if (roomNumber === '1214' || roomNumber === '1215') {
+      const bedKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
+      const isBedOccupied = occupiedBeds[bedKey] || false;
+      
+      if (isBedOccupied) {
+        return { color: '#fecaca', status: 'Fully Occupied' }; // Light red for fully occupied
+      } else {
+        return { color: '#bbf7d0', status: 'Available' }; // Light green for available
+      }
+    }
+    
+    // Regular double bed rooms
     const bedAKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_A`;
     const bedBKey = `${selectedBlock}_${selectedFloor}_${roomNumber}_B`;
     const isBedAOccupied = occupiedBeds[bedAKey] || false;
@@ -57,7 +70,7 @@ const Phase2TwelfthFloorPlan: React.FC<FloorPlanProps> = ({
       case 'room': 
         return getRoomOccupancyStatus(roomId).color;
       case 'corridor': return 'none'; // Transparent for corridors
-      case 'utility': return '#ffeaa7'; // Light yellow for utilities
+      case 'utility': return '#d3d3d3'; // Light yellow for utilities
       default: return '#ffffff'; // White by default
     }
   };
@@ -75,12 +88,11 @@ const Phase2TwelfthFloorPlan: React.FC<FloorPlanProps> = ({
     // Top Row
     { id: '1214', x: 0, y: 0, w: 1, h: 1, type: 'room' },
     { id: '1215', x: 1, y: 0, w: 1, h: 1, type: 'room' },
-    { id: '1220', x: 2, y: 0, w: 1, h: 1, type: 'room' },
-    { id: '1221', x: 3, y: 0, w: 1, h: 1, type: 'room' },
-    { id: '1222', x: 4, y: 0, w: 1, h: 1, type: 'room' },
-    { id: '1223', x: 5, y: 0, w: 1, h: 1, type: 'room' },
-    { id: '1224', x: 6, y: 0, w: 1, h: 1, type: 'room' },
-    { id: 'Corridor', x: 7, y: 0, w: 4, h: 1, type: 'corridor' },
+    { id: '1220', x: 3, y: 0, w: 1, h: 1, type: 'room' },
+    { id: '1221', x: 5, y: 0, w: 1, h: 1, type: 'room' },
+    { id: '1222', x: 6, y: 0, w: 1, h: 1, type: 'room' },
+    { id: '1223', x: 7, y: 0, w: 1, h: 1, type: 'room' },
+    { id: '1224', x: 8, y: 0, w: 1, h: 1, type: 'room' },
     { id: '1228', x: 11, y: 0, w: 1, h: 1, type: 'room' },
     { id: '1229', x: 12, y: 0, w: 1, h: 1, type: 'room' },
     { id: '1230', x: 13, y: 0, w: 1, h: 1, type: 'room' },
@@ -92,60 +104,55 @@ const Phase2TwelfthFloorPlan: React.FC<FloorPlanProps> = ({
     { id: '1236', x: 19, y: 0, w: 1, h: 1, type: 'room' },
     { id: '1237', x: 20, y: 0, w: 1, h: 1, type: 'room' },
     { id: '1238', x: 21, y: 0, w: 1, h: 1, type: 'room' },
-    { id: 'Corridor', x: 22, y: 0, w: 4, h: 1, type: 'corridor' },
-    { id: '1239', x: 26, y: 0, w: 1, h: 1, type: 'room' },
-    { id: '1240', x: 27, y: 0, w: 1, h: 1, type: 'room' },
-    { id: '1241', x: 28, y: 0, w: 1, h: 1, type: 'room' },
-    { id: '1242', x: 29, y: 0, w: 1, h: 1, type: 'room' },
-    { id: '1243', x: 30, y: 0, w: 1, h: 1, type: 'room' },
+    { id: '1239', x: 22, y: 0, w: 1, h: 1, type: 'room' },
+    { id: '1240', x: 23, y: 0, w: 1, h: 1, type: 'room' },
+    { id: '1241', x: 24, y: 0, w: 1, h: 1, type: 'room' },
+    { id: '1242', x: 25, y: 0, w: 1, h: 1, type: 'room' },
+    { id: '1243', x: 26, y: 0, w: 1, h: 1, type: 'room' },
     { id: '1244', x: 31, y: 0, w: 1, h: 1, type: 'room' },
     { id: '1245', x: 32, y: 0, w: 1, h: 1, type: 'room' },
 
     // Second Row
-    { id: '1212A', x: 0, y: 1, w: 1, h: 1, type: 'room' },
-    { id: 'Stairs', x: 2, y: 1, w: 1, h: 1, type: 'utility' },
-    { id: '1227', x: 3, y: 1, w: 1, h: 1, type: 'room' },
-    { id: '1226', x: 4, y: 1, w: 1, h: 1, type: 'room' },
-    { id: '1225', x: 5, y: 1, w: 1, h: 1, type: 'room' },
-    { id: 'WS', x: 7, y: 1, w: 1, h: 1, type: 'utility' },
-    { id: 'Stairs', x: 9, y: 1, w: 1, h: 1, type: 'utility' },
-    { id: 'Lifts', x: 10, y: 1, w: 1, h: 1, type: 'utility' },
-    { id: '1251', x: 11, y: 1, w: 1, h: 1, type: 'room' },
-    { id: '1250', x: 12, y: 1, w: 1, h: 1, type: 'room' },
-    { id: '1249', x: 13, y: 1, w: 1, h: 1, type: 'room' },
-    { id: '1248', x: 14, y: 1, w: 1, h: 1, type: 'room' },
-    { id: '1247', x: 15, y: 1, w: 1, h: 1, type: 'room' },
-    { id: 'WS', x: 17, y: 1, w: 1, h: 1, type: 'utility' },
-    { id: 'Stairs', x: 20, y: 1, w: 1, h: 1, type: 'utility' },
-    { id: 'Lifts', x: 21, y: 1, w: 1, h: 1, type: 'utility' },
-    { id: '1246', x: 23, y: 1, w: 1, h: 1, type: 'room' },
+    { id: '1212A', x: 0, y: 2, w: 1, h: 1, type: 'room' },
+    { id: 'Stairs', x: 2.5, y: 2, w: 1, h: 1.5, type: 'utility' },
+    { id: '1227', x: 6, y: 2, w: 1, h: 1, type: 'room' },
+    { id: '1226', x: 7, y: 2, w: 1, h: 1, type: 'room' },
+    { id: '1225', x: 8, y:2, w: 1, h: 1, type: 'room' },
+    { id: 'WS', x: 9, y: 2, w: 5, h: 1, type: 'utility' },
+    { id: 'Stairs', x: 14, y: 2, w: 1, h: 1, type: 'utility' },
+    { id: 'Lifts', x: 15, y: 2, w: 2, h: 1, type: 'utility' },
+    { id: '1251', x: 17, y: 2, w: 1, h: 1, type: 'room' },
+    { id: '1250', x: 18, y: 2, w: 1, h: 1, type: 'room' },
+    { id: '1249', x: 19, y: 2, w: 1, h: 1, type: 'room' },
+    { id: '1248', x: 20, y: 2, w: 1, h: 1, type: 'room' },
+    { id: '1247', x: 21, y:2, w: 1, h: 1, type: 'room' },
+    { id: 'WS', x: 22, y: 2, w: 4, h: 1, type: 'utility' },
+    { id: 'Stairs', x: 26, y: 2, w: 1, h: 1, type: 'utility' },
+    { id: 'Lifts', x: 27, y: 2, w: 3, h: 1, type: 'utility' },
+    { id: '1246', x: 32, y: 2, w: 1, h: 1, type: 'room' },
 
     // Left Column
-    { id: '1212', x: 0, y: 2, w: 1, h: 1, type: 'room' },
-    { id: 'WS', x: 1, y: 2, w: 1, h: 1, type: 'utility' },
-    { id: '1211', x: 0, y: 3, w: 1, h: 1, type: 'room' },
-    { id: '1216', x: 1, y: 3, w: 1, h: 1, type: 'room' },
-    { id: '1210', x: 0, y: 4, w: 1, h: 1, type: 'room' },
-    { id: '1217', x: 1, y: 4, w: 1, h: 1, type: 'room' },
-    { id: 'Corridor', x: 0, y: 5, w: 2, h: 1, type: 'corridor' },
-    { id: '1209', x: 0, y: 6, w: 1, h: 1, type: 'room' },
-    { id: '1217A', x: 1, y: 6, w: 1, h: 1, type: 'room' }, // Changed the duplicate 1217 to 1217A
-    { id: '1208', x: 0, y: 7, w: 1, h: 1, type: 'room' },
-    { id: '1218', x: 1, y: 7, w: 1, h: 1, type: 'room' },
-    { id: '1207', x: 0, y: 8, w: 1, h: 1, type: 'room' },
-    { id: '1219', x: 1, y: 8, w: 1, h: 1, type: 'room' },
+    { id: '1212', x: 0, y: 5, w: 1, h: 1, type: 'room' },
+    { id: 'WS', x: 2.5, y: 4, w: 1, h: 3, type: 'utility' },
+    { id: '1211', x: 0, y: 6, w: 1, h: 1, type: 'room' },
+    { id: '1216', x: 2.5, y: 7, w: 1, h: 1, type: 'room' },
+    { id: '1210', x: 0, y: 7, w: 1, h: 1, type: 'room' },
+    { id: '1217', x: 2.5, y: 8, w: 1, h: 1, type: 'room' },
+    { id: '1209', x: 0, y: 8, w: 1, h: 1, type: 'room' },
+    { id: '1208', x: 0, y: 9, w: 1, h: 1, type: 'room' },
+    { id: '1218', x: 2.5, y: 9, w: 1, h: 1, type: 'room' },
+    { id: '1207', x: 0, y: 10, w: 1, h: 1, type: 'room' },
+    { id: '1219', x: 2.5, y: 10, w: 1, h: 1, type: 'room' },
 
     // Bottom Left
-    { id: 'Lifts', x: 1, y: 10, w: 1, h: 1, type: 'utility' },
-    { id: '1205', x: 0, y: 11, w: 1, h: 1, type: 'room' },
-    { id: 'Stairs', x: 1, y: 11, w: 1, h: 1, type: 'utility' },
-    { id: '1204', x: 0, y: 12, w: 1, h: 1, type: 'room' },
-    { id: 'Corridor', x: 0, y: 13, w: 2, h: 1, type: 'corridor' },
+    { id: 'Lifts', x: 2.5, y: 13, w: 1, h: 2, type: 'utility' },
+    { id: '1205', x: 0, y: 12, w: 1, h: 1, type: 'room' },
+    { id: 'Stairs', x: 2.5, y: 15, w: 1, h: 1, type: 'utility' },
+    { id: '1204', x: 0, y: 13, w: 1, h: 1, type: 'room' },
     { id: '1203', x: 0, y: 14, w: 1, h: 1, type: 'room' },
-    { id: 'WS', x: 1, y: 14, w: 1, h: 1, type: 'utility' },
     { id: '1202', x: 0, y: 15, w: 1, h: 1, type: 'room' },
     { id: '1201', x: 0, y: 16, w: 1, h: 1, type: 'room' },
-    { id: '1206', x: 1, y: 16, w: 1, h: 1, type: 'room' },
+    { id: '1206', x: 2.5, y: 16, w: 1, h: 1, type: 'room' },
   ];
 
   // Function to render the floor layout with SVG
@@ -222,15 +229,22 @@ const Phase2TwelfthFloorPlan: React.FC<FloorPlanProps> = ({
     );
   };
 
-  // Check if we should use the standard grid layout or the custom floor plan
-  const floorInfo = phase2TwelfthFloorConfig["12th Floor"];
-  
   // Use the SVG floor plan layout
   if (selectedFloor === "12th Floor") {
     return (
       <div className="room-list-container">
         <h3>{`${selectedBlock} - ${selectedFloor}`}</h3>
-        {renderFloorLayout()}
+        <div 
+          style={{ 
+            width: '100%', 
+            height: '600px', 
+            overflow: 'auto', 
+            border: '1px solid #ddd', 
+            borderRadius: '4px'
+          }}
+        >
+          {renderFloorLayout()}
+        </div>
       </div>
     );
   } else {
