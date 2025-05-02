@@ -75,11 +75,61 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const profileRef = useRef<HTMLDivElement | null>(null); // Reference for the profile dropdown
   const userName = localStorage.getItem("student_userName") || "Student";
   const applicationNumber = localStorage.getItem("applicationNo") || "N/A"; // Use actual application number from login
-  const [profilePic, setProfilePic] = useState<string>(localStorage.getItem("profilePic") || defaultProfilePic); // Use default image if no profile picture is available
+  const [profilePic, setProfilePic] = useState<string>("");  // Initialize with empty string
+
+  // Add a new useEffect to load the profile photo first thing when component mounts
+  useEffect(() => {
+    const loadProfilePhoto = async () => {
+      try {
+        if (!applicationNumber || applicationNumber === 'N/A') {
+          setProfilePic(defaultProfilePic);
+          return;
+        }
+        
+        const response = await fetch(`http://localhost:5000/api/students/${applicationNumber}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.student && data.student.profilePhoto) {
+            const photoUrl = `http://localhost:5000${data.student.profilePhoto}`;
+            setProfilePic(photoUrl);
+            localStorage.setItem("profilePic", photoUrl);
+            
+            // Update all profile images in the DOM
+            setTimeout(() => {
+              const profileElements = document.querySelectorAll('.profile-circle-image');
+              profileElements.forEach(el => {
+                (el as HTMLImageElement).src = photoUrl;
+              });
+            }, 10);
+          } else {
+            // Only set default if we can't find a profile photo
+            setProfilePic(defaultProfilePic);
+          }
+        } else {
+          setProfilePic(defaultProfilePic);
+        }
+      } catch (error) {
+        console.error("Error loading profile photo:", error);
+        setProfilePic(defaultProfilePic);
+      }
+    };
+    
+    loadProfilePhoto();
+  }, [applicationNumber]);
 
   // Handle profile photo updates
   const handleProfilePhotoUpdate = (photoUrl: string) => {
     setProfilePic(photoUrl);
+    localStorage.setItem("profilePic", photoUrl);
+    
+    // Update all profile images in the DOM
+    const profileElements = document.querySelectorAll('.profile-circle-image');
+    profileElements.forEach(el => {
+      (el as HTMLImageElement).src = photoUrl;
+    });
+    
+    // Force a re-render of components that might use this image
+    window.dispatchEvent(new Event('storage'));
   };
 
   // Close the profile dropdown when clicking outside
@@ -178,8 +228,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     setCurrentStep(step);
     switch (step) {
       case 1:
-        setShowForm(true);
-        setShowPaymentForm(false);
+        // Instead of showing the form in the dashboard, navigate to the dedicated form page
+        navigate("/hostel-form");
         break;
       case 2:
         if (!completedSteps.includes(1)) {

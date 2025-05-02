@@ -7,6 +7,7 @@ import WardenDashboard from "./pages/WardenDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import HostelBookingPage from "./pages/HostelBookingPage";
 import CurrentBookingPage from "./pages/CurrentBookingPage";
+import HostelFormPage from "./pages/HostelFormPage"; // Import the new HostelFormPage
 import "./App.css"; // Import global styles
 import PaymentPage from "./pages/PaymentPage"; // Import PaymentPage     
 
@@ -110,7 +111,7 @@ const LocationAwareApp: React.FC = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<AdminDashboard />} />
+      <Route path="/" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/student-dashboard" element={<StudentDashboard      
         currentUserBooking={currentUserBooking}
@@ -121,6 +122,9 @@ const LocationAwareApp: React.FC = () => {
       <Route path="/warden-dashboard" element={<WardenDashboard />} /> 
       <Route path="/admin-dashboard" element={<AdminDashboard />} />   
       <Route path="/login" element={<LoginPage />} />
+      
+      {/* Add route for our new Hostel Form Page */}
+      <Route path="/hostel-form" element={<HostelFormPage />} />
       
       {/* Hostel Booking Routes */}
       <Route
