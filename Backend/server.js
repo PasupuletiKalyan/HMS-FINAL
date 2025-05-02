@@ -10,6 +10,7 @@ const studentProgressRoutes = require("./routes/studentProgressRoutes");
 const wardenRoutes = require("./routes/wardenRoutes");
 const occupiedBedRoutes = require("./routes/occupiedBedRoutes"); 
 const hostelRoutes = require("./routes/hostelRoutes"); // Add this for hostel routes
+const announcementRoutes = require("./routes/announcementRoutes"); // Add this for announcement routes
 // Load environment variables
 require('dotenv').config();
 
@@ -57,7 +58,6 @@ app.post("/api/login", async (req, res) => {
     res.status(500).json({ success: false, message: "Server error. Please try again." });
   }
 });
-
 // Form Routes
 app.use("/api/form", studentFormRoutes);
 
@@ -78,6 +78,9 @@ app.use("/api/occupied-beds", occupiedBedRoutes);
 
 // Hostel Routes
 app.use("/api/hostels", hostelRoutes);
+
+// Announcement Routes
+app.use("/api/announcements", announcementRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => {
