@@ -5,6 +5,7 @@ const cors = require("cors");
 // and should be imported only where needed
 const studentFormRoutes = require("./routes/studentFormRoutes");
 const studentRoutes = require("./routes/studentRoutes"); // Add this for student routes
+const userRoutes = require("./routes/userRoutes"); // Add the user routes
 const complaintRoutes = require("./routes/complaintRoutes");
 const studentProgressRoutes = require("./routes/studentProgressRoutes");
 const wardenRoutes = require("./routes/wardenRoutes");
@@ -63,6 +64,9 @@ app.use("/api/form", studentFormRoutes);
 
 // Student Routes
 app.use("/api/students", studentRoutes);
+
+// User Routes
+app.use("/api/users", userRoutes);
 
 // Complaint Routes
 app.use("/api/complaints", complaintRoutes);

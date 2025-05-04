@@ -8,11 +8,14 @@ const LoginPage: React.FC = () => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); // Reset error state
+    setError("");
+    setIsLoading(true);
 
     try {
       const response = await axios.post("http://localhost:5000/api/login", {
@@ -24,46 +27,55 @@ const LoginPage: React.FC = () => {
 
       if (response.data.success) {
         const { role, name, userId, applicationNo } = response.data;
-        console.log("✅ User Logged In:", name);
+        const normalizedRole = role.toLowerCase(); // normalize for consistency
 
-        // Clear any existing user data first
+        console.log("✅ User Logged In:", name, "Role:", normalizedRole);
+
         localStorage.clear();
-        
-        // Create a session key based on role to prevent interference between roles
-        const sessionKey = `user_${role}_${Date.now()}`;
-        
-        // Store user details in localStorage with role-specific keys
-        localStorage.setItem(`${role}_userName`, name);
-        localStorage.setItem(`${role}_userId`, userId);
-        localStorage.setItem("currentRole", role);
-        localStorage.setItem("userRole", role); // Add this line to store role explicitly
+
+        const sessionKey = `user_${normalizedRole}_${Date.now()}`;
+        localStorage.setItem(`${normalizedRole}_userName`, name);
+        localStorage.setItem(`${normalizedRole}_userId`, userId);
+        localStorage.setItem("currentRole", normalizedRole);
+        localStorage.setItem("userRole", normalizedRole);
         localStorage.setItem("sessionKey", sessionKey);
-        
-        // Store application number only for students
-        if (role === "student" && applicationNo) {
+
+        if (normalizedRole === "student" && applicationNo) {
           localStorage.setItem("applicationNo", applicationNo);
         }
 
-        console.log("📌 Stored in Localstorage:", localStorage.getItem(`${role}_userName`));
+        console.log("📌 Stored in Localstorage:", localStorage.getItem(`${normalizedRole}_userName`));
 
         setTimeout(() => {
-          if (role === "student") {
-            navigate("/student-dashboard");
-          } else if (role === "warden") {
-            navigate("/warden-dashboard"); 
-          } else if (role === "admin") {
-            navigate("/admin-dashboard");
-          } else {
-            setError("Unauthorized role");
+          setIsLoading(false);
+          switch (normalizedRole) {
+            case "student":
+              navigate("/student-dashboard");
+              break;
+            case "warden":
+              navigate("/warden-dashboard");
+              break;
+            case "admin":
+              navigate("/admin-dashboard");
+              break;
+            default:
+              setError("Unauthorized role");
+              break;
           }
         }, 500);
       } else {
+        setIsLoading(false);
         setError(response.data.message || "Invalid credentials");
       }
     } catch (err) {
       console.error("🔥 Fetch Error:", err);
+      setIsLoading(false);
       setError("Invalid credentials");
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -91,18 +103,45 @@ const LoginPage: React.FC = () => {
 
           <div className="input-group">
             <label>Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="password-input-container" style={{ position: 'relative', width: '100%' }}>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{ width: '100%', paddingRight: '40px' }}
+                required
+              />
+              <span 
+                className="password-toggle-icon" 
+                onClick={togglePasswordVisibility}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  fontSize: '18px',
+                  color: '#666',
+                  zIndex: 2
+                }}
+              >
+                {showPassword ? "👁️" : "👁️‍🗨️"}
+              </span>
+            </div>
           </div>
 
           {error && <p className="error-message">{error}</p>}
 
-          <button type="submit" className="login-btn">Login</button>
+          <button 
+            type="submit" 
+            className="login-btn"
+            disabled={isLoading}
+            style={{ opacity: isLoading ? 0.7 : 1 }}
+          >
+            {isLoading ? "Logging in..." : "Login"}
+          </button>
         </form>
       </div>
     </div>

@@ -3,6 +3,8 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require("bcryptjs"); // We'll need bcrypt for password hashing
+const User = require("../models/user");
 const Student = require('../models/Student');
 
 // Create uploads directory if it doesn't exist
@@ -101,6 +103,44 @@ router.post('/:applicationNo/profile-photo', upload.single('profilePhoto'), asyn
       success: false, 
       message: 'Error uploading profile photo' 
     });
+  }
+});
+
+// Route to handle password change
+router.post("/change-password", async (req, res) => {
+  try {
+    const { userId, applicationNo, currentPassword, newPassword } = req.body;
+    
+    // Find user by ID or application number
+    let user;
+    if (userId) {
+      user = await User.findById(userId);
+    } else if (applicationNo) {
+      user = await User.findOne({ applicationNo });
+    }
+    
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ success: false, message: "Current password is incorrect" });
+    }
+    
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    
+    // Update the password
+    user.password = hashedPassword;
+    await user.save();
+    
+    res.json({ success: true, message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 });
 

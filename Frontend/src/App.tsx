@@ -8,6 +8,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import HostelBookingPage from "./pages/HostelBookingPage";
 import CurrentBookingPage from "./pages/CurrentBookingPage";
 import HostelFormPage from "./pages/HostelFormPage"; // Import the new HostelFormPage
+import ChangePassword from "./pages/ChangePassword"; // Import ChangePassword component
 import "./App.css"; // Import global styles
 import PaymentPage from "./pages/PaymentPage"; // Import PaymentPage     
 
@@ -49,15 +50,53 @@ const LocationAwareApp: React.FC = () => {
       
       if (applicationNo) {
         try {
+          // First, directly check if the form exists in the database
+          const formResponse = await fetch(`http://localhost:5000/api/form/${applicationNo}`);
+          if (formResponse.ok) {
+            const formData = await formResponse.json();
+            if (formData.success && formData.form) {
+              // Form exists in the database - make sure this is reflected in localStorage
+              localStorage.setItem("formCompleted", "true");
+              console.log("Form found in database for", applicationNo, "- marked as completed");
+            }
+          }
+
+          // Now get the overall progress
           const response = await fetch(`http://localhost:5000/api/progress/${applicationNo}`);
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
               // Load completed steps from backend
-              setCompletedSteps(data.progress.completedSteps || []);
+              const backendCompletedSteps = data.progress.completedSteps || [];
+              
+              // If form exists according to first check but not reflected in completedSteps, add it
+              if (localStorage.getItem("formCompleted") === "true" && !backendCompletedSteps.includes(1)) {
+                backendCompletedSteps.push(1);
+                console.log("Adding form step to completed steps based on form existence");
+              }
+              
+              setCompletedSteps(backendCompletedSteps);
+              
+              // Update backend progress if needed
+              if (localStorage.getItem("formCompleted") === "true" && !data.progress.formCompleted) {
+                console.log("Updating backend progress to mark form as completed");
+                try {
+                  await fetch(`http://localhost:5000/api/progress/${applicationNo}/form`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      completedAt: new Date().toISOString()
+                    }),
+                  });
+                } catch (updateError) {
+                  console.error("Error updating form progress:", updateError);
+                }
+              }
               
               // Store in localStorage for persistence
-              localStorage.setItem("completedSteps", JSON.stringify(data.progress.completedSteps || []));
+              localStorage.setItem("completedSteps", JSON.stringify(backendCompletedSteps));
               
               // Set form and payment completion flags in localStorage
               if (data.progress.formCompleted) {
@@ -101,7 +140,7 @@ const LocationAwareApp: React.FC = () => {
             }
           }
         } catch (error) {
-          console.error("Error fetching booking from backend:", error);
+          console.error("Error fetching data from backend:", error);
         }
       }
     };
@@ -125,6 +164,9 @@ const LocationAwareApp: React.FC = () => {
       
       {/* Add route for our new Hostel Form Page */}
       <Route path="/hostel-form" element={<HostelFormPage />} />
+      
+      {/* Add route for changing password */}
+      <Route path="/change-password" element={<ChangePassword />} />
       
       {/* Hostel Booking Routes */}
       <Route

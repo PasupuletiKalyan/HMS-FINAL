@@ -247,22 +247,64 @@ const AdminDashboard: React.FC = () => {
     setFilteredUsers(dummyUsers);
   };
 
-  // Function to fetch hostel blocks
+  // Updated hostelBlocks structure to match real-world blocks with accurate floor counts
+  const blockConfigs = [
+    { name: "Phase-1", gender: "Boys", floors: 4 },
+    { name: "E-wing", gender: "Boys", floors: 4 },
+    { name: "Phase-2", gender: "Boys", floors: 11 },
+    { name: "Phase-4", gender: "Boys", floors: 6 },
+    { name: "Aravalli", gender: "Girls", floors: 5 },
+    { name: "Ajanta", gender: "Girls", floors: 5 },
+    { name: "Himalaya", gender: "Girls", floors: 5 },
+    { name: "Shivalik", gender: "Girls", floors: 5 },
+    { name: "Vindya", gender: "Girls", floors: 5 },
+    { name: "Satpura", gender: "Girls", floors: 5 },
+    { name: "Kailash", gender: "Girls", floors: 5 },
+    { name: "Phase-3", gender: "Girls", floors: 4 },
+  ];
+
+  // Enhanced function to fetch hostel blocks with appropriate number of floors for each block
   const fetchHostelBlocks = async () => {
-    // In a real app, you would fetch from your backend
-    // For now, we'll use dummy data based on the suggestions array
-    const blocks: RoomBookingBlock[] = suggestions.map((block, index) => ({
+    try {
+      // Try to fetch from backend first
+      const response = await fetch('http://localhost:5000/api/hostels/blocks-availability');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setHostelBlocks(data.blocks);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching hostel blocks:", error);
+    }
+    
+    // Fallback to generating blocks with proper floor counts
+    const blocks: RoomBookingBlock[] = blockConfigs.map((config, index) => ({
       id: (index + 1).toString(),
-      name: block.name,
-      gender: block.gender,
-      isActive: Math.random() > 0.5, // Randomly set some blocks as active
-      floors: Array.from({ length: 5 }, (_, i) => ({
+      name: config.name,
+      gender: config.gender,
+      isActive: false, // Default to disabled
+      floors: Array.from({ length: config.floors }, (_, i) => ({
         id: `${index + 1}-${i + 1}`,
         name: `Floor ${i + 1}`,
-        isActive: Math.random() > 0.3, // Randomly set some floors as active
+        isActive: false, // Default to disabled
       })),
     }));
-    setHostelBlocks(blocks);
+    
+    // Try to load saved settings from localStorage 
+    const savedBlocks = localStorage.getItem('hostel_blocks_config');
+    if (savedBlocks) {
+      try {
+        const parsedBlocks = JSON.parse(savedBlocks);
+        setHostelBlocks(parsedBlocks);
+      } catch (e) {
+        console.error("Error parsing saved hostel blocks:", e);
+        setHostelBlocks(blocks);
+      }
+    } else {
+      setHostelBlocks(blocks);
+    }
   };
 
   // Function to fetch announcements
@@ -577,11 +619,33 @@ const AdminDashboard: React.FC = () => {
     );
   };
 
-  // Save room booking configuration
+  // Enhanced save room booking configuration to persist to both backend and localStorage
   const saveRoomBookingConfiguration = async () => {
-    // In a real app, you would send this to your backend
-    alert('Room booking configuration saved successfully!');
-    // You could send the hostelBlocks state to your backend here
+    try {
+      // Save to backend
+      const response = await fetch('http://localhost:5000/api/hostels/blocks-availability', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ blocks: hostelBlocks }),
+      });
+      
+      if (response.ok) {
+        // Also save to localStorage as fallback
+        localStorage.setItem('hostel_blocks_config', JSON.stringify(hostelBlocks));
+        alert('Room booking configuration saved successfully!');
+      } else {
+        // If backend fails, still save to localStorage
+        localStorage.setItem('hostel_blocks_config', JSON.stringify(hostelBlocks));
+        alert('Room booking configuration saved locally. Server update failed.');
+      }
+    } catch (error) {
+      console.error("Error saving room configuration:", error);
+      // Save to localStorage as fallback
+      localStorage.setItem('hostel_blocks_config', JSON.stringify(hostelBlocks));
+      alert('Room booking configuration saved locally. Server update failed.');
+    }
   };
 
   const renderUserManagement = () => {
@@ -1296,7 +1360,7 @@ const AdminDashboard: React.FC = () => {
             <p className="user-name-top"></p>
           </div>
 
-          {/* ✅ Reverted class names */}
+          {/* Search container */}
           <div className="search-container" ref={searchRef}>
             <span className="search-icon">🔍</span>
             <input
@@ -1335,14 +1399,13 @@ const AdminDashboard: React.FC = () => {
             )}
           </div>
 
+          {/* Updated menu with removed options */}
           <ul className="top-menu">
             {[
               "Overview",
               "User Management",
               "Room Release",
-              "Announcements", // Added Announcements menu item
-              "Hostel Management",
-              "Student Management",
+              "Announcements",
             ].map((item) => (
               <li
                 key={item}
@@ -1393,14 +1456,8 @@ const AdminDashboard: React.FC = () => {
           />
         </div>
 
-        {/* MAIN CONTENT */}
+        {/* MAIN CONTENT - Fixed to properly show selected menu content */}
         <div className="dashboard-content">
-          {/* Admin Tools Section - Added at the top of the content area */}
-          <div className="admin-tools-section" style={{ marginBottom: '30px' }}>
-            <h2 style={{ color: '#dc3545', marginBottom: '15px' }}>Admin Tools</h2>
-            <ResetStudentProgress />
-          </div>
-
           {selectedBlock ? (
             <>
               <h2>Students in {selectedBlock}</h2>
@@ -1440,21 +1497,63 @@ const AdminDashboard: React.FC = () => {
             </>
           ) : (
             <>
+              {/* Show content based on selected menu */}
               {selectedMenu === "Overview" && (
-                <>
-                  <h1>{selectedMenu}</h1>
-                  <p>This is the placeholder content for "{selectedMenu}".</p>
-                </>
+                <div className="overview-content">
+                  {/* Admin Tools Section - Part of Overview only */}
+                  <div className="admin-tools-section" style={{ marginBottom: '30px' }}>
+                    <h2 style={{ color: '#dc3545', marginBottom: '15px' }}>Admin Tools</h2>
+                    <ResetStudentProgress />
+                  </div>
+                  <h1>Admin Dashboard Overview</h1>
+                  <p>Welcome to the hostel management system admin dashboard.</p>
+                  <div className="dashboard-stats" style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginTop: '20px' }}>
+                    <div className="stat-card" style={{ 
+                      flex: '1 1 200px', 
+                      backgroundColor: '#f0f8ff', 
+                      padding: '20px', 
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }}>
+                      <h3>Students</h3>
+                      <p className="stat-number">1,245</p>
+                    </div>
+                    <div className="stat-card" style={{ 
+                      flex: '1 1 200px', 
+                      backgroundColor: '#fff0f5', 
+                      padding: '20px', 
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }}>
+                      <h3>Occupied Rooms</h3>
+                      <p className="stat-number">528</p>
+                    </div>
+                    <div className="stat-card" style={{ 
+                      flex: '1 1 200px', 
+                      backgroundColor: '#f0fff0', 
+                      padding: '20px', 
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }}>
+                      <h3>Active Blocks</h3>
+                      <p className="stat-number">8</p>
+                    </div>
+                    <div className="stat-card" style={{ 
+                      flex: '1 1 200px', 
+                      backgroundColor: '#fff8dc', 
+                      padding: '20px', 
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }}>
+                      <h3>Announcements</h3>
+                      <p className="stat-number">12</p>
+                    </div>
+                  </div>
+                </div>
               )}
               {selectedMenu === "User Management" && renderUserManagement()}
               {selectedMenu === "Room Release" && renderRoomBookingRelease()}
               {selectedMenu === "Announcements" && renderAnnouncementsManagement()}
-              {(selectedMenu === "Hostel Management" || selectedMenu === "Student Management") && (
-                <>
-                  <h1>{selectedMenu}</h1>
-                  <p>This is the placeholder content for "{selectedMenu}".</p>
-                </>
-              )}
             </>
           )}
         </div>
