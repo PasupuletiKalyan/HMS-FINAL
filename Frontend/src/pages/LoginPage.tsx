@@ -92,13 +92,16 @@ const LoginPage: React.FC = () => {
         <form onSubmit={handleLogin}>
           <div className="input-group">
             <label>Email / Application Number</label>
-            <input
-              type="text"
-              placeholder="Enter your email or application number"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              required
-            />
+            <div className="input-container" style={{ position: 'relative', width: '100%' }}>
+              <input
+                type="text"
+                placeholder="Enter your email or application number"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                style={{ width: '100%' }}
+                required
+              />
+            </div>
           </div>
 
           <div className="input-group">
@@ -134,14 +137,16 @@ const LoginPage: React.FC = () => {
 
           {error && <p className="error-message">{error}</p>}
 
-          <button 
-            type="submit" 
-            className="login-btn"
-            disabled={isLoading}
-            style={{ opacity: isLoading ? 0.7 : 1 }}
-          >
-            {isLoading ? "Logging in..." : "Login"}
-          </button>
+          <div style={{ marginTop: '30px' }}> {/* Added spacing container */}
+            <button 
+              type="submit" 
+              className="login-btn"
+              disabled={isLoading}
+              style={{ opacity: isLoading ? 0.7 : 1 }}
+            >
+              {isLoading ? "Logging in..." : "Login"}
+            </button>
+          </div>
         </form>
       </div>
     </div>

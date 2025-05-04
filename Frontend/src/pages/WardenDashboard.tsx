@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/WardenDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
-import HostelFloorPlanViewer from "../components/HostelFloorPlanViewer"; // Add this import
+import defaultProfilePic from "../assets/default-profile-pic.jpg";
+import HostelFloorPlanViewer from "../components/HostelFloorPlanViewer"; 
+import ProfilePhotoUploader from "../components/ProfilePhotoUploader"; // Import ProfilePhotoUploader component
 
 type Student = {
   name: string;
@@ -318,6 +320,8 @@ const WardenDashboard: React.FC = () => {
     antiDrug: false,
     keysHandedOver: false
   });
+  const [profilePic, setProfilePic] = useState<string>(defaultProfilePic);
+  const [wardenEmail, setWardenEmail] = useState<string>("");
   const [complaints, setComplaints] = useState<Complaint[]>([
     { _id: "1", applicationNo: "123", studentName: "Om Sai Vikranth", subject: "AC Not Working", description: "AC in my room is not working since last week.", priority: "High", roomDetails: { block: "A", floor: "1", roomNumber: "101" }, status: "Pending", date: "2023-10-01", createdAt: "2023-10-01T10:00:00Z" },
     { _id: "2", applicationNo: "124", studentName: "Mohana Krishna", subject: "Washroom Issue", description: "Smell From Washroom Spreading all over corridor", priority: "Medium", roomDetails: { block: "A", floor: "1", roomNumber: "102" }, status: "Pending", date: "2023-10-02", createdAt: "2023-10-02T11:00:00Z" },
@@ -429,6 +433,21 @@ const WardenDashboard: React.FC = () => {
     const storedWarden = localStorage.getItem("warden_userName");
     if (storedWarden) {
       setWardenName(storedWarden);
+    }
+
+    // Get warden user ID and email
+    const wardenUserId = localStorage.getItem("warden_userId");
+    if (wardenUserId) {
+      setWardenEmail(localStorage.getItem("warden_email") || "");
+      
+      // Load profile photo if available in localStorage
+      const savedProfilePic = localStorage.getItem("profilePic");
+      if (savedProfilePic && savedProfilePic !== 'null') {
+        setProfilePic(savedProfilePic);
+      } else {
+        // Try to fetch profile photo from the server
+        fetchProfilePhoto(wardenUserId);
+      }
     }
 
     // Fetch initial statistics
@@ -1577,6 +1596,43 @@ const WardenDashboard: React.FC = () => {
     }
   };
 
+  // Add this function to fetch profile photo from the server
+  const fetchProfilePhoto = async (userId: string) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/warden/profile-photo/${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.profilePhoto) {
+          const photoUrl = `http://localhost:5000${data.profilePhoto}`;
+          setProfilePic(photoUrl);
+          localStorage.setItem("profilePic", photoUrl);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching profile photo:", error);
+    }
+  };
+
+  // Handle profile photo updates
+  const handleProfilePhotoUpdate = (photoUrl: string) => {
+    // Add a timestamp to prevent browser caching
+    const photoUrlWithTimestamp = `${photoUrl}?t=${new Date().getTime()}`;
+    
+    setProfilePic(photoUrlWithTimestamp);
+    localStorage.setItem("profilePic", photoUrlWithTimestamp);
+    
+    // Force immediate update of all profile images in the DOM
+    setTimeout(() => {
+      const profileElements = document.querySelectorAll('.profile-circle-image');
+      profileElements.forEach(el => {
+        (el as HTMLImageElement).src = photoUrlWithTimestamp;
+      });
+      
+      // Force a re-render
+      window.dispatchEvent(new Event('storage'));
+    }, 100);
+  };
+
   return (
     <div className="dashboard-container">
       {/* TOP NAVIGATION BAR */}
@@ -1615,14 +1671,31 @@ const WardenDashboard: React.FC = () => {
             className="profile-clickable"
             onClick={() => setShowProfileDropdown((prev) => !prev)}
           >
-            <div className="profile-circle">
-              <span>{wardenName.charAt(0)}</span>
-            </div>
+            {profilePic && profilePic !== defaultProfilePic ? (
+              <img src={profilePic} alt="Profile" className="profile-circle-image" />
+            ) : (
+              <div className="profile-circle">
+                <span>{wardenName.charAt(0)}</span>
+              </div>
+            )}
             <p className="profile-name">{wardenName}</p>
           </button>
           {showProfileDropdown && (
             <div className="profile-dropdown">
+              <div className="profile-info">
+                <p>
+                  <strong>Name:</strong> {wardenName}
+                </p>
+                {wardenEmail && (
+                  <p>
+                    <strong>Email:</strong> {wardenEmail}
+                  </p>
+                )}
+              </div>
               <ul>
+                <li onClick={() => setSelectedMenu("Profile")}>
+                  Profile Photo
+                </li>
                 <li onClick={() => navigate("/change-password")}>
                   Change Password
                 </li>
@@ -1937,6 +2010,66 @@ const WardenDashboard: React.FC = () => {
           </div>
         )}
         {selectedMenu === "Maintenance Complaints" && renderComplaintsContent()}
+        
+        {selectedMenu === "Profile" && (
+          <div className="profile-section">
+            <h2>Profile Settings</h2>
+              
+            <div className="profile-container" style={{
+              maxWidth: '800px',
+              margin: '0 auto',
+              padding: '20px',
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+            }}>
+              <div className="profile-header" style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '30px',
+                padding: '15px',
+                backgroundColor: '#f9f9f9',
+                borderRadius: '8px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}>
+                  <h3>Warden Profile</h3>
+                  <p>Manage your profile photo and account settings</p>
+                </div>
+              </div>
+              
+              {/* Profile Photo Uploader Component */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '30px'
+              }}>
+                <ProfilePhotoUploader 
+                  applicationNumber={localStorage.getItem('warden_userId') || ''}
+                  onPhotoUpdate={handleProfilePhotoUpdate}
+                  userType="warden"
+                />
+              </div>
+              
+              <div style={{
+                marginTop: '30px',
+                padding: '15px',
+                backgroundColor: '#f9f9f9',
+                borderRadius: '8px',
+                textAlign: 'center'
+              }}>
+                <p style={{color: '#666'}}>
+                  Your profile photo will be visible throughout the hostel management system.
+                  Please upload a clear, professional photo of yourself.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <footer className="dashboard-footer">

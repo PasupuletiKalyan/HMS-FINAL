@@ -5,15 +5,18 @@ import defaultProfilePic from '../assets/default-profile-pic.jpg';
 interface ProfilePhotoUploaderProps {
   applicationNumber: string;
   onPhotoUpdate: (photoUrl: string) => void;
+  userType?: 'student' | 'warden'; // Add userType prop with default to student
 }
 
 const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({ 
   applicationNumber,
-  onPhotoUpdate
+  onPhotoUpdate,
+  userType = 'student' // Default to student if not specified
 }) => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [currentPhoto, setCurrentPhoto] = useState<string>(defaultProfilePic);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -31,23 +34,65 @@ const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
     if (!applicationNumber) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/students/${applicationNumber}`);
+      console.log(`Fetching profile photo for ${userType} with ID: ${applicationNumber}`);
+      
+      // Use the appropriate API endpoint based on user type
+      const endpoint = userType === 'warden' 
+        ? `http://localhost:5000/api/warden/profile-photo/${applicationNumber}` 
+        : `http://localhost:5000/api/students/${applicationNumber}/profile-photo`;
+      
+      const response = await fetch(endpoint);
+      console.log('Profile photo fetch response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
-        if (data.success && data.student && data.student.profilePhoto) {
-          const photoUrl = `http://localhost:5000${data.student.profilePhoto}`;
-          setCurrentPhoto(photoUrl);
-          localStorage.setItem("profilePic", photoUrl);
+        console.log('Profile photo fetch response data:', data);
+        
+        if (data.success && data.profilePhoto) {
+          // Handle different response structures
+          const photoPath = data.profilePhoto;
+            
+          if (photoPath) {
+            const photoUrl = `http://localhost:5000${photoPath}`;
+            console.log('Setting photo URL to:', photoUrl);
+            
+            // Verify the image exists by attempting to load it
+            const img = new Image();
+            img.onload = () => {
+              console.log('Image loaded successfully');
+              setCurrentPhoto(photoUrl);
+              localStorage.setItem("profilePic", photoUrl);
+            };
+            img.onerror = () => {
+              console.error('Failed to load image from URL:', photoUrl);
+              setCurrentPhoto(defaultProfilePic);
+            };
+            img.src = photoUrl;
+          }
         }
       }
     } catch (error) {
-      console.error("Error fetching profile photo:", error);
+      console.error(`Error fetching ${userType} profile photo:`, error);
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setUploadError(null);
+    
     if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setUploadError('Please select an image file.');
+        return;
+      }
+      
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        setUploadError('File size must be less than 5MB.');
+        return;
+      }
+      
       // Create preview
       const reader = new FileReader();
       reader.onload = () => {
@@ -61,37 +106,55 @@ const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
     if (!fileInputRef.current?.files?.[0] || !applicationNumber) return;
     
     setIsUploading(true);
+    setUploadError(null);
+    
     const formData = new FormData();
     formData.append('profilePhoto', fileInputRef.current.files[0]);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/students/${applicationNumber}/profile-photo`, {
+      console.log(`Uploading profile photo for ${userType} with ID: ${applicationNumber}`);
+      
+      // Use the appropriate API endpoint based on user type
+      const endpoint = userType === 'warden'
+        ? `http://localhost:5000/api/warden/profile-photo/${applicationNumber}`
+        : `http://localhost:5000/api/students/${applicationNumber}/profile-photo`;
+      
+      console.log('Upload endpoint:', endpoint);
+      
+      const response = await fetch(endpoint, {
         method: 'POST',
         body: formData,
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        
+      
+      console.log('Upload response status:', response.status);
+      
+      const data = await response.json();
+      console.log('Upload response data:', data);
+      
+      if (response.ok && data.success) {
         // Update to use full URL including server
         const fullPhotoUrl = `http://localhost:5000${data.profilePhoto}`;
+        console.log('Full photo URL:', fullPhotoUrl);
+        
+        // Add a timestamp to bust cache
+        const photoUrlWithTimestamp = `${fullPhotoUrl}?t=${new Date().getTime()}`;
         
         // Update local storage
-        localStorage.setItem('profilePic', fullPhotoUrl);
+        localStorage.setItem('profilePic', photoUrlWithTimestamp);
         
         // Update in component state
-        setCurrentPhoto(fullPhotoUrl);
+        setCurrentPhoto(photoUrlWithTimestamp);
         
         // Notify parent component
-        onPhotoUpdate(fullPhotoUrl);
+        onPhotoUpdate(photoUrlWithTimestamp);
         
         alert('Profile photo updated successfully!');
       } else {
-        alert('Failed to upload photo. Please try again.');
+        setUploadError(data.message || 'Failed to upload photo. Please try again.');
       }
     } catch (error) {
-      console.error('Error uploading photo:', error);
-      alert('An error occurred while uploading your photo.');
+      console.error(`Error uploading ${userType} profile photo:`, error);
+      setUploadError('An error occurred while uploading your photo.');
     } finally {
       setIsUploading(false);
       setPreviewUrl(null);
@@ -143,15 +206,41 @@ const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
     display: 'inline-block'
   };
 
+  const errorStyle: React.CSSProperties = {
+    color: '#c23535',
+    marginTop: '10px',
+    fontSize: '14px',
+    textAlign: 'center'
+  };
+
   return (
     <div style={photoContainerStyle}>
       <h3 style={{ marginBottom: '15px', color: '#333' }}>Profile Photo</h3>
       
-      <img 
-        src={previewUrl || currentPhoto}
-        alt="Profile" 
-        style={photoPreviewStyle}
-      />
+      <div style={{ 
+        width: '120px', 
+        height: '120px', 
+        borderRadius: '50%',
+        overflow: 'hidden',
+        border: '3px solid #c23535',
+        marginBottom: '15px',
+        position: 'relative'
+      }}>
+        <img 
+          src={previewUrl || currentPhoto}
+          alt="Profile" 
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover'
+          }}
+          onError={(e) => {
+            console.log('Image failed to load, setting to default');
+            // If image fails to load, set to default
+            (e.target as HTMLImageElement).src = defaultProfilePic;
+          }}
+        />
+      </div>
       
       <div style={{ marginTop: '10px' }}>
         <input
@@ -181,6 +270,12 @@ const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
             >
               Cancel
             </button>
+          </div>
+        )}
+        
+        {uploadError && (
+          <div style={errorStyle}>
+            {uploadError}
           </div>
         )}
       </div>

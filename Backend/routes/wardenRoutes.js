@@ -4,6 +4,44 @@ const StudentForm = require('../models/StudentForm');
 const StudentProgress = require('../models/StudentProgress');
 const Student = require('../models/Student');
 const Hostel = require('../models/Hostel');
+const User = require('../models/user');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configure multer storage for warden profile photos
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, '../uploads/warden-photos');
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const { userId } = req.params;
+    const fileExt = path.extname(file.originalname);
+    // Create unique filename using userId and timestamp
+    cb(null, `warden-${userId}-${Date.now()}-${Math.floor(Math.random() * 1000000000)}${fileExt}`);
+  }
+});
+
+// Initialize multer middleware with file filtering
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max file size
+  },
+  fileFilter: function (req, file, cb) {
+    // Accept only image files
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  }
+});
 
 // Get student details by application number
 router.get('/student/:applicationNo', async (req, res) => {
@@ -111,6 +149,70 @@ router.post('/student/:applicationNo/verify-documents', async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: 'Failed to update document verification status' 
+    });
+  }
+});
+
+// Upload or update warden profile photo
+router.post('/profile-photo/:userId', upload.single('profilePhoto'), async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    if (!req.file) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'No file uploaded' 
+      });
+    }
+    
+    // Generate URL path for the uploaded file - ensure consistency with Express static middleware
+    const profilePhotoPath = `/uploads/warden-photos/${req.file.filename}`;
+    
+    // Update the user record with the profile photo path
+    await User.findByIdAndUpdate(
+      userId,
+      { profilePhoto: profilePhotoPath },
+      { new: true }
+    );
+    
+    res.status(200).json({ 
+      success: true, 
+      message: 'Profile photo uploaded successfully',
+      profilePhoto: profilePhotoPath
+    });
+  } catch (error) {
+    console.error("Error uploading warden profile photo:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error uploading profile photo' 
+    });
+  }
+});
+
+// Get warden profile photo
+router.get('/profile-photo/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Find user by ID
+    const user = await User.findById(userId);
+    
+    if (!user || !user.profilePhoto) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Profile photo not found' 
+      });
+    }
+    
+    res.json({ 
+      success: true, 
+      profilePhoto: user.profilePhoto
+    });
+  } catch (error) {
+    console.error("Error getting warden profile photo:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error retrieving profile photo' 
     });
   }
 });

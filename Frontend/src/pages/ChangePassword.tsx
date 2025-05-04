@@ -78,7 +78,13 @@ const ChangePassword: React.FC = () => {
         
         // Redirect after 2 seconds
         setTimeout(() => {
-          navigate("/student-dashboard");
+          if (userRole === 'warden') {
+            navigate("/warden-dashboard");
+          } else if (userRole === 'admin') {
+            navigate("/admin-dashboard");
+          } else {
+            navigate("/student-dashboard");
+          }
         }, 2000);
       } else {
         setMessage(data.message || "Failed to change password");
@@ -268,7 +274,15 @@ const ChangePassword: React.FC = () => {
               <button
                 type="button"
                 className="back-button"
-                onClick={() => navigate("/student-dashboard")}
+                onClick={() => {
+                  if (userRole === 'warden') {
+                    navigate("/warden-dashboard");
+                  } else if (userRole === 'admin') {
+                    navigate("/admin-dashboard");
+                  } else {
+                    navigate("/student-dashboard");
+                  }
+                }}
                 style={{
                   flex: 1,
                   padding: '12px',

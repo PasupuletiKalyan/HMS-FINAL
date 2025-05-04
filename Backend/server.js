@@ -1,17 +1,19 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-// Remove the User model import from here as it's used in multiple files
-// and should be imported only where needed
+const path = require("path"); // Add path module
+
+// Routes imports
 const studentFormRoutes = require("./routes/studentFormRoutes");
-const studentRoutes = require("./routes/studentRoutes"); // Add this for student routes
-const userRoutes = require("./routes/userRoutes"); // Add the user routes
+const studentRoutes = require("./routes/studentRoutes");
+const userRoutes = require("./routes/userRoutes");
 const complaintRoutes = require("./routes/complaintRoutes");
 const studentProgressRoutes = require("./routes/studentProgressRoutes");
 const wardenRoutes = require("./routes/wardenRoutes");
 const occupiedBedRoutes = require("./routes/occupiedBedRoutes"); 
-const hostelRoutes = require("./routes/hostelRoutes"); // Add this for hostel routes
-const announcementRoutes = require("./routes/announcementRoutes"); // Add this for announcement routes
+const hostelRoutes = require("./routes/hostelRoutes");
+const announcementRoutes = require("./routes/announcementRoutes");
+
 // Load environment variables
 require('dotenv').config();
 
@@ -20,6 +22,23 @@ app.use(express.json());
 
 // Enable CORS
 app.use(cors());
+
+// Create uploads directory if it doesn't exist
+const fs = require('fs');
+const uploadDirs = ['./uploads', './uploads/warden-photos', './uploads/profile-photos'];
+uploadDirs.forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
+
+// Serve static files - make sure these paths match what's being returned to the client
+app.use('/api/warden/uploads/warden-photos', express.static(path.join(__dirname, 'uploads/warden-photos')));
+app.use('/api/students/uploads/profile-photos', express.static(path.join(__dirname, 'uploads/profile-photos')));
+
+// Also serve from root paths for direct access
+app.use('/uploads/warden-photos', express.static(path.join(__dirname, 'uploads/warden-photos')));
+app.use('/uploads/profile-photos', express.static(path.join(__dirname, 'uploads/profile-photos')));
 
 // Use environment variables for the connection string
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://OmSaiVikranth:HMS_SE_CodeMonkeys@cluster0.zvkzt5n.mongodb.net/hostelDB?retryWrites=true&w=majority&appName=Cluster0";
