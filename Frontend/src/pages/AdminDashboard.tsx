@@ -1560,12 +1560,8 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* FOOTER */}
-      <footer className="footer">
-        <p>&copy; 2025 Your Company Name. All rights reserved.</p>
-        <p>
-          <a href="/about">About</a> | <a href="/contact">Contact</a> |{" "}
-          <a href="/privacy">Privacy Policy</a>
-        </p>
+      <footer className="dashboard-footer">
+        <p>&copy; {new Date().getFullYear()} Hostel Management System. All rights reserved.</p>
       </footer>
     </>
   );

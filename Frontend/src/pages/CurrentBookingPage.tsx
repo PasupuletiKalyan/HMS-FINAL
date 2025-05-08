@@ -53,7 +53,7 @@ const CurrentBookingPage: React.FC<CurrentBookingPageProps> = ({
                 </div>
                 <div className="info-row">
                   <span className="info-label">Room Number:</span>
-                  <span className="info-value">{currentUserBooking.roomNumber}</span>
+                  <span className="info-value">{currentUserBooking.floor}-{currentUserBooking.roomNumber}</span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">Bed:</span>

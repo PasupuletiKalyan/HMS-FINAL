@@ -2072,6 +2072,7 @@ const WardenDashboard: React.FC = () => {
         )}
       </div>
 
+      {/* FOOTER */}
       <footer className="dashboard-footer">
         <p>&copy; {new Date().getFullYear()} Hostel Management System. All rights reserved.</p>
       </footer>

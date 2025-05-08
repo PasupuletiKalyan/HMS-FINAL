@@ -187,7 +187,7 @@ const HostelFormPage: React.FC = () => {
           <form onSubmit={handleFormSubmit} className="hostel-form">
             {/* Hostel Form Fields */}
             {[
-              { name: "admission_no", label: "Admission Number", type: "text", placeholder: "Enter your admission number" },
+              { name: "admission_no", label: "Admission Number", type: "text", placeholder: "Enter your admission number", defaultValue: applicationNumber },
               { name: "hall_ticket_no", label: "Hall Ticket Number", type: "text", placeholder: "Enter your hall ticket number" },
               { name: "batch", label: "Batch", type: "text", placeholder: "Enter your batch (e.g., 2023-2027)" },
               { name: "programme", label: "Programme", type: "text", placeholder: "Enter your programme (e.g., B.Tech)" },
@@ -200,7 +200,7 @@ const HostelFormPage: React.FC = () => {
               { name: "blood_group", label: "Blood Group", type: "text", placeholder: "Enter your blood group (e.g., O+)" },
               { name: "medical_history", label: "Medical History", type: "textarea", placeholder: "Enter any medical history" },
               { name: "permanent_address", label: "Permanent Address", type: "textarea", placeholder: "Enter your permanent address" },
-              { name: "local_guardian", label: "Local Guardian", type: "text", placeholder: "Enter your local guardian's name" },
+              { name: "local_guardian", label: "Local Guardian (Optional)", type: "text", placeholder: "Enter your local guardian's name (optional)" },
             ].map((field) => (
               <div className="form-group" key={field.name}>
                 <label>{field.label}</label>
@@ -209,14 +209,15 @@ const HostelFormPage: React.FC = () => {
                     name={field.name}
                     placeholder={field.placeholder}
                     className="no-resize"
-                    required
+                    required={field.name !== "local_guardian"}
                   />
                 ) : (
                   <input
                     type={field.type}
                     name={field.name}
                     placeholder={field.placeholder}
-                    required
+                    required={field.name !== "local_guardian"}
+                    defaultValue={field.defaultValue}
                   />
                 )}
               </div>
@@ -364,7 +365,10 @@ const HostelFormPage: React.FC = () => {
               <button
                 type="button"
                 className="back-button"
-                onClick={() => navigate("/student-dashboard")}
+                onClick={() => {
+                  // Just navigate back without updating any completion status
+                  navigate("/student-dashboard", { state: { formCanceled: true } });
+                }}
                 style={{
                   flex: 1,
                   padding: '12px',

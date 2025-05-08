@@ -48,6 +48,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const [completedSteps, setCompletedSteps] = useState<number[]>([]); // Track completed steps
   const [studentComplaints, setStudentComplaints] = useState<any[]>([]); // Track complaints submitted by the student
   const navigate = useNavigate();
+  const [studentFormData, setStudentFormData] = useState<any>(null); // Add state for storing student form data
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -218,33 +219,50 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     fetchStudentProgress();
   }, [applicationNumber, setCurrentUserBooking]);
 
+  // Add effect to handle navigation from form pages
+  useEffect(() => {
+    // Check if we're returning from a canceled form
+    const handleLocationChange = () => {
+      const location = window.location;
+      const state = window.history.state;
+      if (location.pathname === '/student-dashboard' && state && state.formCanceled) {
+        // Reset the state to ensure properly tracking form status
+        setCurrentStep(1);
+        // Clear the state to avoid repeated handling
+        window.history.replaceState({}, document.title);
+      }
+    };
+    
+    // Call once when component mounts to handle any existing state
+    handleLocationChange();
+    
+    // Add event listener for future location changes
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
   const handleStepClick = (step: number) => {
-    // Check if previous steps are completed
+    // Check if we're trying to access the form and if it's completed
+    if (step === 1) {
+      // For the first step (form), always navigate to the form page
+      navigate("/hostel-form");
+      return;
+    }
+    
+    // Check if previous steps are completed before allowing navigation to step 2 or 3
     if (step > 1 && !completedSteps.includes(step - 1)) {
       alert("Please complete the previous steps first!");
       return;
     }
 
+    // Set the current step for visual indication
     setCurrentStep(step);
-    switch (step) {
-      case 1:
-        // Instead of showing the form in the dashboard, navigate to the dedicated form page
-        navigate("/hostel-form");
-        break;
-      case 2:
-        if (!completedSteps.includes(1)) {
-          alert("Please fill the form first!");
-          return;
-        }
-        navigate("/payment");
-        break;
-      case 3:
-        if (!completedSteps.includes(2)) {
-          alert("Please complete the payment first!");
-          return;
-        }
-        navigate("/hostel-booking");
-        break;
+    
+    // Handle navigation for steps 2 and 3
+    if (step === 2) {
+      navigate("/payment");
+    } else if (step === 3) {
+      navigate("/hostel-booking");
     }
   };
 
@@ -425,6 +443,30 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     fetchStudentComplaints();
   }, [applicationNumber, selectedSection]);
 
+  // Function to fetch student form data
+  const fetchStudentFormData = async () => {
+    if (applicationNumber && applicationNumber !== 'N/A') {
+      try {
+        const response = await fetch(`http://localhost:5000/api/form/${applicationNumber}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setStudentFormData(data.form);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching student form data:", error);
+      }
+    }
+  };
+
+  // Fetch form data when selectedSection changes to "Profile"
+  useEffect(() => {
+    if (selectedSection === "Profile") {
+      fetchStudentFormData();
+    }
+  }, [selectedSection, applicationNumber]);
+
   return (
     <>
       <div className="dashboard-container">
@@ -438,7 +480,6 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               "Dashboard",
               "My Booking",
               "Virtual Tour",
-              "Hostel Layout",
             ].map((item) => (
               <li
                 key={item}
@@ -658,11 +699,10 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <form onSubmit={handleFormSubmit2} className="hostel-form">
                   {/* Hostel Form Fields */}
                   {[
-                    { name: "admission_no", label: "Admission Number", type: "text", placeholder: "Enter your admission number" },
                     { name: "hall_ticket_no", label: "Hall Ticket Number", type: "text", placeholder: "Enter your hall ticket number" },
                     { name: "batch", label: "Batch", type: "text", placeholder: "Enter your batch (e.g., 2023-2027)" },
                     { name: "programme", label: "Programme", type: "text", placeholder: "Enter your programme (e.g., B.Tech)" },
-                    { name: "school", label: "School", type: "text", placeholder: "Enter your school name" },
+                    { name: "school", label: "School", type: "text", placeholder: "Enter your school name (e.g., ECOLE,SOM)" },
                     { name: "student_name", label: "Student Name", type: "text", placeholder: "Enter your full name" },
                     { name: "student_email", label: "Student Email", type: "email", placeholder: "Enter your email address" },
                     { name: "father_name", label: "Father's Name", type: "text", placeholder: "Enter your father's name" },
@@ -833,8 +873,9 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     type="button"
                     className="back-button"
                     onClick={() => {
-                      setShowForm(false); // Hide the form
-                      setCurrentStep(1); // Reset to the first step
+                      // Only hide the form without changing step status
+                      setShowForm(false);
+                      // Don't modify currentStep or completedSteps when cancelling
                     }}
                   >
                     Back to Dashboard
@@ -903,7 +944,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   <h2>Your Current Booking</h2>
                   <p><strong>Block:</strong> {localCurrentUserBooking.block}</p>
                   <p><strong>Floor:</strong> {localCurrentUserBooking.floor}</p>
-                  <p><strong>Room Number:</strong> {localCurrentUserBooking.roomNumber}</p>
+                  <p><strong>Room Number:</strong> {localCurrentUserBooking.floor}-{localCurrentUserBooking.roomNumber}</p>
                   <p><strong>Bed:</strong> {localCurrentUserBooking.bed}</p>
                   {localCurrentUserBooking.allottedBy && (
                     <>
@@ -927,170 +968,128 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           {selectedSection === "Virtual Tour" && (
             <div className="virtual-tour-section">
               <h2>Virtual Hostel Tour</h2>
-              <div className="tour-info">
-                <p>Experience a 360° view of our hostel facilities before making your decision.</p>
-                
-                {/* Embedded iframe for Mahindra University virtual tour */}
-                <div className="tour-iframe-container" style={{
-                  width: '100%',
-                  height: '600px',
-                  marginTop: '20px',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  overflow: 'hidden'
-                }}>
-                  <iframe 
-                    src="https://www.mahindrauniversity.edu.in/sites/virtual-tour-of-mu-campus.html" 
-                    title="Mahindra University Virtual Tour"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      border: 'none'
-                    }}
-                    allowFullScreen
-                  ></iframe>
-                </div>
-                
-                <div className="tour-note" style={{
-                  backgroundColor: '#f7f7f7',
-                  padding: '15px',
-                  borderRadius: '8px',
-                  marginTop: '20px',
-                  textAlign: 'center'
-                }}>
-                  <p style={{fontWeight: 'bold', color: '#c23535'}}>
-                    Note: Navigate through the virtual tour using your mouse or touchscreen. 
-                    Click on hotspots to move between locations.
-                  </p>
-                </div>
-                
-                {/* Credits section */}
-                <div style={{
-                  marginTop: '30px',
-                  padding: '15px',
-                  backgroundColor: '#f9f9f9',
-                  borderRadius: '8px',
-                  textAlign: 'center'
-                }}>
-                  <p style={{fontStyle: 'italic', color: '#555'}}>
-                    Credits: This virtual tour was created by Venkata Rajesh Kumar Tavva
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Hostel Layout Section */}
-          {selectedSection === "Hostel Layout" && (
-            <div className="hostel-layout-section">
-              <h2>Hostel Layout & Floor Plans</h2>
+              <p>Experience a 360° view of our hostel facilities before making your decision.</p>
               
-              <div className="layout-selector" style={{marginTop: '20px', marginBottom: '30px'}}>
-                <label htmlFor="block-select" style={{marginRight: '10px', fontWeight: 'bold'}}>Select Block:</label>
-                <select id="block-select" style={{
-                  padding: '8px 15px',
-                  borderRadius: '5px',
-                  border: '1px solid #c23535',
-                  backgroundColor: 'white'
-                }}>
-                  <option value="phase1">Phase 1</option>
-                  <option value="phase2">Phase 2</option>
-                  <option value="phase3">Phase 3</option>
-                  <option value="phase4">Phase 4</option>
-                  <option value="ewing">E-Wing</option>
-                </select>
-              </div>
-              
-              <div className="floor-map-container" style={{
+              {/* Simple loading container for virtual tour iframe */}
+              <div className="tour-iframe-container" style={{
+                width: '100%',
+                height: '600px',
+                marginTop: '20px',
                 border: '1px solid #ddd',
                 borderRadius: '8px',
-                padding: '20px',
-                backgroundColor: '#f9f9f9'
+                overflow: 'hidden',
+                position: 'relative'
               }}>
-                <div className="map-placeholder" style={{
-                  background: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)',
-                  height: '500px',
+                <div className="loading-overlay" id="tour-loading" style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1px dashed #ccc',
-                  borderRadius: '4px'
+                  zIndex: 10
                 }}>
-                  <div style={{textAlign: 'center'}}>
-                    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9 6H5V10H9V6Z" stroke="#c23535" strokeWidth="2"/>
-                      <path d="M19 6H15V10H19V6Z" stroke="#c23535" strokeWidth="2"/>
-                      <path d="M9 14H5V18H9V14Z" stroke="#c23535" strokeWidth="2"/>
-                      <path d="M19 14H15V18H19V14Z" stroke="#c23535" strokeWidth="2"/>
-                      <path d="M13 6H11V18H13V6Z" stroke="#c23535" strokeWidth="2"/>
-                      <path d="M21 10H3V14H21V10Z" stroke="#c23535" strokeWidth="2"/>
-                    </svg>
-                    <p style={{marginTop: '15px', color: '#666'}}>Interactive Floor Plan</p>
-                    <p style={{fontSize: '14px', color: '#888', maxWidth: '400px', margin: '10px auto'}}>
-                      Click on a room to view more details including occupancy status and facilities
-                    </p>
+                  <div className="spinner" style={{
+                    width: '50px',
+                    height: '50px',
+                    border: '5px solid #f3f3f3',
+                    borderTop: '5px solid #c23535',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                    marginBottom: '15px'
+                  }}></div>
+                  
+                  <p style={{fontWeight: 'bold'}}>Loading Virtual Tour...</p>
+                  
+                  {/* Simple progress bar */}
+                  <div style={{
+                    width: '200px',
+                    backgroundColor: '#f0f0f0',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    height: '10px',
+                    margin: '10px 0'
+                  }}>
+                    <div id="loading-progress-bar" style={{
+                      width: '10%',
+                      height: '100%',
+                      backgroundColor: '#c23535',
+                      borderRadius: '4px',
+                      transition: 'width 0.5s'
+                    }}></div>
                   </div>
                 </div>
                 
-                <div className="layout-legend" style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  gap: '20px',
-                  marginTop: '20px'
-                }}>
-                  { [
-                    { color: '#bbf7d0', label: 'Available' },
-                    { color: '#fef08a', label: 'Partially Occupied' },
-                    { color: '#fecaca', label: 'Fully Occupied' },
-                    { color: '#d3d3d3', label: 'Common Areas' },
-                    { color: '#f56565', label: 'Washrooms' }
-                  ].map((item, index) => (
-                    <div key={index} style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
-                      <div style={{
-                        width: '20px',
-                        height: '20px',
-                        backgroundColor: item.color,
-                        border: '1px solid #999',
-                        borderRadius: '3px'
-                      }}></div>
-                      <span style={{fontSize: '14px'}}>{item.label}</span>
-                    </div>
-                  ))}
-                </div>
+                <iframe 
+                  src="https://www.mahindrauniversity.edu.in/sites/virtual-tour-of-mu-campus.html" 
+                  title="Mahindra University Virtual Tour"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    border: 'none'
+                  }}
+                  allowFullScreen
+                  onLoad={() => {
+                    const loadingElement = document.getElementById('tour-loading');
+                    if (loadingElement) {
+                      loadingElement.style.display = 'none';
+                    }
+                  }}
+                ></iframe>
               </div>
               
-              <div className="download-links" style={{
-                marginTop: '25px',
-                display: 'flex',
-                justifyContent: 'center',
-                gap: '15px'
+              {/* Add spinner animation */}
+              <style>
+                {`
+                  @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                  }
+                `}
+              </style>
+              
+              {/* Simple progress simulation */}
+              <div dangerouslySetInnerHTML={{ __html: `
+                <script>
+                  (function() {
+                    const progressBar = document.getElementById('loading-progress-bar');
+                    let width = 10;
+                    
+                    const interval = setInterval(() => {
+                      width += 10;
+                      if (width >= 100) {
+                        clearInterval(interval);
+                        width = 100;
+                      }
+                      
+                      if (progressBar) progressBar.style.width = width + '%';
+                    }, 800);
+                    
+                    setTimeout(() => {
+                      const loadingElement = document.getElementById('tour-loading');
+                      if (loadingElement) loadingElement.style.display = 'none';
+                    }, 10000);
+                  })();
+                </script>
+              `}}></div>
+              
+              <div className="tour-note" style={{
+                backgroundColor: '#f7f7f7',
+                padding: '15px',
+                borderRadius: '8px',
+                marginTop: '20px',
+                textAlign: 'center'
               }}>
-                <button style={{
-                  padding: '10px 18px',
-                  backgroundColor: '#c23535',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '5px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  cursor: 'pointer'
-                }}>
-                  <span>📄</span> Download PDF
-                </button>
-                <button style={{
-                  padding: '10px 18px',
-                  backgroundColor: '#2196f3',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '5px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  cursor: 'pointer'
-                }}>
-                  <span>🖨️</span> Print Layout
-                </button>
+                <p style={{fontWeight: 'bold', color: '#c23535'}}>
+                  Click on hotspots to navigate between different locations in the tour.
+                </p>
+                <p style={{marginTop: '12px', fontSize: '14px', fontStyle: 'italic', color: '#555'}}>
+                  Virtual tour created by Dr. Venkata Rajesh Kumar Tavva(Assistant professor, CSE)
+                </p>
               </div>
             </div>
           )}
@@ -1114,9 +1113,16 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   const subject = (form.querySelector('#complaint-subject') as HTMLInputElement).value;
                   const description = (form.querySelector('#complaint-description') as HTMLTextAreaElement).value;
                   const priority = (form.querySelector('#complaint-priority') as HTMLSelectElement).value;
-                  const block = (form.querySelector('#input-block') as HTMLInputElement).value;
-                  const floor = (form.querySelector('#input-floor') as HTMLInputElement).value;
-                  const roomNumber = (form.querySelector('#input-room') as HTMLInputElement).value;
+                  
+                  // Use room details from the booking
+                  const block = localCurrentUserBooking?.block || '';
+                  const floor = localCurrentUserBooking?.floor || '';
+                  const roomNumber = localCurrentUserBooking?.roomNumber || '';
+                  
+                  if (!block || !floor || !roomNumber) {
+                    alert('No room booking found. Please book a room before submitting a complaint.');
+                    return;
+                  }
                   
                   try {
                     const response = await fetch('http://localhost:5000/api/complaints', {
@@ -1197,7 +1203,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     />
                   </div>
                   
-                  {/* Room details - Allow manual entry */}
+                  {/* Room details - Display from booking (read-only) */}
                   <div className="room-details-section" style={{
                     padding: '15px',
                     backgroundColor: '#f9f9f9',
@@ -1207,62 +1213,79 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   }}>
                     <h3 style={{marginBottom: '15px', fontSize: '16px', color: '#666'}}>Room Details</h3>
                     
-                    <div className="room-details" style={{
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: '15px'
-                    }}>
-                      <div className="form-group" style={{flex: '1', minWidth: '150px'}}>
-                        <label htmlFor="input-block">Block</label>
-                        <input 
-                          type="text" 
-                          id="input-block" 
-                          placeholder="Enter block name (e.g., Phase 1, E-Wing)"
-                          required
-                          style={{
-                            width: '100%',
-                            padding: '12px',
-                            borderRadius: '5px',
-                            border: '1px solid #c23535',
-                            marginTop: '8px'
-                          }}
-                        />
+                    {localCurrentUserBooking ? (
+                      <div className="room-details" style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '15px'
+                      }}>
+                        <div className="form-group" style={{flex: '1', minWidth: '150px'}}>
+                          <label htmlFor="input-block">Block</label>
+                          <input 
+                            type="text" 
+                            id="input-block" 
+                            value={localCurrentUserBooking.block}
+                            readOnly
+                            style={{
+                              width: '100%',
+                              padding: '12px',
+                              borderRadius: '5px',
+                              border: '1px solid #ddd',
+                              backgroundColor: '#f0f0f0',
+                              marginTop: '8px'
+                            }}
+                          />
+                        </div>
+                        
+                        <div className="form-group" style={{flex: '1', minWidth: '150px'}}>
+                          <label htmlFor="input-floor">Floor</label>
+                          <input 
+                            type="text" 
+                            id="input-floor" 
+                            value={localCurrentUserBooking.floor}
+                            readOnly
+                            style={{
+                              width: '100%',
+                              padding: '12px',
+                              borderRadius: '5px',
+                              border: '1px solid #ddd',
+                              backgroundColor: '#f0f0f0',
+                              marginTop: '8px'
+                            }}
+                          />
+                        </div>
+                        
+                        <div className="form-group" style={{flex: '1', minWidth: '150px'}}>
+                          <label htmlFor="input-room">Room Number</label>
+                          <input 
+                            type="text" 
+                            id="input-room" 
+                            value={`${localCurrentUserBooking.floor}-${localCurrentUserBooking.roomNumber}`}
+                            readOnly
+                            style={{
+                              width: '100%',
+                              padding: '12px',
+                              borderRadius: '5px',
+                              border: '1px solid #ddd',
+                              backgroundColor: '#f0f0f0',
+                              marginTop: '8px'
+                            }}
+                          />
+                        </div>
                       </div>
-                      
-                      <div className="form-group" style={{flex: '1', minWidth: '150px'}}>
-                        <label htmlFor="input-floor">Floor</label>
-                        <input 
-                          type="text" 
-                          id="input-floor" 
-                          placeholder="Enter floor (e.g., Ground Floor, 1st Floor)"
-                          required
-                          style={{
-                            width: '100%',
-                            padding: '12px',
-                            borderRadius: '5px',
-                            border: '1px solid #c23535',
-                            marginTop: '8px'
-                          }}
-                        />
+                    ) : (
+                      <div style={{
+                        padding: '15px',
+                        backgroundColor: '#fff3e0',
+                        borderRadius: '8px',
+                        textAlign: 'center',
+                        color: '#e65100'
+                      }}>
+                        <p style={{margin: 0, fontSize: '14px'}}>
+                          <strong>No room booking found.</strong> Please book a room before submitting a complaint.
+                        </p>
                       </div>
-                      
-                      <div className="form-group" style={{flex: '1', minWidth: '150px'}}>
-                        <label htmlFor="input-room">Room Number</label>
-                        <input 
-                          type="text" 
-                          id="input-room" 
-                          placeholder="Enter room number"
-                          required
-                          style={{
-                            width: '100%',
-                            padding: '12px',
-                            borderRadius: '5px',
-                            border: '1px solid #c23535',
-                            marginTop: '8px'
-                          }}
-                        />
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
                 
@@ -1355,13 +1378,28 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     marginTop: '15px',
                     width: '100%'
                   }}
+                  disabled={!localCurrentUserBooking}
                 >
                   Submit Complaint
                 </button>
+                
+                {!localCurrentUserBooking && (
+                  <div style={{
+                    marginTop: '15px',
+                    padding: '10px',
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '5px',
+                    textAlign: 'center'
+                  }}>
+                    <p style={{margin: 0, color: '#666'}}>
+                      You need to have an active room booking to submit a complaint.
+                    </p>
+                  </div>
+                )}
               </form>
             </div>
           )}
-
+          
           {/* Complaints - Old */}
           {selectedSection === "Complaints-Old" && (
             <div className="complaints-history-section">
@@ -1553,6 +1591,79 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     onPhotoUpdate={handleProfilePhotoUpdate}
                   />
                 </div>
+
+                {/* Display student form data */}
+                {studentFormData && (
+                  <div className="form-data-container" style={{
+                    marginTop: '30px',
+                    padding: '20px',
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '8px'
+                  }}>
+                    <h3 style={{marginBottom: '20px', color: '#333'}}>Student Information Form Data</h3>
+                    <div className="form-data-fields" style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr',
+                      gap: '15px'
+                    }}>
+                      {Object.entries(studentFormData)
+                        .filter(([key]) => {
+                          // Filter out technical ID fields
+                          if (['_id', '__v', 'id'].includes(key)) return false;
+                          
+                          // If key is applicationNo and admission_no exists and is not empty, skip applicationNo
+                          if (key === 'applicationNo' && 
+                              studentFormData.admission_no && 
+                              studentFormData.admission_no.trim() !== '') {
+                            return false;
+                          }
+                          
+                          return true;
+                        })
+                        .map(([key, value]) => {
+                          // Format key for display
+                          const formattedKey = key
+                            .replace(/_/g, ' ')
+                            .split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(' ');
+                          
+                          // For admission number, clarify it's also the application number if they match
+                          let displayLabel = formattedKey;
+                          if (key === 'admission_no' && 
+                              studentFormData.applicationNo && 
+                              studentFormData.applicationNo === studentFormData.admission_no) {
+                            displayLabel = 'Application/Admission Number';
+                          }
+                          
+                          return (
+                            <div key={key} style={{
+                              padding: '12px 15px',
+                              backgroundColor: '#fff',
+                              borderRadius: '5px',
+                              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                              display: 'flex'
+                            }}>
+                              <div style={{
+                                width: '200px',
+                                fontWeight: 'bold',
+                                color: '#555',
+                                flexShrink: 0
+                              }}>
+                                {displayLabel}:
+                              </div>
+                              <div style={{
+                                flex: 1,
+                                color: '#333'
+                              }}>
+                                {typeof value === 'string' ? value : String(value || '')}
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
                 
                 <div style={{
                   marginTop: '30px',
@@ -1569,15 +1680,433 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </div>
             </div>
           )}
+
+          {/* About Section */}
+          {selectedSection === "About" && (
+            <div className="about-section">
+              <h2>About Hostel Management System</h2>
+              
+              <div className="about-container" style={{
+                maxWidth: '800px',
+                margin: '20px auto',
+                padding: '25px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+              }}>
+                <div className="about-content">
+                  <h3>Our Project</h3>
+                  <p>
+                    The Hostel Management System is a comprehensive web-based application designed to streamline and automate 
+                    the entire hostel management process at Mahindra University. Our platform provides an end-to-end solution 
+                    for students, wardens, and administrators to manage hostel allocations, room bookings, complaints, and more.
+                  </p>
+                  
+                  <h3 style={{marginTop: '25px'}}>Key Features</h3>
+                  <ul style={{
+                    paddingLeft: '20px',
+                    lineHeight: '1.6'
+                  }}>
+                    <li><strong>Online Form Submission:</strong> Digital student registration with all necessary information</li>
+                    <li><strong>Fee Payment:</strong> Secure online payment processing for hostel fees</li>
+                    <li><strong>Room Selection:</strong> Interactive floor plans for students to select and book rooms</li>
+                    <li><strong>Complaint Management:</strong> Digital system for submitting and tracking maintenance requests</li>
+                    <li><strong>Warden Dashboard:</strong> Comprehensive tools for wardens to manage student allocations</li>
+                    <li><strong>Admin Controls:</strong> Advanced features for system administrators</li>
+                    <li><strong>Profile Management:</strong> Personalized profiles for students with photo upload capability</li>
+                  </ul>
+                  
+                  <h3 style={{marginTop: '25px'}}>Technologies Used</h3>
+                  <div className="tech-stack" style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '10px',
+                    marginTop: '15px'
+                  }}>
+                    {['React', 'TypeScript', 'Node.js', 'Express', 'MongoDB', 'JWT Authentication'].map(tech => (
+                      <div key={tech} style={{
+                        padding: '8px 12px',
+                        backgroundColor: '#f0f0f0',
+                        borderRadius: '20px',
+                        fontSize: '14px'
+                      }}>
+                        {tech}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <h3 style={{marginTop: '25px'}}>Our Goal</h3>
+                  <p>
+                    Our project aims to transform the traditional hostel management process by eliminating paperwork,
+                    reducing administrative overhead, and providing a seamless experience for all stakeholders. 
+                    We've focused on creating an intuitive interface with real-time updates and interactive elements
+                    to make hostel allocation more efficient and transparent.
+                  </p>
+                </div>
+                
+                <div className="team-section" style={{
+                  marginTop: '30px',
+                  padding: '20px',
+                  backgroundColor: '#f9f9f9',
+                  borderRadius: '8px'
+                }}>
+                  <h3 style={{textAlign: 'center', marginBottom: '20px'}}>Project Team</h3>
+                  <div className="team-members" style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap',
+                    gap: '20px'
+                  }}>
+                    <div className="team-member" style={{textAlign: 'center'}}>
+                      <h4 style={{margin: '5px 0'}}>Om Sai Vikranth</h4>
+                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE009</p>
+                    </div>
+                    
+                    <div className="team-member" style={{textAlign: 'center'}}>
+                      <h4 style={{margin: '5px 0'}}>Palacharla Sriroop</h4>
+                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE190</p>
+                    </div>
+                    
+                    <div className="team-member" style={{textAlign: 'center'}}>
+                      <h4 style={{margin: '5px 0'}}>Kalyan Krishna</h4>
+                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE302</p>
+                    </div>
+                    
+                    <div className="team-member" style={{textAlign: 'center'}}>
+                      <h4 style={{margin: '5px 0'}}>Chandra</h4>
+                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE134</p>
+                    </div>
+                    
+                    <div className="team-member" style={{textAlign: 'center'}}>
+                      <h4 style={{margin: '5px 0'}}>Mohana Krishna</h4>
+                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE173</p>
+                    </div>
+                    
+                    <div className="team-member" style={{textAlign: 'center'}}>
+                      <h4 style={{margin: '5px 0'}}>Varun</h4>
+                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE069</p>
+                    </div>
+                    
+                    <div className="team-member" style={{textAlign: 'center'}}>
+                      <h4 style={{margin: '5px 0'}}>Mukund</h4>
+                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE075</p>
+                    </div>
+                    
+                    <div className="team-member" style={{textAlign: 'center'}}>
+                      <h4 style={{margin: '5px 0'}}>Tejas</h4>
+                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE270</p>
+                    </div>
+                  </div>
+                  
+                  <div style={{
+                    marginTop: '20px',
+                    padding: '15px',
+                    backgroundColor: '#f0f0f0',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    fontSize: '14px',
+                    color: '#555'
+                  }}>
+                    <p>Our team of 8 members collaborated across frontend development, backend architecture, database design, UI/UX, and testing to deliver this comprehensive hostel management solution.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Contact Section */}
+          {selectedSection === "Contact" && (
+            <div className="contact-section">
+              <h2>Contact Us</h2>
+              
+              <div className="contact-container" style={{
+                maxWidth: '800px',
+                margin: '20px auto',
+                padding: '25px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+              }}>
+                <div className="contact-info">
+                  <h3>Development Team</h3>
+                  <p>If you have any technical issues, suggestions, or questions about the Hostel Management System, please feel free to contact our development team:</p>
+                  
+                  <div className="developer-contacts" style={{
+                    marginTop: '20px',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gap: '20px'
+                  }}>
+                    <div className="developer-card" style={{
+                      padding: '15px',
+                      backgroundColor: '#f9f9f9',
+                      borderRadius: '8px',
+                      border: '1px solid #eee'
+                    }}>
+                      <h4>Om Sai Vikranth</h4>
+                      <p style={{
+                        margin: '10px 0',
+                        fontSize: '14px'
+                      }}>
+                        <strong>Email:</strong> <a href="mailto:se22ucse009@mahindrauniversity.edu.in">se22ucse009@mahindrauniversity.edu.in</a>
+                      </p>
+                      <p style={{
+                        fontSize: '14px',
+                        color: '#666'
+                      }}>Full-stack Developer, UI/UX Design</p>
+                    </div>
+                    
+                    <div className="developer-card" style={{
+                      padding: '15px',
+                      backgroundColor: '#f9f9f9',
+                      borderRadius: '8px',
+                      border: '1px solid #eee'
+                    }}>
+                      <h4>Palacharla Sriroop</h4>
+                      <p style={{
+                        margin: '10px 0',
+                        fontSize: '14px'
+                      }}>
+                        <strong>Email:</strong> <a href="mailto:se22ucse190@mahindrauniversity.edu.in">se22ucse190@mahindrauniversity.edu.in</a>
+                      </p>
+                      <p style={{
+                        fontSize: '14px',
+                        color: '#666'
+                      }}>Backend Developer, Database Management</p>
+                    </div>
+                    
+                    <div className="developer-card" style={{
+                      padding: '15px',
+                      backgroundColor: '#f9f9f9',
+                      borderRadius: '8px',
+                      border: '1px solid #eee'
+                    }}>
+                      <h4>Kalyan Krishna</h4>
+                      <p style={{
+                        margin: '10px 0',
+                        fontSize: '14px'
+                      }}>
+                        <strong>Email:</strong> <a href="mailto:se22ucse302@mahindrauniversity.edu.in">se22ucse302@mahindrauniversity.edu.in</a>
+                      </p>
+                      <p style={{
+                        fontSize: '14px',
+                        color: '#666'
+                      }}>Frontend Developer, Testing</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="hostel-contact" style={{
+                  marginTop: '30px',
+                  padding: '20px',
+                  backgroundColor: '#f9f9f9',
+                  borderRadius: '8px'
+                }}>
+                  <h3>Hostel Administration Contact</h3>
+                  <p>For general inquiries related to hostel administration:</p>
+                  
+                  <div className="contact-details" style={{marginTop: '15px'}}>
+                    <p><strong>Hostel Office:</strong> Student Affairs Office Main Block, Mahindra University</p>
+                    <p><strong>Email:</strong> hostelcom@mahindrauniversity.edu.in</p>
+                    <p><strong>Phone:</strong> +91 9100947891</p>
+                  </div>
+                  
+                  <p style={{
+                    marginTop: '20px',
+                    padding: '10px',
+                    backgroundColor: '#e8f4fd',
+                    borderRadius: '5px',
+                    fontSize: '14px'
+                  }}>
+                    <strong>Note:</strong> For urgent issues outside office hours, please contact your floor warden directly.
+                  </p>
+                </div>
+                
+                <div className="feedback-section" style={{marginTop: '30px'}}>
+                  <h3>Feedback Form</h3>
+                  <p>We value your feedback! Please share your thoughts about the Hostel Management System:</p>
+                  
+                  <form className="feedback-form" style={{marginTop: '15px'}}>
+                    <div className="form-group">
+                      <label htmlFor="feedback-name">Name (Optional)</label>
+                      <input 
+                        type="text" 
+                        id="feedback-name" 
+                        placeholder="Your Name"
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          margin: '5px 0 15px',
+                          borderRadius: '5px',
+                          border: '1px solid #ddd'
+                        }}
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="feedback-email">Email (Optional)</label>
+                      <input 
+                        type="email" 
+                        id="feedback-email" 
+                        placeholder="Your Email"
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          margin: '5px 0 15px',
+                          borderRadius: '5px',
+                          border: '1px solid #ddd'
+                        }}
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="feedback-type">Feedback Type</label>
+                      <select 
+                        id="feedback-type"
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          margin: '5px 0 15px',
+                          borderRadius: '5px',
+                          border: '1px solid #ddd'
+                        }}
+                      >
+                        <option value="">Select type</option>
+                        <option value="bug">Bug Report</option>
+                        <option value="feature">Feature Request</option>
+                        <option value="improvement">Improvement Suggestion</option>
+                        <option value="general">General Feedback</option>
+                      </select>
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="feedback-message">Your Feedback</label>
+                      <textarea 
+                        id="feedback-message" 
+                        placeholder="Please share your thoughts, suggestions, or report issues..."
+                        rows={5}
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          margin: '5px 0 15px',
+                          borderRadius: '5px',
+                          border: '1px solid #ddd',
+                          resize: 'vertical'
+                        }}
+                      ></textarea>
+                    </div>
+                    
+                    <button 
+                      type="submit"
+                      style={{
+                        backgroundColor: '#c23535',
+                        color: 'white',
+                        padding: '10px 20px',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        fontSize: '16px'
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        alert('Thank you for your feedback! We will review it shortly.');
+                        // Reset form
+                        const form = e.target as HTMLFormElement;
+                        form.reset();
+                      }}
+                    >
+                      Submit Feedback
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Privacy Policy Section */}
+          {selectedSection === "Privacy" && (
+            <div className="privacy-section">
+              <h2>Privacy Policy</h2>
+              
+              <div className="privacy-container" style={{
+                maxWidth: '800px',
+                margin: '20px auto',
+                padding: '25px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+              }}>
+                <p style={{marginBottom: '15px'}}>
+                  <strong>Last Updated: May 2025</strong>
+                </p>
+                
+                <p>
+                  This privacy policy describes how the Hostel Management System collects, uses, 
+                  and shares your personal information in connection with your use of our services.
+                </p>
+                
+                <h3 style={{marginTop: '20px'}}>Information We Collect</h3>
+                <p>
+                  We collect information you provide directly to us when you:
+                </p>
+                <ul>
+                  <li>Register and create an account</li>
+                  <li>Fill out student information forms</li>
+                  <li>Submit hostel booking requests</li>
+                  <li>Make payments through our system</li>
+                  <li>Submit maintenance complaints</li>
+                  <li>Upload profile photos</li>
+                  <li>Contact our support team</li>
+                </ul>
+                
+                <h3 style={{marginTop: '20px'}}>How We Use Your Information</h3>
+                <p>We use the information we collect to:</p>
+                <ul>
+                  <li>Provide and maintain our services</li>
+                  <li>Process hostel allocations</li>
+                  <li>Manage room bookings and facility maintenance</li>
+                  <li>Communicate with you about your requests</li>
+                  <li>Respond to your inquiries and provide support</li>
+                  <li>Improve our services and develop new features</li>
+                </ul>
+                
+                <h3 style={{marginTop: '20px'}}>Data Security</h3>
+                <p>
+                  We implement reasonable security measures to protect your personal information from unauthorized access,
+                  destruction, use, modification, or disclosure. However, no security system is impenetrable, and we cannot
+                  guarantee the security of our systems 100%.
+                </p>
+                
+                <h3 style={{marginTop: '20px'}}>Data Sharing</h3>
+                <p>
+                  Your information is shared only with Mahindra University administrators and hostel management staff 
+                  who need access to provide you with services. We do not sell your personal information to third parties.
+                </p>
+                
+                <h3 style={{marginTop: '20px'}}>Your Rights</h3>
+                <p>
+                  You have the right to access, update, or delete your personal information. You can manage most of your information
+                  through your account settings or by contacting the hostel administration office.
+                </p>
+                
+                <h3 style={{marginTop: '20px'}}>Contact Us</h3>
+                <p>
+                  If you have questions about this Privacy Policy, please contact us at:
+                  <br />
+                  <a href="mailto:hostelcom@mahindrauniversity.edu.i">hostelcom@mahindrauniversity.edu.in</a>
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* FOOTER */}
       <footer className="footer">
-        <p>&copy; 2025 Your Company Name. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Hostel Management System. All rights reserved.</p>
         <p>
-          <a href="/about">About</a> | <a href="/contact">Contact</a> |{" "}
-          <a href="/privacy">Privacy Policy</a>
+          <a href="/about" onClick={(e) => {e.preventDefault(); setSelectedSection("About")}}>About</a> | 
+          <a href="/contact" onClick={(e) => {e.preventDefault(); setSelectedSection("Contact")}}>Contact</a>
         </p>
       </footer>
     </>
