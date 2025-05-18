@@ -39,20 +39,15 @@ export const getRoomOccupancyStatus = (
 
 // SVG String for Phase 3 North Wing Ground Floor
 export const phase3NorthWingGroundFloorSvgString = `
-  <svg viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="10 0 500 350" xmlns="http://www.w3.org/2000/svg">
     <!-- Background -->
     <rect width="500" height="350" fill="#ffffff"/>
     
-    <!-- Outer Walls Path - Define the L-shape boundary -->
-    <path
-      d="M10 10 H 350 V 60 H 490 V 340 H 250 V 160 H 10 Z"
-      fill="none"
-    />
 
     <!-- Top Section -->
     <!-- WS Left -->
     <g data-room-number="WS1">
-      <rect x="20" y="20" width="90" height="30" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
+      <rect x="20" y="20" width="90" height="30" rx="4" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
       <text x="65" y="39" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">WS</text>
     </g>
     
@@ -187,9 +182,9 @@ export const phase3NorthWingGroundFloorSvgString = `
 
 // SVG String for Phase 3 North Wing 1st Floor
 export const phase3NorthWing1stFloorSvgString = `
-  <svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="-15 -15 600 400" xmlns="http://www.w3.org/2000/svg">
     <!-- Background -->
-    <rect width="00" height="400" fill="#ffffff"/>
+    <rect width="600" height="400" fill="#ffffff"/>
     
     <!-- Top section with WS, Stairs, Lift, WS -->
     <!-- WS Left -->

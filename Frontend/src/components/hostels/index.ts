@@ -98,8 +98,11 @@ import Phase4AUpperFloorPlan, {
 import Phase4BLowerFloorPlan, { 
   phase4BLowerConfig,
   phase4BGroundFloorSvgString,
+  phase4B1stFloorSvgString,
   phase4BSecondFloorSvgString,
-  phase4B3rdFloorSvgString
+  phase4B3rdFloorSvgString,
+  phase4B4thFloorSvgString,
+  phase4B5thFloorSvgString
 } from './Phase4BLowerFloors';
 
 import Phase4BUpperFloorPlan, { 
@@ -278,12 +281,13 @@ export {
   phase4BUpperConfig,
   
   // Phase 4B Combined Config
-  phase4BConfig,
-  
-  // Phase 4B SVG Strings
+  phase4BConfig,  // Phase 4B SVG Strings
   phase4BGroundFloorSvgString,
+  phase4B1stFloorSvgString,
   phase4BSecondFloorSvgString,
   phase4B3rdFloorSvgString,
+  phase4B4thFloorSvgString,
+  phase4B5thFloorSvgString,
   phase4B6thFloorSvgString,
   phase4B7thFloorSvgString,
   phase4B8thFloorSvgString,
