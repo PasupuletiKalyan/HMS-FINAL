@@ -1,6 +1,7 @@
 import React from 'react';
 import { FloorConfig, FloorPlanProps } from './types';
 import Phase3NorthWingFirstFloor from './Phase3NorthWingFirstFloor';
+import Phase3NorthWingGroundFloor from './Phase3NorthWingGroundFloor';
 
 // Phase 3 North Wing configuration
 export const phase3NorthWingConfig: Record<string, FloorConfig> = {
@@ -38,148 +39,7 @@ export const getRoomOccupancyStatus = (
   }
 };
 
-// SVG String for Phase 3 North Wing Ground Floor
-export const phase3NorthWingGroundFloorSvgString = `
-  <svg viewBox="10 0 500 350" xmlns="http://www.w3.org/2000/svg">
-    <!-- Background -->
-    <rect width="500" height="350" fill="#ffffff"/>
-    
-
-    <!-- Top Section -->
-    <!-- WS Left -->
-    <g data-room-number="WS1">
-      <rect x="20" y="20" width="90" height="30" rx="4" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
-      <text x="65" y="39" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">WS</text>
-    </g>
-    
-    <!-- Lift -->
-    <g data-common-area="Lift">
-      <rect x="150" y="20" width="30" height="25" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
-      <text x="165" y="35" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Lift</text>
-    </g>
-    
-    <!-- Lobby Text -->
-    <text x="215" y="35" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Lobby</text>
-    
-    <!-- WS Right -->
-    <g data-room-number="WS2">
-      <rect x="250" y="20" width="90" height="30" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
-      <text x="295" y="39" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">WS</text>
-    </g>
-
-    <!-- Corridor Top Text -->
-    <text x="180" y="75" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
-
-    <!-- Middle Section (Left) -->
-    <!-- G05 - G01 -->
-    <g data-room-number="5">
-      <rect x="20" y="90" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="32" y="105" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">G05</text>
-    </g>
-    
-    <g data-room-number="4">
-      <rect x="60" y="90" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="72" y="105" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">G04</text>
-    </g>
-    
-    <g data-room-number="3">
-      <rect x="120" y="90" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="132" y="105" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">G03</text>
-    </g>
-    
-    <g data-room-number="2">
-      <rect x="160" y="90" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="172" y="105" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">G02</text>
-    </g>
-    
-    <g data-room-number="1">
-      <rect x="200" y="90" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="212" y="105" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">G01</text>
-    </g>
-    
-    <!-- Warden Office -->
-    <g data-common-area="WardenOffice">
-      <rect x="240" y="90" width="30" height="25" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
-      <text x="255" y="105" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">WO</text>
-    </g>
-    
-    <!-- Reception Text -->
-    <text x="315" y="105" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Reception</text>
-
-    <!-- Right Wing -->
-    <g data-room-number="26">
-      <rect x="450" y="70" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="462" y="85" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">G26</text>
-    </g>
-    
-    <g data-room-number="27">
-      <rect x="450" y="110" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="462" y="125" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">G27</text>
-    </g>
-    
-    <g data-room-number="28">
-      <rect x="450" y="150" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="462" y="165" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">G28</text>
-    </g>
-    
-    <!-- Corridor Right Text -->
-    <text x="430" y="180" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif" transform="rotate(-90 430 180)">Corridor</text>
-    
-    <g data-room-number="29">
-      <rect x="450" y="190" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="462" y="205" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">G29</text>
-    </g>
-    
-    <!-- Stairs -->
-    <g data-common-area="Stairs">
-      <rect x="400" y="170" width="25" height="45" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
-      <text x="412" y="195" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">Stairs</text>
-    </g>
-    
-    <g data-room-number="30">
-      <rect x="450" y="230" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="462" y="245" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">G30</text>
-    </g>
-    
-    <g data-room-number="31">
-      <rect x="450" y="270" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="462" y="285" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">G31</text>
-    </g>
-    
-    <!-- Warden Residence -->
-    <g data-common-area="WardenResidence">
-      <rect x="400" y="250" width="25" height="45" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
-      <text x="412" y="275" fontSize="9" textAnchor="middle" fontFamily="Inter, sans-serif">WR</text>
-    </g>
-
-    <!-- Bottom Section (Large Corridor) -->
-    <text x="130" y="320" fontSize="10" textAnchor="middle" fontFamily="Inter, sans-serif">Corridor</text>
-
-    <!-- Arrow markers definition -->
-    <defs>
-      <marker
-        id="arrowhead-right"
-        markerWidth="6"
-        markerHeight="4"
-        refX="5"
-        refY="2"
-        orient="auto"
-        markerUnits="strokeWidth">
-        <polygon points="0 0, 6 2, 0 4" fill="#a0a0a0" />
-      </marker>
-      <marker
-        id="arrowhead-left"
-        markerWidth="6"
-        markerHeight="4"
-        refX="1"
-        refY="2"
-        orient="auto"
-        markerUnits="strokeWidth">
-        <polygon points="6 0, 0 2, 6 4" fill="#a0a0a0" />
-      </marker>
-    </defs>
-  </svg>
-`;
+// SVG String declarations moved to their respective component files
 
 // SVG String for Phase 3 North Wing 2nd Floor
 export const phase3NorthWing2ndFloorSvgString = `
@@ -928,51 +788,22 @@ export const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
   const floorInfo = phase3NorthWingConfig[floor];
   if (!floorInfo) return <p>Floor data not available</p>;
   
-  // For Ground Floor, use the originalSVG rendering
+  // For Ground Floor, use the new component
   if (floor === 'Ground Floor') {
-    const svgRef = React.useRef<HTMLDivElement>(null);
-    
-    React.useEffect(() => {
-      if (!svgRef.current) return;
-      
-      const container = svgRef.current;
-      
-      // Apply room occupancy status colors
-      const roomElements = container.querySelectorAll('g[data-room-number]');
-      roomElements.forEach(roomElement => {
-        const roomNumber = roomElement.getAttribute('data-room-number') || '';
-        const { color } = getRoomOccupancyStatus(roomNumber, selectedBlock, selectedFloor, occupiedBeds);
-        
-        const rect = roomElement.querySelector('rect');
-        if (rect) {
-          rect.setAttribute('fill', color);
-        }
-      });
-      
-      // Event handler usingdelegation
-      const handleClick = (event: MouseEvent) => {
-        const targetGroup = (event.target as Element).closest('g[data-room-number]');
-        if (targetGroup) {
-          const roomNumber = targetGroup.getAttribute('data-room-number');
-          if (roomNumber) {
-            onRoomClick(roomNumber);
-          }
-        }
-      };
-      
-      container.addEventListener('click', handleClick);
-      
-      return () => {
-        container.removeEventListener('click', handleClick);
-      };
-    }, [onRoomClick, occupiedBeds, selectedBlock, selectedFloor]);
-    
     return (
-      <div
-        ref={svgRef}
-        className="svg-container"
-        dangerouslySetInnerHTML={{ __html: phase3NorthWingGroundFloorSvgString }}
-      />
+      <div>
+        <h3 className="text-center mb-4">{`${selectedBlock} - ${floor}`}</h3>
+        <Phase3NorthWingGroundFloor
+          selectedBlock={selectedBlock}
+          selectedFloor={selectedFloor}
+          occupiedBeds={occupiedBeds}
+          onRoomClick={onRoomClick}
+          floor={floor}
+        />
+        <div className="mt-4 text-center text-sm text-gray-500">
+          <p>Click on a room to book a bed</p>
+        </div>
+      </div>
     );
   }
   // For 1st floor, use the new Phase3NorthWingFirstFloor component

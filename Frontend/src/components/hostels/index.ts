@@ -73,11 +73,11 @@ import Phase2Part5FloorPlan, {
 
 import { 
   Phase3NorthWingFloorPlan, 
-  phase3NorthWingConfig,
-  phase3NorthWingGroundFloorSvgString 
+  phase3NorthWingConfig
 } from './Phase3NorthWing';
 
 import { phase3NorthWingFirstFloorSvgString } from './Phase3NorthWingFirstFloor';
+import { phase3NorthWingGroundFloorSvgString } from './Phase3NorthWingGroundFloor';
 
 import Phase3SouthWingFloorPlan, { 
   phase3SouthWingConfig 
