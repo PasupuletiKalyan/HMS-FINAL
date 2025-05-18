@@ -25,34 +25,25 @@ export const phase4BGroundFloorSvgString = `
       <text x="610" y="85" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text>
     </g>
     
-    <g data-room-number="8">
+    <g data-room-number="G01">
       <rect x="720" y="60" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="750" y="85" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">8</text>
+      <text x="740" y="85" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">G01</text>
     </g>
     
-    <g data-room-number="9">
+    <g data-room-number="G02">
       <rect x="720" y="110" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="750" y="135" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">9</text>
+      <text x="740" y="135" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">G02</text>
     </g>
     
-    <g data-room-number="7">
-      <rect x="600" y="160" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="630" y="185" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">7</text>
-    </g>
-    
-    <g data-room-number="10">
+    <g data-room-number="G03">
       <rect x="720" y="160" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="750" y="185" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">10</text>
+      <text x="740" y="185" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">G03</text>
     </g>
     
-    <g data-room-number="6">
-      <rect x="600" y="210" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="630" y="235" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">6</text>
-    </g>
     
-    <g data-room-number="11">
+    <g data-room-number="G04">
       <rect x="720" y="210" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="750" y="235" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">11</text>
+      <text x="740" y="235" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">G04</text>
     </g>
     
     <!-- Vertical Corridor Text -->
@@ -60,121 +51,235 @@ export const phase4BGroundFloorSvgString = `
       <text x="0" y="0" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="#6b7280">Corridor</text>
     </g>
     
-    <g data-room-number="12">
+    <g data-room-number="G05">
       <rect x="720" y="260" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="750" y="285" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">12</text>
+      <text x="740" y="285" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">G05</text>
     </g>
     
-    <g data-room-number="13">
+    <g data-room-number="G06">
       <rect x="720" y="310" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="750" y="335" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">13</text>
+      <text x="740" y="335" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">G06</text>
     </g>
     
     <g>
       <rect x="600" y="360" width="60" height="120" rx="4" fill="#f56565" stroke="#c53030" strokeWidth="2" />
-      <text x="630" y="425" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif" fill="white">🚽</text>
+      <text x="620" y="425" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif" fill="white">🚽</text>
     </g>
     
-    <g data-room-number="14">
+    <g data-room-number="G07">
       <rect x="720" y="410" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="750" y="435" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">14</text>
+      <text x="740" y="435" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">G07</text>
     </g>
     
-    <g data-room-number="15">
+    <g data-room-number="G08">
       <rect x="720" y="460" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="750" y="485" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">15</text>
+      <text x="740" y="485" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">G08</text>
     </g>
     
     <!-- Middle Connection -->
-    <g data-room-number="16">
+    <g data-room-number="G09">
       <rect x="720" y="520" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="750" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">16</text>
+      <text x="740" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">G09</text>
     </g>
     
     <g>
       <rect x="600" y="520" width="60" height="40" rx="4" fill="#d3d3d3" stroke="black" strokeWidth="2" />
-      <text x="630" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text>
+      <text x="610" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text>
     </g>
     
     <g>
       <rect x="500" y="520" width="80" height="40" rx="4" fill="#d3d3d3" stroke="black" strokeWidth="2" />
-      <text x="540" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Lift</text>
+      <text x="530" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Lift</text>
     </g>
     
     <!-- Bottom Horizontal Section -->
     <g>
       <rect x="40" y="520" width="80" height="40" rx="4" fill="#d3d3d3" stroke="black" strokeWidth="2" />
-      <text x="80" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text>
+      <text x="70" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text>
     </g>
     
-    <g data-room-number="1">
-      <rect x="130" y="520" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="160" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">1</text>
-    </g>
-    
-    <g data-room-number="2">
-      <rect x="200" y="520" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="230" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">2</text>
-    </g>
     
     <!-- Gap in the layout -->
     
-    <g data-room-number="3">
-      <rect x="270" y="520" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="300" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">3</text>
-    </g>
-    
-    <g data-room-number="4">
-      <rect x="340" y="520" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="370" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">4</text>
-    </g>
-    
-    <g data-room-number="5">
-      <rect x="410" y="520" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="440" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">5</text>
-    </g>
     
     <!-- Corridor Label -->
-    <text x="400" y="590" fontSize="13" textAnchor="middle" fontFamily="Inter, sans-serif" fill="#6b7280">Corridor</text>
+    <text x="280" y="590" fontSize="13" textAnchor="middle" fontFamily="Inter, sans-serif" fill="#6b7280">LOBBY</text>
     
     <!-- Study Lounge -->
     <g>
       <rect x="500" y="620" width="180" height="40" rx="4" fill="#d3d3d3" stroke="black" strokeWidth="2" />
-      <text x="590" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Study Lounge</text>
+      <text x="560" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Study Lounge</text>
     </g>
     
-    <g data-room-number="17">
-      <rect x="410" y="620" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="440" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">17</text>
-    </g>
-    
-    <g data-room-number="18">
-      <rect x="340" y="620" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="370" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">18</text>
-    </g>
-    
-    <g data-room-number="19">
-      <rect x="270" y="620" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="300" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">19</text>
-    </g>
     
     <!-- Gap in the layout -->
     
-    <g data-room-number="20">
-      <rect x="200" y="620" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="230" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">20</text>
-    </g>
-    
-    <g data-room-number="21">
-      <rect x="130" y="620" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="160" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">21</text>
-    </g>
-    
-    <g data-room-number="22">
-      <rect x="40" y="620" width="80" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-      <text x="80" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">22</text>
-    </g>
   </svg>
+`;
+
+// SVG string for Phase 4B 1st Floor
+export const phase4B1stFloorSvgString = `
+ <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">
+   
+   <!-- Title -->
+   <rect x="230" y="400" width="200" height="60" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="2"/>
+   <text x="270" y="435" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase-4B 1st Floor</text>
+         <!-- Top Right Vertical Section -->
+      <g>
+        <rect x="600" y="60" width="60" height="40" rx="4" fill="#d3d3d3" stroke="black" strokeWidth="2" />
+        <text x="610" y="85" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text>
+      </g>
+      
+      <g data-room-number="108">
+        <rect x="720" y="60" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="730" y="85" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">108</text>
+      </g>
+      
+      <g data-room-number="109">
+        <rect x="720" y="110" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="730" y="135" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">109</text>
+      </g>
+      
+      <g data-room-number="107">
+        <rect x="600" y="160" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="620" y="185" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">107</text>
+      </g>
+      
+      <g data-room-number="110">
+        <rect x="720" y="160" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="730" y="185" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">110</text>
+      </g>
+      
+      <g data-room-number="106">
+        <rect x="600" y="210" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="620" y="235" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">106</text>
+      </g>
+      
+      <g data-room-number="111">
+        <rect x="720" y="210" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="730" y="235" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">111</text>
+      </g>
+      
+      <!-- Vertical Corridor Text -->
+      <g transform="translate(680, 280) rotate(90)">
+        <text x="0" y="0" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="#6b7280">Corridor</text>
+      </g>
+      
+      <g data-room-number="112">
+        <rect x="720" y="260" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="730" y="285" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">112</text>
+      </g>
+      
+      <g data-room-number="113">
+        <rect x="720" y="310" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="730" y="335" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">113</text>
+      </g>
+      
+      <g>
+        <rect x="600" y="360" width="60" height="120" rx="4" fill="#f56565" stroke="#c53030" strokeWidth="2" />
+        <text x="620" y="425" fontSize="14" textAnchor="middle" fontFamily="Inter, sans-serif" fill="white">🚽</text>
+      </g>
+      
+      <g data-room-number="114">
+        <rect x="720" y="410" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="730" y="435" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">114</text>
+      </g>
+      
+      <g data-room-number="115">
+        <rect x="720" y="460" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="730" y="485" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">115</text>
+      </g>
+      
+      <!-- Middle Connection -->
+      <g data-room-number="116">
+        <rect x="720" y="520" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="730" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">116</text>
+      </g>
+      
+      <g>
+        <rect x="600" y="520" width="60" height="40" rx="4" fill="#d3d3d3" stroke="black" strokeWidth="2" />
+        <text x="610" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text>
+      </g>
+      
+      <g>
+        <rect x="500" y="520" width="80" height="40" rx="4" fill="#d3d3d3" stroke="black" strokeWidth="2" />
+        <text x="540" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Lift</text>
+      </g>
+      
+      <!-- Bottom Horizontal Section -->
+      <g>
+        <rect x="40" y="520" width="80" height="40" rx="4" fill="#d3d3d3" stroke="black" strokeWidth="2" />
+        <text x="60" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Stairs</text>
+      </g>
+      
+      <g data-room-number="101">
+        <rect x="130" y="520" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="160" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">101</text>
+      </g>
+      
+      <g data-room-number="102">
+        <rect x="200" y="520" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="210" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">102</text>
+      </g>
+      
+      <!-- Gap in the layout -->
+      
+      <g data-room-number="103">
+        <rect x="270" y="520" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="290" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">103</text>
+      </g>
+      
+      <g data-room-number="104">
+        <rect x="340" y="520" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="360" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">104</text>
+      </g>
+      
+      <g data-room-number="105">
+        <rect x="410" y="520" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="430" y="545" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">105</text>
+      </g>
+      
+      <!-- Corridor Label -->
+      <text x="400" y="590" fontSize="13" textAnchor="middle" fontFamily="Inter, sans-serif" fill="#6b7280">Corridor</text>
+      
+      <!-- Study Lounge -->
+      <g>
+        <rect x="500" y="620" width="180" height="40" rx="4" fill="#d3d3d3" stroke="black" strokeWidth="2" />
+        <text x="550" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif" fill="black">Study Lounge</text>
+      </g>
+      
+      <g data-room-number="117">
+        <rect x="410" y="620" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="430" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">117</text>
+      </g>
+      
+      <g data-room-number="118">
+        <rect x="340" y="620" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="360" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">118</text>
+      </g>
+      
+      <g data-room-number="119">
+        <rect x="270" y="620" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="290" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">119</text>
+      </g>
+      
+      <!-- Gap in the layout -->
+      
+      <g data-room-number="120">
+        <rect x="200" y="620" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="220" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">120</text>
+      </g>
+      
+      <g data-room-number="121">
+        <rect x="130" y="620" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="160" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">121</text>
+      </g>
+      
+      <g data-room-number="122">
+        <rect x="40" y="620" width="80" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
+        <text x="80" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">122</text>
+      </g>
+ </svg>
 `;
 
 // SVG string for Phase 4B 2nd Floor
@@ -676,10 +781,11 @@ export const phase4B4thFloorSvgString = `
 
 export const phase4B5thFloorSvgString = `
   <!-- SVG content for 5th floor -->
-      <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">      
+      <svg viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">
+      
       <!-- Title -->
       <rect x="230" y="400" width="200" height="60" rx="5" fill="#f0f0f0" stroke="black" strokeWidth="2"/>
-      <text x="270" y="435" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase-4B 5th Floor</text>
+      <text x="250" y="435" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Inter, sans-serif">Phase-4B 5th Floor</text>
       
       <!-- Top Right Vertical Section -->
       <g>
@@ -824,7 +930,7 @@ export const phase4B5thFloorSvgString = `
       
       <g data-room-number="520">
         <rect x="200" y="620" width="60" height="40" rx="4" fill="#86efac" stroke="black" strokeWidth="2" />
-        <text x="230" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">520</text>
+        <text x="220" y="645" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">520</text>
       </g>
       
       <g data-room-number="521">
@@ -857,6 +963,9 @@ const Phase4BLowerFloorPlan: React.FC<FloorPlanProps> = ({
   switch(floor) {
     case 'Ground Floor':
       svgString = phase4BGroundFloorSvgString;
+      break;
+    case '1st Floor':
+      svgString = phase4B1stFloorSvgString;
       break;
     case '2nd Floor':
       svgString = phase4BSecondFloorSvgString;

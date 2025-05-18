@@ -1,5 +1,6 @@
 import React from 'react';
 import { FloorConfig, FloorPlanProps } from './types';
+import Phase3NorthWingFirstFloor from './Phase3NorthWingFirstFloor';
 
 // Phase 3 North Wing configuration
 export const phase3NorthWingConfig: Record<string, FloorConfig> = {
@@ -39,20 +40,15 @@ export const getRoomOccupancyStatus = (
 
 // SVG String for Phase 3 North Wing Ground Floor
 export const phase3NorthWingGroundFloorSvgString = `
-  <svg viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="10 0 500 350" xmlns="http://www.w3.org/2000/svg">
     <!-- Background -->
     <rect width="500" height="350" fill="#ffffff"/>
     
-    <!-- Outer Walls Path - Define the L-shape boundary -->
-    <path
-      d="M10 10 H 350 V 60 H 490 V 340 H 250 V 160 H 10 Z"
-      fill="none"
-    />
 
     <!-- Top Section -->
     <!-- WS Left -->
     <g data-room-number="WS1">
-      <rect x="20" y="20" width="90" height="30" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
+      <rect x="20" y="20" width="90" height="30" rx="4" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
       <text x="65" y="39" fontSize="12" textAnchor="middle" fontFamily="Inter, sans-serif">WS</text>
     </g>
     
@@ -182,117 +178,6 @@ export const phase3NorthWingGroundFloorSvgString = `
         <polygon points="6 0, 0 2, 6 4" fill="#a0a0a0" />
       </marker>
     </defs>
-  </svg>
-`;
-
-// SVG String for Phase 3 North Wing 1st Floor
-export const phase3NorthWing1stFloorSvgString = `
-  <svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
-    <!-- Background -->
-    <rect width="00" height="400" fill="#ffffff"/>
-    
-    <!-- Top section with WS, Stairs, Lift, WS -->
-    <!-- WS Left -->
-    <g data-common-area="WSLeft">
-      <rect x="30" y="30" width="60" height="40" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
-      <text x="60" y="55" fontSize="12" textAnchor="middle" fontFamily="Arial, sans-serif">WS</text>
-    </g>
-    
-    <!-- Stairs Left -->
-    <g data-common-area="StairsLeft">
-      <rect x="100" y="30" width="40" height="40" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
-      <text x="120" y="55" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">Stairs</text>
-    </g>
-    
-    <!-- Lift -->
-    <g data-common-area="Lift">
-      <rect x="220" y="30" width="40" height="40" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
-      <text x="240" y="55" fontSize="10" textAnchor="middle" fontFamily="Arial, sans-serif">Lift</text>
-    </g>
-    
-    <!-- WS Right -->
-    <g data-common-area="WSRight">
-      <rect x="380" y="30" width="60" height="40" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
-      <text x="410" y="55" fontSize="12" textAnchor="middle" fontFamily="Arial, sans-serif">WS</text>
-    </g>
-
-    <!-- Corridor Text -->
-    <text x="80" y="100" fontSize="10" fontFamily="Arial, sans-serif" textAnchor="middle">Corridor</text>
-    
-    <!-- Lobby Text -->
-    <text x="350" y="100" fontSize="10" fontFamily="Arial, sans-serif" textAnchor="middle">Lobby</text>
-
-    <!-- Middle Section (Left) Rooms -->
-    <g data-room-number="108">
-      <rect x="30" y="130" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="42" y="145" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">108</text>
-    </g>
-    
-    <g data-room-number="107">
-      <rect x="70" y="130" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="82" y="145" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">107</text>
-    </g>
-    
-    <g data-room-number="106">
-      <rect x="130" y="130" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="142" y="145" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">106</text>
-    </g>
-    
-    <g data-room-number="105">
-      <rect x="170" y="130" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="182" y="145" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">105</text>
-    </g>
-    
-    <g data-room-number="104">
-      <rect x="210" y="130" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="222" y="145" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">104</text>
-    </g>
-    
-    <g data-room-number="103">
-      <rect x="270" y="130" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="282" y="145" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">103</text>
-    </g>
-
-    <!-- Right Wing Section -->
-    <!-- Vertical corridor text -->
-    <text x="405" y="250" fontSize="8" fontFamily="Arial, sans-serif" textAnchor="middle" transform="rotate(90 405 250)">Corridor</text>
-    
-    <!-- Stairs Right -->
-    <g data-common-area="StairsRight">
-      <rect x="345" y="240" width="30" height="50" rx="2" fill="#d3d3d3" stroke="#000000" strokeWidth="1" />
-      <text x="360" y="265" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">Stairs</text>
-    </g>
-    
-    <g data-room-number="131">
-      <rect x="410" y="220" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="422" y="235" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">131</text>
-    </g>
-    
-    <g data-room-number="132">
-      <rect x="410" y="260" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="422" y="275" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">132</text>
-    </g>
-    
-    <g data-room-number="133">
-      <rect x="410" y="300" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="422" y="315" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">133</text>
-    </g>
-    
-    <g data-room-number="134">
-      <rect x="410" y="340" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="422" y="355" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">134</text>
-    </g>
-
-    <!-- Bottom Rooms -->
-    <g data-room-number="102">
-      <rect x="345" y="300" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="357" y="315" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">102</text>
-    </g>
-    
-    <g data-room-number="101">
-      <rect x="345" y="340" width="25" height="25" rx="2" fill="#bbdefb" stroke="#1976d2" strokeWidth="1.5" />
-      <text x="357" y="355" fontSize="8" textAnchor="middle" fontFamily="Arial, sans-serif">101</text>
-    </g>
   </svg>
 `;
 
@@ -1090,9 +975,27 @@ export const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
       />
     );
   }
-  
-  // For 1st floor, use the 1st floor SVG layout
+  // For 1st floor, use the new Phase3NorthWingFirstFloor component
   if (floor === '1st Floor') {
+    return (
+      <div>
+        <h3 className="text-center mb-4">{`${selectedBlock} - ${floor}`}</h3>
+        <Phase3NorthWingFirstFloor
+          selectedBlock={selectedBlock}
+          selectedFloor={selectedFloor}
+          occupiedBeds={occupiedBeds}
+          onRoomClick={onRoomClick}
+          floor={floor}
+        />
+        <div className="mt-4 text-center text-sm text-gray-500">
+          <p>Click on a room to book a bed</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // For 2nd floor, use the 2nd floor SVG layout
+  if (floor === '2nd Floor') {
     const svgRef = React.useRef<HTMLDivElement>(null);
     
     React.useEffect(() => {
@@ -1131,16 +1034,22 @@ export const Phase3NorthWingFloorPlan: React.FC<FloorPlanProps> = ({
     }, [onRoomClick, occupiedBeds, selectedBlock, selectedFloor]);
     
     return (
-      <div
-        ref={svgRef}
-        className="svg-container"
-        dangerouslySetInnerHTML={{ __html: phase3NorthWing1stFloorSvgString }}
-      />
+      <div>
+        <h3 className="text-center mb-4">{`${selectedBlock} - ${floor}`}</h3>
+        <div
+          ref={svgRef}
+          className="svg-container"
+          dangerouslySetInnerHTML={{ __html: phase3NorthWing2ndFloorSvgString }}
+        />
+        <div className="mt-4 text-center text-sm text-gray-500">
+          <p>Click on a room to book a bed</p>
+        </div>
+      </div>
     );
   }
   
-  // For 2nd floor, use the 2nd floor SVG layout
-  if (floor === '2nd Floor') {
+  // For 3rd to 7th floor, use the new SVG layout
+  if (['3rd Floor', '4th Floor', '5th Floor', '6th Floor', '7th Floor'].includes(floor)) {
     const svgRef = React.useRef<HTMLDivElement>(null);
     
     React.useEffect(() => {

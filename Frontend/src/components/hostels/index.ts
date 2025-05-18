@@ -77,6 +77,8 @@ import {
   phase3NorthWingGroundFloorSvgString 
 } from './Phase3NorthWing';
 
+import { phase3NorthWingFirstFloorSvgString } from './Phase3NorthWingFirstFloor';
+
 import Phase3SouthWingFloorPlan, { 
   phase3SouthWingConfig 
 } from './Phase3SouthWing';
@@ -98,8 +100,11 @@ import Phase4AUpperFloorPlan, {
 import Phase4BLowerFloorPlan, { 
   phase4BLowerConfig,
   phase4BGroundFloorSvgString,
+  phase4B1stFloorSvgString,
   phase4BSecondFloorSvgString,
-  phase4B3rdFloorSvgString
+  phase4B3rdFloorSvgString,
+  phase4B4thFloorSvgString,
+  phase4B5thFloorSvgString
 } from './Phase4BLowerFloors';
 
 import Phase4BUpperFloorPlan, { 
@@ -242,11 +247,11 @@ export {
   // Phase 2 Part 5
   Phase2Part5FloorPlan,
   phase2Part5Config,
-  
-  // Phase 3 North Wing
+    // Phase 3 North Wing
   Phase3NorthWingFloorPlan,
   phase3NorthWingConfig,
   phase3NorthWingGroundFloorSvgString,
+  phase3NorthWingFirstFloorSvgString,
   
   // Phase 3 South Wing
   Phase3SouthWingFloorPlan,
@@ -278,12 +283,13 @@ export {
   phase4BUpperConfig,
   
   // Phase 4B Combined Config
-  phase4BConfig,
-  
-  // Phase 4B SVG Strings
+  phase4BConfig,  // Phase 4B SVG Strings
   phase4BGroundFloorSvgString,
+  phase4B1stFloorSvgString,
   phase4BSecondFloorSvgString,
   phase4B3rdFloorSvgString,
+  phase4B4thFloorSvgString,
+  phase4B5thFloorSvgString,
   phase4B6thFloorSvgString,
   phase4B7thFloorSvgString,
   phase4B8thFloorSvgString,
