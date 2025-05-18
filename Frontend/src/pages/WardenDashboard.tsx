@@ -307,8 +307,7 @@ const WardenDashboard: React.FC = () => {
   // const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<EditableData | null>(null);
   const [girlsHostelData, setGirlsHostelData] = useState(initialGirlsHostelData);
-  const [boysHostelData, setBoysHostelData] = useState(initialBoysHostelData);
-  const [occupiedBeds, setOccupiedBeds] = useState<{[key: string]: boolean}>({});
+  const [boysHostelData, setBoysHostelData] = useState(initialBoysHostelData);  const [occupiedBeds, setOccupiedBeds] = useState<{[key: string]: boolean}>({});
   const [studentApplicationNumber, setStudentApplicationNumber] = useState<string>("");
   const [showStudentInput, setShowStudentInput] = useState<boolean>(false);
   const [studentBookings, setStudentBookings] = useState<StudentBooking[]>([]);
@@ -316,7 +315,6 @@ const WardenDashboard: React.FC = () => {
   const [studentDetails, setStudentDetails] = useState<any>(null);
   const [isLoadingStudent, setIsLoadingStudent] = useState<boolean>(false);
   const [documentVerification, setDocumentVerification] = useState({
-    antiRagging: false,
     antiDrug: false,
     keysHandedOver: false
   });
@@ -1331,18 +1329,15 @@ const WardenDashboard: React.FC = () => {
         // Check if API call was successful
         if (data.success) {
           setStudentDetails(data.studentDetails);
-          
-          // Set document verification state from response
+            // Set document verification state from response
           if (data.studentDetails.documentVerification) {
             setDocumentVerification({
-              antiRagging: data.studentDetails.documentVerification.antiRagging || false,
               antiDrug: data.studentDetails.documentVerification.antiDrug || false,
               keysHandedOver: data.studentDetails.documentVerification.keysHandedOver || false
             });
           } else {
             // Reset verification checkboxes if no verification data
             setDocumentVerification({
-              antiRagging: false,
               antiDrug: false,
               keysHandedOver: false
             });
@@ -1363,15 +1358,13 @@ const WardenDashboard: React.FC = () => {
       setStudentDetails(null);
     } finally {
       setIsLoadingStudent(false);
-    }
-  };
+    }  };
 
   // Function to submit document verification
   const submitDocumentVerification = async () => {
     if (!studentDetails) return;
     
     const confirmMsg = 'This will mark the following documents as received:\n' + 
-      (documentVerification.antiRagging ? '✓ Anti-Ragging Declaration\n' : '✗ Anti-Ragging Declaration\n') +
       (documentVerification.antiDrug ? '✓ Anti-Drug Declaration\n' : '✗ Anti-Drug Declaration\n') +
       (documentVerification.keysHandedOver ? '✓ Room Keys Handed Over\n' : '✗ Room Keys Handed Over\n') +
       '\nDo you want to proceed?';
@@ -2554,7 +2547,6 @@ const WardenDashboard: React.FC = () => {
                       Document Verification
                     </h3>
                   </div>
-                  
                   <div className="verification-form" style={{
                     backgroundColor: '#f9fafc',
                     borderRadius: '8px',
@@ -2567,33 +2559,6 @@ const WardenDashboard: React.FC = () => {
                       gap: '15px',
                       marginBottom: '25px'
                     }}>
-                      <div className="verification-item" style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px'
-                      }}>
-                        <input
-                          type="checkbox"
-                          id="anti-ragging"
-                          checked={documentVerification.antiRagging}
-                          onChange={(e) => setDocumentVerification(prev => ({...prev, antiRagging: e.target.checked}))}
-                          style={{
-                            width: '18px',
-                            height: '18px',
-                            accentColor: '#1976d2',
-                            cursor: 'pointer'
-                          }}
-                        />
-                        <label htmlFor="anti-ragging" style={{
-                          fontSize: '15px',
-                          cursor: 'pointer',
-                          fontWeight: '500',
-                          color: '#444'
-                        }}>
-                          Anti-Ragging Declaration
-                        </label>
-                      </div>
-                      
                       <div className="verification-item" style={{
                         display: 'flex',
                         alignItems: 'center',
