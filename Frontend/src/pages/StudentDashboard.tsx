@@ -5,6 +5,8 @@ import collegeLogo from "../assets/college-logo.jpg";
 import defaultProfilePic from "../assets/default-profile-pic.jpg";
 import ResetStudentProgress from "../components/ResetStudentProgress"; // Import the reset component
 import ProfilePhotoUploader from "../components/ProfilePhotoUploader"; // Import our new component
+import antiDrugPolicy from "../assets/ANTI DRUG.pdf"; // Import the anti-drug policy PDF
+import annexureAntiDrug from "../assets/Annexure Anti Drug.pdf"; // Import the annexure PDF
 
 // Define proper BookingInfo interface instead of using 'any'
 interface BookingInfo {
@@ -1000,6 +1002,112 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     </>
                   )}
                   <p><strong>Note:</strong> Please collect your room key from the hostel office.</p>
+                  
+                  {/* Anti-Drug Policy and Affidavit Section */}
+                  <div className="policy-section" style={{
+                    marginTop: '30px',
+                    padding: '20px',
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '8px',
+                    border: '1px solid #e0e0e0'
+                  }}>
+                    <h3 style={{color: '#c23535', marginBottom: '15px'}}>Important: Anti-Drug Policy Documentation</h3>
+                    
+                    <p>Before collecting your room key, you must review, download, and submit the following documents:</p>
+                    
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '15px',
+                      marginTop: '20px'
+                    }}>
+                      <div style={{
+                        padding: '15px',
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}>
+                        <div>
+                          <h4 style={{margin: '0 0 5px 0'}}>Anti-Drug, Substance & Alcohol Use Policy</h4>
+                          <p style={{margin: '0', fontSize: '14px', color: '#666'}}>
+                            Review university policy on prohibited substances and disciplinary actions
+                          </p>
+                        </div>
+                        <a 
+                          href={antiDrugPolicy} 
+                          download="Mahindra_University_Anti_Drug_Policy.pdf"
+                          style={{
+                            backgroundColor: '#c23535',
+                            color: 'white',
+                            padding: '8px 15px',
+                            borderRadius: '5px',
+                            textDecoration: 'none',
+                            fontSize: '14px',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          Download Policy
+                        </a>
+                      </div>
+                      
+                      <div style={{
+                        padding: '15px',
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}>
+                        <div>
+                          <h4 style={{margin: '0 0 5px 0'}}>Annexure: Affidavit Form</h4>
+                          <p style={{margin: '0', fontSize: '14px', color: '#666'}}>
+                            Download, print and get signed by both student and parent/guardian
+                          </p>
+                        </div>
+                        <a 
+                          href={annexureAntiDrug} 
+                          download="Mahindra_University_Affidavit_Form.pdf"
+                          style={{
+                            backgroundColor: '#c23535',
+                            color: 'white',
+                            padding: '8px 15px',
+                            borderRadius: '5px',
+                            textDecoration: 'none',
+                            fontSize: '14px',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          Download Affidavit
+                        </a>
+                      </div>
+                    </div>
+                    
+                    <div style={{
+                      marginTop: '20px',
+                      padding: '15px',
+                      backgroundColor: '#fff8f8',
+                      borderRadius: '5px',
+                      borderLeft: '4px solid #c23535'
+                    }}>
+                      <h4 style={{margin: '0 0 10px 0', color: '#c23535'}}>Submission Process:</h4>
+                      <ol style={{margin: '0', paddingLeft: '20px'}}>
+                        <li>Download both documents</li>
+                        <li>Print the Affidavit Form</li>
+                        <li>Fill in all required details</li>
+                        <li>Get signatures from both student and parent/guardian</li>
+                        <li>Submit the signed Affidavit to the hostel warden upon arrival</li>
+                        <li>Receive your room key after the warden verifies your documentation</li>
+                      </ol>
+                    </div>
+                    
+                    <p style={{marginTop: '20px', fontStyle: 'italic', fontSize: '14px', color: '#666'}}>
+                      Note: Failure to submit the signed Affidavit may result in delayed room key issuance.
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <div className="no-booking-message">
@@ -1013,8 +1121,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           {/* Virtual Tour Section */}
           {selectedSection === "Virtual Tour" && (
             <div className="virtual-tour-section">
-              <h2>Virtual Hostel Tour</h2>
-              <p>Experience a 360° view of our hostel facilities before making your decision.</p>
+              <h2>Virtual Tour</h2>
+              <p>Experience a 360° view of our College.</p>
               
               {/* Simple loading container for virtual tour iframe */}
               <div className="tour-iframe-container" style={{
