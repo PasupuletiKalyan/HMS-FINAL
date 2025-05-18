@@ -30,12 +30,13 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
   setCurrentUserBooking,
   occupiedBeds,
   setOccupiedBeds
-}) => {
-  const [selectedSection, setSelectedSection] = useState("Dashboard"); // Track the selected section
+}) => {  const [selectedSection, setSelectedSection] = useState("Dashboard"); // Track the selected section
   const [showProfileDropdown, setShowProfileDropdown] = useState(false); // Track profile dropdown visibility
   const [currentStep, setCurrentStep] = useState<number>(1); // Track the current step (1, 2, or 3)
   const [showForm, setShowForm] = useState(false); // Track whether the form is displayed
   const [showPaymentForm, setShowPaymentForm] = useState(false); // Track payment form visibility
+  const [showWelcomePopup, setShowWelcomePopup] = useState<boolean>(false); // State for welcome popup
+  const [showHostelInfoPopup, setShowHostelInfoPopup] = useState<boolean>(false); // State for hostel information popup
   // Add state to track booking details locally
   const [localCurrentUserBooking, setLocalCurrentUserBooking] = useState<BookingInfo | null>(propCurrentUserBooking);
   const [paymentDetails, setPaymentDetails] = useState({
@@ -143,6 +144,17 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+  // Add useEffect to show the welcome popup when the component mounts (if first login)
+  useEffect(() => {
+    // Check if this is the first login by checking localStorage
+    const hasShownWelcome = localStorage.getItem('hasShownWelcomePopup');
+    if (!hasShownWelcome) {
+      // If it's the first login, show the popup
+      setShowWelcomePopup(true);
+      // Mark as shown for future visits
+      localStorage.setItem('hasShownWelcomePopup', 'true');
+    }
   }, []);
 
   useEffect(() => {
@@ -253,17 +265,22 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     if (step > 1 && !completedSteps.includes(step - 1)) {
       alert("Please complete the previous steps first!");
       return;
-    }
-
-    // Set the current step for visual indication
+    }    // Set the current step for visual indication
     setCurrentStep(step);
     
     // Handle navigation for steps 2 and 3
     if (step === 2) {
       navigate("/payment");
     } else if (step === 3) {
-      navigate("/hostel-booking");
+      // Show the hostel information popup first, then navigate to booking page
+      setShowHostelInfoPopup(true);
     }
+  };
+
+  // Function to handle continuing to hostel booking after viewing info popup
+  const handleContinueToBooking = () => {
+    setShowHostelInfoPopup(false);
+    navigate("/hostel-booking");
   };
 
   const handleFormSubmit2 = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -356,14 +373,14 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
         body: JSON.stringify({
           completedAt: new Date().toISOString()
         }),
-      });
-
-      if (response.ok) {
+      });      if (response.ok) {
         const data = await response.json();
         if (data.success) {
           setCompletedSteps(prev => [...prev, 2]); // Update local state
           setCurrentStep(3); // Move to the next step
-          navigate("/hostel-booking");
+          
+          // Show hostel info popup instead of navigating directly
+          setShowHostelInfoPopup(true);
         } else {
           alert("There was an error processing your payment. Please try again.");
         }
@@ -376,10 +393,39 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
       alert("An error occurred while processing your payment. Please check your connection and try again.");
     }
   };
-
   // Add function to mark booking as complete
-  const markBookingComplete = () => {
-    setCompletedSteps(prev => [...prev, 3]); // Mark step 3 as completed
+  const markBookingComplete = async (bookingDetails: BookingInfo) => {
+    try {
+      // Call API to mark booking as completed for this student
+      const response = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/booking`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          completedAt: new Date().toISOString(),
+          bookingDetails: bookingDetails
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setCompletedSteps(prev => [...prev, 3]); // Mark step 3 as completed
+          // Update both local and parent state with booking info
+          setLocalCurrentUserBooking(bookingDetails);
+          setCurrentUserBooking(bookingDetails);
+        } else {
+          alert("There was an error saving your booking. Please try again.");
+        }
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || "Failed to save booking. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Error marking booking as complete:", error);
+      alert("An error occurred while saving your booking. Please check your connection and try again.");
+    }
   };
 
   const validatePhoneNumber = (name: string, value: string) => {
@@ -2097,9 +2143,78 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 </p>
               </div>
             </div>
-          )}
-        </div>
+          )}        </div>
       </div>
+
+      {/* Welcome Popup */}
+      {showWelcomePopup && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <span className="popup-close" onClick={() => setShowWelcomePopup(false)}>×</span>
+            <h2 className="popup-title">Welcome to Hostel Management System!</h2>
+            <p>Complete your hostel booking step-by-step — each step unlocks only after you finish the previous one, and must be followed in order.</p>
+            
+            <div className="popup-steps">
+              <div className="popup-step">
+                <div className="step-number">1</div>
+                <div className="step-content">
+                  <div className="step-title">Submit Student Information Form</div>
+                  <div className="step-description">Fill out all your personal and contact details to help us serve you better.</div>
+                </div>
+              </div>
+              
+              <div className="popup-step">
+                <div className="step-number">2</div>
+                <div className="step-content">
+                  <div className="step-title">Complete Fee Payment</div>
+                  <div className="step-description">Pay your hostel fees securely through our payment portal.</div>
+                </div>
+              </div>
+              
+              <div className="popup-step">
+                <div className="step-number">3</div>
+                <div className="step-content">
+                  <div className="step-title">Book Your Room</div>
+                  <div className="step-description">Select your preferred hostel block, floor, room, and bed.</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="popup-buttons">
+              <button className="popup-button primary" onClick={() => setShowWelcomePopup(false)}>Get Started</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hostel Information Popup */}
+      {showHostelInfoPopup && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <span className="popup-close" onClick={() => setShowHostelInfoPopup(false)}>×</span>
+            <h2 className="popup-title">Available Hostel Blocks</h2>
+            <p>Please review the hostel blocks before proceeding to book your room:</p>
+            
+            <div className="hostel-info-grid">              <div className="hostel-block boys">
+                <h3>Boys Hostel</h3>
+                <p><strong>Blocks:</strong> Phase 1, Phase 1 E-Wing, Phase 2, Phase 2 Part 5, Phase 4A, Phase 4B</p>
+              </div>
+              
+              <div className="hostel-block girls">
+                <h3>Girls Hostel</h3>
+                <p><strong>Blocks:</strong> Phase 3 North Wing, Phase 3 South Wing, Aravali, Himalaya, Ajanta, Shivalik, Vindya, Niligiri, Satpura, Kailash</p>
+              </div>
+            </div>
+            
+            <p><strong>Note:</strong> Please Book Rooms based on your gender. Each room has 2 beds.</p>
+            
+            <div className="popup-buttons">
+              <button className="popup-button secondary" onClick={() => setShowHostelInfoPopup(false)}>Cancel</button>
+              <button className="popup-button primary" onClick={handleContinueToBooking}>Continue to Booking</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* FOOTER */}
       <footer className="footer">

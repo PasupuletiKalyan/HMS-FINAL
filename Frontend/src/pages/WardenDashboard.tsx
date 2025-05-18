@@ -336,13 +336,14 @@ const WardenDashboard: React.FC = () => {
     localStorage.clear();
     navigate("/login");
   };
-
   const suggestions = [
+    // Boys hostels
     { name: "Phase 1", gender: "Boys" },
     { name: "E-wing", gender: "Boys" },
     { name: "Phase 2", gender: "Boys" },
-    { name: "Phase 4", gender: "Boys" },
     { name: "Phase 2- part 5", gender: "Boys" },
+    { name: "Phase 4", gender: "Boys" },
+    // Girls hostels 
     { name: "Dorms", gender: "Girls" },
     { name: "Phase 3-NW", gender: "Girls" },
     { name: "Phase 3-SW", gender: "Girls" },
@@ -351,9 +352,55 @@ const WardenDashboard: React.FC = () => {
   const filteredSuggestions = suggestions.filter((s) =>
     s.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   const getDummyHostelData = () => {
     return [
+      // Boys hostels grouped together (blue)
+      {
+        id: "4",
+        blockName: "Phase 1",
+        totalRooms: 205,
+        occupiedRooms: 200,
+        totalStudents: 400,
+        maintenanceRooms: 3,
+        type: 'Boys' as const
+      },
+      {
+        id: "6",
+        blockName: "E-wing",
+        totalRooms: 60,
+        occupiedRooms: 55,
+        totalStudents: 109,
+        maintenanceRooms: 0,
+        type: 'Boys' as const
+      },
+      {
+        id: "5",
+        blockName: "Phase 2",
+        totalRooms: 621,
+        occupiedRooms: 584,
+        totalStudents: 1168,
+        maintenanceRooms: 5,
+        type: 'Boys' as const
+      },
+      {
+        id: "8",
+        blockName: "Phase 2- part 5",
+        totalRooms: 135,
+        occupiedRooms: 119,
+        totalStudents: 238,
+        maintenanceRooms: 7,
+        type: 'Boys' as const
+      },
+      {
+        id: "7",
+        blockName: "Phase 4",
+        totalRooms: 102,
+        occupiedRooms: 51,
+        totalStudents: 101,
+        maintenanceRooms: 13,
+        type: 'Boys' as const
+      },
+      // Girls hostels grouped together
       {
         id: "1",
         blockName: "Dorms",
@@ -380,51 +427,6 @@ const WardenDashboard: React.FC = () => {
         totalStudents: 376,
         maintenanceRooms: 2,
         type: 'Girls' as const
-      },
-      {
-        id: "4",
-        blockName: "Phase 1",
-        totalRooms: 205,
-        occupiedRooms: 200,
-        totalStudents: 400,
-        maintenanceRooms: 3,
-        type: 'Boys' as const
-      },
-      {
-        id: "5",
-        blockName: "Phase 2",
-        totalRooms: 621,
-        occupiedRooms: 584,
-        totalStudents: 1168,
-        maintenanceRooms: 5,
-        type: 'Boys' as const
-      },
-      {
-        id: "6",
-        blockName: "E-wing",
-        totalRooms: 60,
-        occupiedRooms: 55,
-        totalStudents: 109,
-        maintenanceRooms: 0,
-        type: 'Boys' as const
-      },
-      {
-        id: "7",
-        blockName: "Phase 4",
-        totalRooms: 102,
-        occupiedRooms: 51,
-        totalStudents: 101,
-        maintenanceRooms: 13,
-        type: 'Boys' as const
-      },
-      {
-        id: "8",
-        blockName: "Phase 2- part 5",
-        totalRooms: 135,
-        occupiedRooms: 119,
-        totalStudents: 238,
-        maintenanceRooms: 7,
-        type: 'Boys' as const
       }
     ];
   };
@@ -486,6 +488,11 @@ const WardenDashboard: React.FC = () => {
       });
     }
   }, [selectedSuggestionIndex]);
+  useEffect(() => {
+    // This effect will run whenever occupiedBeds state changes
+    // It ensures that when a bed is booked/unbooked, all views are updated
+    fetchHostelStatistics();
+  }, [occupiedBeds]);
 
   useEffect(() => {
     fetchHostelSummary();
@@ -670,8 +677,7 @@ const WardenDashboard: React.FC = () => {
       
       // Save the application number temporarily for the next booking process
       localStorage.setItem("applicationNo", studentApplicationNumber);
-      
-      // Show success message
+        // Show success message
       alert(`Room successfully allocated to student ${studentApplicationNumber}`);
 
       // Refresh occupied beds from server to make sure UI is in sync
@@ -686,6 +692,9 @@ const WardenDashboard: React.FC = () => {
       } catch (error) {
         console.error('Error refreshing occupied beds:', error);
       }
+      
+      // Update statistics to reflect the new booking across all views
+      fetchHostelStatistics();
 
     } catch (error) {
       console.error('Error allocating room:', error);
@@ -1421,12 +1430,10 @@ const WardenDashboard: React.FC = () => {
       blockName: string;
       floors: FloorData[];
       totals: Omit<FloorData, "floorNumber">;
-    }
-  }
-
+    }  }
   const fetchHostelStatistics = async () => {
     try {
-      // Real API call to get statistics from the backend
+      // First try to fetch real data from the server
       const response = await fetch('http://localhost:5000/api/hostels/statistics/all');
       if (!response.ok) {
         throw new Error('Failed to fetch hostel statistics');
@@ -1435,34 +1442,152 @@ const WardenDashboard: React.FC = () => {
       const data = await response.json();
       
       if (data.success) {
-        // Format the data for our frontend
-        let formattedData;
+        // Process the real data from the server
+        processHostelStatistics(data);
+      } else {
+        console.error('Error in hostel statistics response:', data.message);
+        // Fallback to dummy data if the API fails
+        fallbackToLocalData();
+      }
+    } catch (error) {
+      console.error('Error fetching hostel statistics:', error);
+      // Fallback to dummy data if the API fails
+      fallbackToLocalData();
+    }
+  };
+
+  // Function to process real data from the server
+  const processHostelStatistics = (data: any) => {
+    // Format the data for our frontend
+    let formattedData;
+    
+    if (summaryView === 'summary') {
+      // For all blocks summary, transform to match our frontend format
+      formattedData = data.statistics.allBlocks.map((block: BlockStatistics) => ({
+        id: block.blockName,
+        blockName: block.blockName,
+        totalRooms: block.totalRooms,
+        occupiedRooms: Math.ceil(block.occupiedBeds / 2), // Assuming 2 beds per room
+        totalStudents: block.occupiedBeds,
+        maintenanceRooms: Math.ceil(block.nonStudentBeds / 2), // Assuming 2 beds per room
+        type: block.blockName.includes('Phase 3') || ['Aravali', 'Ajanta', 'Himalaya', 'Shivalik', 'Vindhya', 'Nilgiri', 'Satpura', 'Kailash'].includes(block.blockName) ? 'Girls' as const : 'Boys' as const
+      }));
+      setHostelSummary(formattedData);
+    } 
+    else if (summaryView === 'girls') {
+      // Process girls hostel data
+      const girlsBlocks = data.statistics.girlsHostels as BlockStatistics[];
+      
+      // Process dorms (blocks named Aravali, Ajanta, etc.)
+      const dormBlocks = girlsBlocks.filter((block: BlockStatistics) => 
+        ['Aravali', 'Ajanta', 'Himalaya', 'Shivalik', 'Vindhya', 
+         'Nilgiri', 'Satpura', 'Kailash'].includes(block.blockName)
+      );
+      
+      const dorms = dormBlocks.map((block: BlockStatistics) => ({
+        name: block.blockName,
+        totals: {
+          totalRooms: block.totalRooms,
+          totalBeds: block.totalBeds,
+          warden: 1,
+          staff: 2,
+          hk: 3,
+          guest: 2,
+          others: 1,
+          totalNSBeds: block.nonStudentBeds,
+          studentBedsAvailable: block.studentBedsAvailable,
+          occupiedBeds: block.occupiedBeds,
+          emptyBeds: block.studentBedsAvailable - block.occupiedBeds
+        }
+      }));
+      
+      // Process Phase 3 blocks
+      const phase3Blocks = girlsBlocks.filter((block: BlockStatistics) => 
+        block.blockName.startsWith('Phase 3')
+      ).map((block: BlockStatistics) => {
+        // Extract floor data
+        const floors = Object.entries(block.floors).map(([floorName, floorData]) => ({
+          floorNumber: floorName,
+          totalRooms: floorData.totalRooms,
+          totalBeds: floorData.totalBeds,
+          warden: 1,
+          staff: 1,
+          hk: 1,
+          guest: 1,
+          others: 0,
+          totalNSBeds: floorData.totalBeds - floorData.studentBedsAvailable,
+          studentBedsAvailable: floorData.studentBedsAvailable,
+          occupiedBeds: floorData.occupiedBeds,
+          emptyBeds: floorData.studentBedsAvailable - floorData.occupiedBeds
+        }));
         
-        if (summaryView === 'summary') {
-          // For all blocks summary, transform to match our frontend format
-          formattedData = data.statistics.allBlocks.map((block: BlockStatistics) => ({
-            id: block.blockName,
-            blockName: block.blockName,
+        return {
+          blockName: block.blockName,
+          floors: floors,
+          totals: {
             totalRooms: block.totalRooms,
-            occupiedRooms: Math.ceil(block.occupiedBeds / 2), // Assuming 2 beds per room
-            totalStudents: block.occupiedBeds,
-            maintenanceRooms: Math.ceil(block.nonStudentBeds / 2), // Assuming 2 beds per room
-            type: block.blockName.includes('Phase 3') || ['Aravali', 'Ajanta', 'Himalaya', 'Shivalik', 'Vindhya', 'Nilgiri', 'Satpura', 'Kailash'].includes(block.blockName) ? 'Girls' as const : 'Boys' as const
+            totalBeds: block.totalBeds,
+            warden: 1,
+            staff: 2,
+            hk: 3,
+            guest: 2,
+            others: 1,
+            totalNSBeds: block.nonStudentBeds,
+            studentBedsAvailable: block.studentBedsAvailable,
+            occupiedBeds: block.occupiedBeds,
+            emptyBeds: block.studentBedsAvailable - block.occupiedBeds
+          }
+        };
+      });
+      
+      setGirlsHostelData({ 
+        dorms: dorms.length > 0 ? dorms : initialGirlsHostelData.dorms,
+        phase3Blocks: phase3Blocks.length > 0 ? phase3Blocks : initialGirlsHostelData.phase3Blocks
+      });
+    } 
+    else if (summaryView === 'boys') {
+      // Process boys hostel data
+      const boysBlocks = data.statistics.boysHostels as BlockStatistics[];
+      
+      // Create new boys hostel data object
+      const newBoysHostelData = { ...initialBoysHostelData } as BoysHostelData;
+      
+      // Update each block with its real data
+      boysBlocks.forEach((block: BlockStatistics) => {
+        let targetBlock = '';
+        
+        if (block.blockName === 'Phase 1') {
+          targetBlock = 'phase1';
+        } else if (block.blockName === 'E-wing') {
+          targetBlock = 'eWing';
+        } else if (block.blockName === 'Phase 2') {
+          targetBlock = 'phase2';
+        } else if (block.blockName === 'Phase 2- part 5') {
+          targetBlock = 'phase2Part5';
+        } else if (block.blockName === 'Phase 4') {
+          targetBlock = 'phase4';
+        }
+        
+        if (targetBlock && newBoysHostelData[targetBlock]) {
+          // Extract floor data
+          const floors = Object.entries(block.floors).map(([floorName, floorData]) => ({
+            floorNumber: floorName,
+            totalRooms: floorData.totalRooms,
+            totalBeds: floorData.totalBeds,
+            warden: 1,
+            staff: 1,
+            hk: 1,
+            guest: 1,
+            others: 0,
+            totalNSBeds: floorData.totalBeds - floorData.studentBedsAvailable,
+            studentBedsAvailable: floorData.studentBedsAvailable,
+            occupiedBeds: floorData.occupiedBeds,
+            emptyBeds: floorData.studentBedsAvailable - floorData.occupiedBeds
           }));
-          setHostelSummary(formattedData);
-        } 
-        else if (summaryView === 'girls') {
-          // Process girls hostel data
-          const girlsBlocks = data.statistics.girlsHostels as BlockStatistics[];
           
-          // Process dorms (blocks named Aravali, Ajanta, etc.)
-          const dormBlocks = girlsBlocks.filter((block: BlockStatistics) => 
-            ['Aravali', 'Ajanta', 'Himalaya', 'Shivalik', 'Vindhya', 
-             'Nilgiri', 'Satpura', 'Kailash'].includes(block.blockName)
-          );
-          
-          const dorms = dormBlocks.map((block: BlockStatistics) => ({
-            name: block.blockName,
+          newBoysHostelData[targetBlock] = {
+            blockName: block.blockName,
+            floors: floors.length > 0 ? floors : initialBoysHostelData[targetBlock as keyof typeof initialBoysHostelData].floors,
             totals: {
               totalRooms: block.totalRooms,
               totalBeds: block.totalBeds,
@@ -1476,123 +1601,22 @@ const WardenDashboard: React.FC = () => {
               occupiedBeds: block.occupiedBeds,
               emptyBeds: block.studentBedsAvailable - block.occupiedBeds
             }
-          }));
-          
-          // Process Phase 3 blocks
-          const phase3Blocks = girlsBlocks.filter((block: BlockStatistics) => 
-            block.blockName.startsWith('Phase 3')
-          ).map((block: BlockStatistics) => {
-            // Extract floor data
-            const floors = Object.entries(block.floors).map(([floorName, floorData]) => ({
-              floorNumber: floorName,
-              totalRooms: floorData.totalRooms,
-              totalBeds: floorData.totalBeds,
-              warden: 1,
-              staff: 1,
-              hk: 1,
-              guest: 1,
-              others: 0,
-              totalNSBeds: floorData.totalBeds - floorData.studentBedsAvailable,
-              studentBedsAvailable: floorData.studentBedsAvailable,
-              occupiedBeds: floorData.occupiedBeds,
-              emptyBeds: floorData.studentBedsAvailable - floorData.occupiedBeds
-            }));
-            
-            return {
-              blockName: block.blockName,
-              floors: floors,
-              totals: {
-                totalRooms: block.totalRooms,
-                totalBeds: block.totalBeds,
-                warden: 1,
-                staff: 2,
-                hk: 3,
-                guest: 2,
-                others: 1,
-                totalNSBeds: block.nonStudentBeds,
-                studentBedsAvailable: block.studentBedsAvailable,
-                occupiedBeds: block.occupiedBeds,
-                emptyBeds: block.studentBedsAvailable - block.occupiedBeds
-              }
-            };
-          });
-          
-          setGirlsHostelData({ 
-            dorms: dorms.length > 0 ? dorms : initialGirlsHostelData.dorms,
-            phase3Blocks: phase3Blocks.length > 0 ? phase3Blocks : initialGirlsHostelData.phase3Blocks
-          });
-        } 
-        else if (summaryView === 'boys') {
-          // Process boys hostel data
-          const boysBlocks = data.statistics.boysHostels as BlockStatistics[];
-          
-          // Create new boys hostel data object
-          const newBoysHostelData = { ...initialBoysHostelData } as BoysHostelData;
-          
-          // Update each block with its real data
-          boysBlocks.forEach((block: BlockStatistics) => {
-            let targetBlock = '';
-            
-            if (block.blockName === 'Phase 1') {
-              targetBlock = 'phase1';
-            } else if (block.blockName === 'E-wing') {
-              targetBlock = 'eWing';
-            } else if (block.blockName === 'Phase 2') {
-              targetBlock = 'phase2';
-            } else if (block.blockName === 'Phase 2- part 5') {
-              targetBlock = 'phase2Part5';
-            } else if (block.blockName === 'Phase 4') {
-              targetBlock = 'phase4';
-            }
-            
-            if (targetBlock && newBoysHostelData[targetBlock]) {
-              // Extract floor data
-              const floors = Object.entries(block.floors).map(([floorName, floorData]) => ({
-                floorNumber: floorName,
-                totalRooms: floorData.totalRooms,
-                totalBeds: floorData.totalBeds,
-                warden: 1,
-                staff: 1,
-                hk: 1,
-                guest: 1,
-                others: 0,
-                totalNSBeds: floorData.totalBeds - floorData.studentBedsAvailable,
-                studentBedsAvailable: floorData.studentBedsAvailable,
-                occupiedBeds: floorData.occupiedBeds,
-                emptyBeds: floorData.studentBedsAvailable - floorData.occupiedBeds
-              }));
-              
-              newBoysHostelData[targetBlock] = {
-                blockName: block.blockName,
-                floors: floors.length > 0 ? floors : initialBoysHostelData[targetBlock as keyof typeof initialBoysHostelData].floors,
-                totals: {
-                  totalRooms: block.totalRooms,
-                  totalBeds: block.totalBeds,
-                  warden: 1,
-                  staff: 2,
-                  hk: 3,
-                  guest: 2,
-                  others: 1,
-                  totalNSBeds: block.nonStudentBeds,
-                  studentBedsAvailable: block.studentBedsAvailable,
-                  occupiedBeds: block.occupiedBeds,
-                  emptyBeds: block.studentBedsAvailable - block.occupiedBeds
-                }
-              };
-            }
-          });
-          
-          setBoysHostelData(newBoysHostelData as typeof initialBoysHostelData);
+          };
         }
-      } else {
-        console.error('Error in hostel statistics response:', data.message);
-        // Fallback to dummy data if the API fails
-        fetchHostelSummary();
-      }
-    } catch (error) {
-      console.error('Error fetching hostel statistics:', error);
-      // Fallback to dummy data if the API fails
-      fetchHostelSummary();
+      });
+      
+      setBoysHostelData(newBoysHostelData as typeof initialBoysHostelData);
+    }
+  };
+
+  // Fallback to local dummy data when API fails
+  const fallbackToLocalData = () => {
+    // For summary view, use the dummy data with the appropriate filtering
+    if (summaryView === 'summary') {
+      setHostelSummary(getDummyHostelData());
+    } else if (summaryView === 'girls') {
+      setHostelSummary(getDummyHostelData().filter(hostel => hostel.type === 'Girls'));    } else if (summaryView === 'boys') {
+      setHostelSummary(getDummyHostelData().filter(hostel => hostel.type === 'Boys'));
     }
   };
 
@@ -1609,9 +1633,8 @@ const WardenDashboard: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error("Error fetching profile photo:", error);
-    }
-  };
+      console.error('Error fetching profile photo:', error);
+    }  };
 
   // Handle profile photo updates
   const handleProfilePhotoUpdate = (photoUrl: string) => {
@@ -1712,36 +1735,48 @@ const WardenDashboard: React.FC = () => {
         <h1>{selectedMenu}</h1>
         {selectedMenu === "Overview" && renderOverviewContent()}
         {selectedMenu === "Room Allotment" && renderRoomAllotmentContent()}
-        {selectedMenu === "Student Search" && (
-          <div className="student-search-container">
+        {selectedMenu === "Student Search" && (          <div className="student-search-container">
             <div className="search-box" style={{
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              maxWidth: '600px',
+              maxWidth: '700px',
               margin: '0 auto 30px',
-              height: '45px'
+              height: '50px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px',
+              padding: '5px',
+              backgroundColor: '#fff'
             }}>
               <input
                 type="text"
-                placeholder="Enter Student Application Number"
+                placeholder="Enter Student Application/Admission Number"
                 value={studentSearchQuery}
                 onChange={(e) => setStudentSearchQuery(e.target.value)}
                 className="search-input"
                 style={{
-                  width: '70%',
-                  padding: '12px',
-                  borderRadius: '4px 0 0 4px',
-                  border: '1px solid #ccc',
+                  width: '75%',
+                  padding: '12px 15px',
+                  borderRadius: '6px 0 0 6px',
+                  border: '1px solid #e0e0e0',
                   fontSize: '16px',
                   height: '100%',
                   boxSizing: 'border-box',
-                  margin: 0
+                  margin: 0,
+                  outline: 'none',
+                  transition: 'border-color 0.3s ease',
+                  fontFamily: 'inherit'
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     searchStudent();
                   }
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#c23535';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e0e0e0';
                 }}
               />
               <button 
@@ -1749,63 +1784,209 @@ const WardenDashboard: React.FC = () => {
                 className="search-button"
                 disabled={isLoadingStudent}
                 style={{
-                  width: '30%',
-                  padding: '12px',
+                  width: '25%',
+                  padding: '12px 15px',
                   backgroundColor: '#c23535',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '0 4px 4px 0',
+                  borderRadius: '0 6px 6px 0',
                   cursor: 'pointer',
                   fontSize: '16px',
                   height: '100%',
                   boxSizing: 'border-box',
-                  margin: 0
+                  margin: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  transition: 'background-color 0.3s ease',
+                  fontWeight: '500'
                 }}
               >
-                {isLoadingStudent ? 'Searching...' : 'Search'}
+                {isLoadingStudent ? (
+                  <>
+                    <span className="loading-spinner" style={{
+                      display: 'inline-block',
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid rgba(255,255,255,0.3)',
+                      borderRadius: '50%',
+                      borderTopColor: '#fff',
+                      animation: 'spin 1s linear infinite'
+                    }}></span>
+                    Searching...
+                  </>
+                ) : (
+                  <>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M21 21L16.65 16.65" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Search
+                  </>
+                )}
               </button>
             </div>
             
-            {studentDetails && (
-              <div className="student-details-container">
-                <div className="student-header">
-                  <h2>Student Details</h2>
-                  <div className="completion-status">
-                    <div className={`status-item ${studentDetails.progress.formCompleted ? 'completed' : 'pending'}`}>
-                      <span className="status-label">Form</span>
-                      <span className="status-icon">{studentDetails.progress.formCompleted ? '✓' : '✗'}</span>
+            <style>
+              {`
+                @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                }
+                .search-button:hover {
+                  background-color: #a52020 !important;
+                }
+              `}
+            </style>
+              {studentDetails && (
+              <div className="student-details-container" style={{
+                backgroundColor: '#ffffff',
+                borderRadius: '12px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                overflow: 'hidden',
+                maxWidth: '1000px',
+                margin: '0 auto',
+                border: '1px solid #e0e0e0'
+              }}>
+                {/* Student Progress Header */}
+                <div className="student-header" style={{
+                  backgroundColor: '#f5f5f5',
+                  padding: '18px 25px',
+                  borderBottom: '1px solid #e0e0e0',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '20px'
+                }}>
+                  <h2 style={{
+                    margin: 0,
+                    fontSize: '22px',
+                    color: '#333',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px'
+                  }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M16 3.13C16.8604 3.3503 17.623 3.8507 18.1676 4.55231C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89317 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Student Details
+                  </h2>
+                  
+                  <div className="completion-status" style={{
+                    display: 'flex',
+                    gap: '15px'
+                  }}>
+                    <div className={`status-item ${studentDetails.progress.formCompleted ? 'completed' : 'pending'}`} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '8px 16px',
+                      borderRadius: '30px',
+                      backgroundColor: studentDetails.progress.formCompleted ? '#e8f5e9' : '#fff3e0',
+                      border: `1px solid ${studentDetails.progress.formCompleted ? '#a5d6a7' : '#ffcc80'}`,
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}>
+                      <span className="status-icon" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        backgroundColor: studentDetails.progress.formCompleted ? '#4caf50' : '#ff9800',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}>
+                        {studentDetails.progress.formCompleted ? '✓' : '!'}
+                      </span>
+                      <span>Form</span>
                     </div>
-                    <div className={`status-item ${studentDetails.progress.paymentCompleted ? 'completed' : 'pending'}`}>
-                      <span className="status-label">Payment</span>
-                      <span className="status-icon">{studentDetails.progress.paymentCompleted ? '✓' : '✗'}</span>
+                    
+                    <div className={`status-item ${studentDetails.progress.paymentCompleted ? 'completed' : 'pending'}`} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '8px 16px',
+                      borderRadius: '30px',
+                      backgroundColor: studentDetails.progress.paymentCompleted ? '#e8f5e9' : '#fff3e0',
+                      border: `1px solid ${studentDetails.progress.paymentCompleted ? '#a5d6a7' : '#ffcc80'}`,
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}>
+                      <span className="status-icon" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        backgroundColor: studentDetails.progress.paymentCompleted ? '#4caf50' : '#ff9800',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}>
+                        {studentDetails.progress.paymentCompleted ? '✓' : '!'}
+                      </span>
+                      <span>Payment</span>
                     </div>
-                    <div className={`status-item ${studentDetails.progress.roomBooked ? 'completed' : 'pending'}`}>
-                      <span className="status-label">Room Booking</span>
-                      <span className="status-icon">{studentDetails.progress.roomBooked ? '✓' : '✗'}</span>
+                    
+                    <div className={`status-item ${studentDetails.progress.roomBooked ? 'completed' : 'pending'}`} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '8px 16px',
+                      borderRadius: '30px',
+                      backgroundColor: studentDetails.progress.roomBooked ? '#e8f5e9' : '#fff3e0',
+                      border: `1px solid ${studentDetails.progress.roomBooked ? '#a5d6a7' : '#ffcc80'}`,
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}>
+                      <span className="status-icon" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        backgroundColor: studentDetails.progress.roomBooked ? '#4caf50' : '#ff9800',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}>
+                        {studentDetails.progress.roomBooked ? '✓' : '!'}
+                      </span>
+                      <span>Room</span>
                     </div>
                   </div>
                 </div>
-                
-                {/* Student photo and basic info section - Streamlined, side-by-side layout */}
-                <div className="student-profile-section" style={{
+                  {/* Student profile card */}
+                <div className="student-profile-card" style={{
                   display: 'flex',
-                  flexDirection: 'column',
-                  gap: '15px',
-                  marginBottom: '20px',
-                  padding: '20px',
-                  backgroundColor: '#f9f9f9',
-                  borderRadius: '8px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  padding: '25px',
+                  borderBottom: '1px solid #e0e0e0',
+                  backgroundColor: '#ffffff'
                 }}>
-                  <div style={{display: 'flex', alignItems: 'flex-start', gap: '20px'}}>
-                    {/* Profile Photo */}
+                  {/* Left side - Photo and ID badge */}
+                  <div className="profile-photo-section" style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    minWidth: '200px',
+                    marginRight: '30px'
+                  }}>
                     <div className="profile-photo-container" style={{
-                      width: '150px',
-                      height: '150px',
-                      borderRadius: '50%',
+                      width: '160px',
+                      height: '160px',
+                      borderRadius: '12px',
                       overflow: 'hidden',
-                      border: '3px solid #c23535',
-                      flexShrink: 0
+                      boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                      border: '3px solid #ffffff',
+                      position: 'relative'
                     }}>
                       {studentDetails.profilePhoto ? (
                         <img
@@ -1821,181 +2002,702 @@ const WardenDashboard: React.FC = () => {
                         <div style={{
                           width: '100%',
                           height: '100%',
-                          backgroundColor: '#e0e0e0',
+                          backgroundColor: '#f5f5f5',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '40px',
-                          color: '#666'
+                          justifyContent: 'center'
                         }}>
-                          {studentDetails.formData?.student_name ? 
-                            studentDetails.formData.student_name.charAt(0).toUpperCase() :
-                            '?'}
+                          <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
                         </div>
                       )}
                     </div>
-
-                    {/* Primary student info - Name and Application Number */}
-                    <div style={{flex: 1}}>
-                      <h2 style={{margin: '0 0 10px 0', color: '#333', fontSize: '24px', fontWeight: 'bold'}}>
+                    
+                    <div className="id-badge" style={{
+                      marginTop: '15px',
+                      textAlign: 'center',
+                      padding: '10px 20px',
+                      backgroundColor: '#f8f8f8',
+                      borderRadius: '6px',
+                      border: '1px solid #e0e0e0',
+                      width: '100%'
+                    }}>
+                      <div style={{fontSize: '13px', color: '#666', marginBottom: '3px'}}>Application Number</div>
+                      <div style={{
+                        fontSize: '16px', 
+                        fontWeight: 'bold', 
+                        color: '#333',
+                        wordBreak: 'break-word'
+                      }}>
+                        {studentDetails.formData?.applicationNo || studentDetails.formData?.admission_no || studentSearchQuery}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Right side - Student details */}
+                  <div className="student-details-content" style={{flex: 1}}>
+                    <div className="student-name-section" style={{marginBottom: '20px'}}>
+                      <h2 style={{
+                        margin: '0 0 8px 0', 
+                        fontSize: '26px', 
+                        fontWeight: '600',
+                        color: '#222'
+                      }}>
                         {studentDetails.formData?.student_name || 'Student Name'}
                       </h2>
-                      
-                      <div style={{
-                        padding: '8px 12px',
-                        backgroundColor: '#f0f0f0',
-                        borderRadius: '4px',
-                        marginBottom: '10px'
-                      }}>
-                        <strong>Application Number:</strong> {studentDetails.formData?.applicationNo || studentDetails.formData?.admission_no || studentSearchQuery}
+                      <div style={{display: 'flex', gap: '15px', flexWrap: 'wrap'}}>
+                        {studentDetails.formData?.programme && (
+                          <div style={{
+                            padding: '6px 12px',
+                            backgroundColor: '#e3f2fd',
+                            borderRadius: '30px',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                            color: '#1565c0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M22 10V6C22 4.89543 21.1046 4 20 4H4C2.89543 4 2 4.89543 2 6V10M22 10V18C22 19.1046 21.1046 20 20 20H4C2.89543 20 2 19.1046 2 18V10M22 10H2M8 15H16" stroke="#1565c0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            {studentDetails.formData?.programme}
+                          </div>
+                        )}
+                        
+                        {studentDetails.formData?.batch && (
+                          <div style={{
+                            padding: '6px 12px',
+                            backgroundColor: '#f3e5f5',
+                            borderRadius: '30px',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                            color: '#7b1fa2',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M19 4H5C3.89543 4 3 4.89543 3 6V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V6C21 4.89543 20.1046 4 19 4Z" stroke="#7b1fa2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M16 2V6" stroke="#7b1fa2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M8 2V6" stroke="#7b1fa2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M3 10H21" stroke="#7b1fa2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            {studentDetails.formData?.batch}
+                          </div>
+                        )}
+                        
+                        {studentDetails.formData?.school && (
+                          <div style={{
+                            padding: '6px 12px',
+                            backgroundColor: '#e8f5e9',
+                            borderRadius: '30px',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                            color: '#2e7d32',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#2e7d32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M2 17L12 22L22 17" stroke="#2e7d32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M2 12L12 17L22 12" stroke="#2e7d32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            {studentDetails.formData?.school}
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
-                  
-                  {/* Essential contact information in a row */}
-                  <div style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '15px',
-                    justifyContent: 'space-between'
-                  }}>
-                    {/* Student Mobile */}
-                    <div style={{
-                      flex: '1 0 30%',
-                      minWidth: '200px',
-                      padding: '15px',
-                      backgroundColor: '#e8f4fd',
-                      borderRadius: '8px',
-                      border: '1px solid #bbdefb'
-                    }}>
-                      <h4 style={{margin: '0 0 8px 0', color: '#1976d2'}}>Student Mobile</h4>
-                      <p style={{margin: 0, fontSize: '16px', fontWeight: 'bold'}}>{studentDetails.formData?.student_mobile || 'Not provided'}</p>
-                    </div>
                     
-                    {/* Father Details */}
+                    {/* Contact information cards */}
                     <div style={{
-                      flex: '1 0 30%',
-                      minWidth: '200px',
-                      padding: '15px',
-                      backgroundColor: '#e8f5e9',
-                      borderRadius: '8px',
-                      border: '1px solid #c8e6c9'
-                    }}>
-                      <h4 style={{margin: '0 0 8px 0', color: '#2e7d32'}}>Father Details</h4>
-                      <p style={{margin: 0, fontSize: '16px'}}>
-                        <strong>{studentDetails.formData?.father_name || 'Not provided'}</strong><br />
-                        {studentDetails.formData?.father_mobile || 'Contact not provided'}
-                      </p>
-                    </div>
-                    
-                    {/* Emergency Contact */}
-                    <div style={{
-                      flex: '1 0 30%',
-                      minWidth: '200px',
-                      padding: '15px',
-                      backgroundColor: '#fff3e0',
-                      borderRadius: '8px',
-                      border: '1px solid #ffe0b2'
-                    }}>
-                      <h4 style={{margin: '0 0 8px 0', color: '#e65100'}}>Emergency Contact</h4>
-                      <p style={{margin: 0, fontSize: '16px', fontWeight: 'bold'}}>{studentDetails.formData?.emergency_contact || 'Not provided'}</p>
-                    </div>
-                  </div>
-                  
-                  {/* Room booking details */}
-                  <div style={{
-                    padding: '15px',
-                    backgroundColor: studentDetails.bookingDetails ? '#e8f5e9' : '#fff3e0',
-                    borderRadius: '8px',
-                    border: `1px solid ${studentDetails.bookingDetails ? '#c8e6c9' : '#ffe0b2'}`,
-                    marginTop: '5px'
-                  }}>
-                    <h4 style={{
-                      margin: '0 0 10px 0', 
-                      color: studentDetails.bookingDetails ? '#2e7d32' : '#e65100',
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
+                      flexWrap: 'wrap',
+                      gap: '15px',
+                      marginBottom: '20px'
                     }}>
-                      <span>{studentDetails.bookingDetails ? '🏠' : '⚠️'}</span>
-                      Room Details
-                    </h4>
-                    
-                    {studentDetails.bookingDetails ? (
-                      <div style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: '20px'
+                      {/* Student Contact */}
+                      <div className="contact-card" style={{
+                        flex: '1 0 calc(33.33% - 15px)',
+                        minWidth: '250px',
+                        backgroundColor: '#f9fafc',
+                        borderRadius: '8px',
+                        border: '1px solid #e0e0e0',
+                        padding: '15px',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
                       }}>
-                        <div style={{flex: '1 0 20%', minWidth: '150px'}}>
-                          <strong style={{fontSize: '14px', color: '#555'}}>Block</strong>
-                          <p style={{margin: '4px 0 0 0', fontSize: '18px', fontWeight: 'bold'}}>{studentDetails.bookingDetails.block}</p>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          marginBottom: '10px'
+                        }}>
+                          <div style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            backgroundColor: '#e8f4fd',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M22 16.92V19.92C22 20.4704 21.7893 20.9996 21.4142 21.3746C21.0391 21.7497 20.5099 21.9604 19.96 21.96C16.4289 21.6533 13.0343 20.3971 10.07 18.32C7.31353 16.4208 5.06218 13.9658 3.5 11C1.42 7.93 0.170038 4.41 0 0.75C-0.000331979 0.204195 0.208058 -0.320209 0.58026 -0.692573C0.952462 -1.06494 1.47989 -1.27311 2.026 -1.27H5.026C5.90343 -1.28437 6.68872 -0.648376 6.9 0.2C7.06261 1.02008 7.3163 1.82546 7.66 2.6C7.91734 3.16497 7.8793 3.81326 7.554 4.347L6.554 5.96C7.97472 8.97284 10.4772 11.4753 13.49 12.898L15.103 11.898C15.6367 11.5727 16.285 11.5347 16.85 11.792C17.6245 12.1357 18.4299 12.3894 19.25 12.552C20.1251 12.7676 20.7735 13.5823 20.75 14.482L22 16.92Z" stroke="#1976d2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </div>
+                          <div>
+                            <div style={{fontSize: '15px', fontWeight: '600', color: '#333'}}>Student Contact</div>
+                          </div>
                         </div>
-                        <div style={{flex: '1 0 20%', minWidth: '150px'}}>
-                          <strong style={{fontSize: '14px', color: '#555'}}>Floor</strong>
-                          <p style={{margin: '4px 0 0 0', fontSize: '18px', fontWeight: 'bold'}}>{studentDetails.bookingDetails.floor}</p>
-                        </div>
-                        <div style={{flex: '1 0 20%', minWidth: '150px'}}>
-                          <strong style={{fontSize: '14px', color: '#555'}}>Room Number</strong>
-                          <p style={{margin: '4px 0 0 0', fontSize: '18px', fontWeight: 'bold'}}>{studentDetails.bookingDetails.roomNumber}</p>
-                        </div>
-                        <div style={{flex: '1 0 20%', minWidth: '150px'}}>
-                          <strong style={{fontSize: '14px', color: '#555'}}>Bed</strong>
-                          <p style={{margin: '4px 0 0 0', fontSize: '18px', fontWeight: 'bold'}}>{studentDetails.bookingDetails.bed}</p>
+                        <div style={{
+                          display: 'flex', 
+                          flexDirection: 'column',
+                          gap: '5px'
+                        }}>
+                          <div style={{display: 'flex', alignItems: 'center'}}>
+                            <span style={{flex: '0 0 80px', fontSize: '14px', color: '#666'}}>Mobile:</span>
+                            <span style={{fontSize: '14px', fontWeight: '500', color: '#333'}}>
+                              {studentDetails.formData?.student_mobile || 'Not provided'}
+                            </span>
+                          </div>
+                          <div style={{display: 'flex', alignItems: 'center'}}>
+                            <span style={{flex: '0 0 80px', fontSize: '14px', color: '#666'}}>Email:</span>
+                            <span style={{fontSize: '14px', fontWeight: '500', color: '#333', wordBreak: 'break-word'}}>
+                              {studentDetails.formData?.student_email || 'Not provided'}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    ) : (
-                      <p style={{margin: '0', fontSize: '16px'}}>
-                        <strong>No room booking found.</strong> This student has not been assigned a room yet.
-                      </p>
-                    )}
+                      
+                      {/* Parent Contact */}
+                      <div className="contact-card" style={{
+                        flex: '1 0 calc(33.33% - 15px)',
+                        minWidth: '250px',
+                        backgroundColor: '#f9fafc',
+                        borderRadius: '8px',
+                        border: '1px solid #e0e0e0',
+                        padding: '15px',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          marginBottom: '10px'
+                        }}>
+                          <div style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            backgroundColor: '#e8f5e9',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="#2e7d32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="#2e7d32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </div>
+                          <div>
+                            <div style={{fontSize: '15px', fontWeight: '600', color: '#333'}}>Parent Information</div>
+                          </div>
+                        </div>
+                        <div style={{
+                          display: 'flex', 
+                          flexDirection: 'column',
+                          gap: '5px'
+                        }}>
+                          <div style={{display: 'flex', alignItems: 'center'}}>
+                            <span style={{flex: '0 0 80px', fontSize: '14px', color: '#666'}}>Father:</span>
+                            <span style={{fontSize: '14px', fontWeight: '500', color: '#333'}}>
+                              {studentDetails.formData?.father_name || 'Not provided'}
+                            </span>
+                          </div>
+                          <div style={{display: 'flex', alignItems: 'center'}}>
+                            <span style={{flex: '0 0 80px', fontSize: '14px', color: '#666'}}>Contact:</span>
+                            <span style={{fontSize: '14px', fontWeight: '500', color: '#333'}}>
+                              {studentDetails.formData?.father_mobile || 'Not provided'}
+                            </span>
+                          </div>
+                          {studentDetails.formData?.mother_name && (
+                            <div style={{display: 'flex', alignItems: 'center'}}>
+                              <span style={{flex: '0 0 80px', fontSize: '14px', color: '#666'}}>Mother:</span>
+                              <span style={{fontSize: '14px', fontWeight: '500', color: '#333'}}>
+                                {studentDetails.formData?.mother_name}
+                              </span>
+                            </div>
+                          )}
+                          {studentDetails.formData?.mother_mobile && (
+                            <div style={{display: 'flex', alignItems: 'center'}}>
+                              <span style={{flex: '0 0 80px', fontSize: '14px', color: '#666'}}>Contact:</span>
+                              <span style={{fontSize: '14px', fontWeight: '500', color: '#333'}}>
+                                {studentDetails.formData?.mother_mobile}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Emergency Contact */}
+                      <div className="contact-card" style={{
+                        flex: '1 0 calc(33.33% - 15px)',
+                        minWidth: '250px',
+                        backgroundColor: '#f9fafc',
+                        borderRadius: '8px',
+                        border: '1px solid #e0e0e0',
+                        padding: '15px',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          marginBottom: '10px'
+                        }}>
+                          <div style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            backgroundColor: '#fff3e0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M10.29 3.86L1.82 18C1.64537 18.3024 1.55296 18.6453 1.55198 18.9945C1.551 19.3437 1.64149 19.6871 1.81442 19.9905C1.98736 20.2939 2.23672 20.5467 2.53773 20.7239C2.83875 20.901 3.18058 20.9962 3.53 21H20.47C20.8194 20.9962 21.1613 20.901 21.4623 20.7239C21.7633 20.5467 22.0126 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3546 18.3024 22.18 18L13.71 3.86C13.5317 3.56611 13.2807 3.32312 12.9812 3.15448C12.6817 2.98585 12.3437 2.89725 12 2.89725C11.6563 2.89725 11.3183 2.98585 11.0188 3.15448C10.7193 3.32312 10.4683 3.56611 10.29 3.86Z" stroke="#e65100" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M12 9V13" stroke="#e65100" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M12 17H12.01" stroke="#e65100" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </div>
+                          <div>
+                            <div style={{fontSize: '15px', fontWeight: '600', color: '#333'}}>Emergency Contact</div>
+                          </div>
+                        </div>
+                        <div style={{
+                          display: 'flex', 
+                          flexDirection: 'column',
+                          gap: '5px'
+                        }}>
+                          <div style={{display: 'flex', alignItems: 'center'}}>
+                            <span style={{flex: '0 0 80px', fontSize: '14px', color: '#666'}}>Contact:</span>
+                            <span style={{fontSize: '14px', fontWeight: '500', color: '#333'}}>
+                              {studentDetails.formData?.emergency_contact || 'Not provided'}
+                            </span>
+                          </div>
+                          {studentDetails.formData?.local_guardian && (
+                            <div style={{display: 'flex', alignItems: 'center'}}>
+                              <span style={{flex: '0 0 80px', fontSize: '14px', color: '#666'}}>Guardian:</span>
+                              <span style={{fontSize: '14px', fontWeight: '500', color: '#333'}}>
+                                {studentDetails.formData?.local_guardian}
+                              </span>
+                            </div>
+                          )}
+                          {studentDetails.formData?.blood_group && (
+                            <div style={{display: 'flex', alignItems: 'center'}}>
+                              <span style={{flex: '0 0 80px', fontSize: '14px', color: '#666'}}>Blood:</span>
+                              <span style={{fontSize: '14px', fontWeight: '500', color: '#333'}}>
+                                {studentDetails.formData?.blood_group}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="document-verification">
-                  <h3>Document Verification</h3>
-                  <div className="verification-form">
-                    <div className="verification-item">
-                      <input
-                        type="checkbox"
-                        id="anti-ragging"
-                        checked={documentVerification.antiRagging}
-                        onChange={(e) => setDocumentVerification(prev => ({...prev, antiRagging: e.target.checked}))}
-                      />
-                      <label htmlFor="anti-ragging">Anti-Ragging Declaration Received</label>
+                  {/* Room booking card */}
+                <div className="room-booking-card" style={{
+                  padding: '25px',
+                  backgroundColor: '#ffffff',
+                  borderBottom: '1px solid #e0e0e0'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    marginBottom: '15px'
+                  }}>
+                    <div style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      backgroundColor: studentDetails.bookingDetails ? '#e8f5e9' : '#fff3e0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      {studentDetails.bookingDetails ? (
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#2e7d32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M9 22V12H15V22" stroke="#2e7d32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      ) : (
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z" fill="#e65100"/>
+                        </svg>
+                      )}
                     </div>
-                    <div className="verification-item">
-                      <input
-                        type="checkbox"
-                        id="anti-drug"
-                        checked={documentVerification.antiDrug}
-                        onChange={(e) => setDocumentVerification(prev => ({...prev, antiDrug: e.target.checked}))}
-                      />
-                      <label htmlFor="anti-drug">Anti-Drug Declaration Received</label>
+                    <h3 style={{
+                      margin: 0,
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      color: studentDetails.bookingDetails ? '#2e7d32' : '#e65100'
+                    }}>
+                      Room Allocation
+                    </h3>
+                  </div>                    {studentDetails.bookingDetails ? (
+                    <div className="room-details-container" style={{
+                      backgroundColor: '#f9fafc',
+                      borderRadius: '8px',
+                      padding: '20px',
+                      border: '1px solid #e0e0e0'
+                    }}>
+                      <h3 style={{
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        color: '#333',
+                        marginBottom: '15px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M9 22V12H15V22" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Room Allocation Details
+                      </h3>
+                        <div className="table-responsive" style={{ overflowX: 'auto' }}>
+                        <table style={{
+                          width: '100%',
+                          borderCollapse: 'collapse',
+                          marginTop: '10px',
+                          fontSize: '14px',
+                          borderSpacing: 0,
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                          border: '1px solid #d0e8f2',
+                          borderRadius: '8px',
+                          overflow: 'hidden'
+                        }}>
+                          <thead>
+                            <tr style={{
+                              backgroundColor: '#1976d2',
+                            }}>
+                              <th style={{
+                                padding: '14px 16px',
+                                textAlign: 'left',
+                                fontWeight: '600',
+                                color: 'white',
+                                borderRight: '1px solid rgba(255,255,255,0.2)'
+                              }}>Block</th>
+                              <th style={{
+                                padding: '14px 16px',
+                                textAlign: 'left',
+                                fontWeight: '600',
+                                color: 'white',
+                                borderRight: '1px solid rgba(255,255,255,0.2)'
+                              }}>Floor</th>
+                              <th style={{
+                                padding: '14px 16px',
+                                textAlign: 'left',
+                                fontWeight: '600',
+                                color: 'white',
+                                borderRight: '1px solid rgba(255,255,255,0.2)'
+                              }}>Room Number</th>
+                              <th style={{
+                                padding: '14px 16px',
+                                textAlign: 'left',
+                                fontWeight: '600',
+                                color: 'white',
+                                borderRight: '1px solid rgba(255,255,255,0.2)'
+                              }}>Bed</th>
+                              <th style={{
+                                padding: '14px 16px',
+                                textAlign: 'left',
+                                fontWeight: '600',
+                                color: 'white',
+                                borderRight: '1px solid rgba(255,255,255,0.2)'
+                              }}>Booking Date</th>
+                              <th style={{
+                                padding: '14px 16px',
+                                textAlign: 'left',
+                                fontWeight: '600',
+                                color: 'white'
+                              }}>Allotted By</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr style={{
+                              backgroundColor: '#ffffff',
+                              transition: 'background-color 0.2s'
+                            }}>
+                              <td style={{
+                                padding: '14px 16px',
+                                fontWeight: '500',
+                                borderRight: '1px solid #e0e0e0',
+                                borderBottom: '1px solid #e0e0e0'
+                              }}>{studentDetails.bookingDetails.block}</td>
+                              <td style={{
+                                padding: '14px 16px',
+                                fontWeight: '500',
+                                borderRight: '1px solid #e0e0e0',
+                                borderBottom: '1px solid #e0e0e0'
+                              }}>{studentDetails.bookingDetails.floor}</td>
+                              <td style={{
+                                padding: '14px 16px',
+                                fontWeight: '500',
+                                borderRight: '1px solid #e0e0e0',
+                                borderBottom: '1px solid #e0e0e0'
+                              }}>{studentDetails.bookingDetails.roomNumber}</td>
+                              <td style={{
+                                padding: '14px 16px',
+                                fontWeight: '500',
+                                borderRight: '1px solid #e0e0e0',
+                                borderBottom: '1px solid #e0e0e0'
+                              }}>{studentDetails.bookingDetails.bed}</td>
+                              <td style={{
+                                padding: '14px 16px',
+                                fontWeight: '500',
+                                borderRight: '1px solid #e0e0e0',
+                                borderBottom: '1px solid #e0e0e0'
+                              }}>{studentDetails.bookingDetails.bookingDate ? new Date(studentDetails.bookingDetails.bookingDate).toLocaleDateString() : 'N/A'}</td>
+                              <td style={{
+                                padding: '14px 16px',
+                                fontWeight: '500',
+                                borderBottom: '1px solid #e0e0e0'
+                              }}>{studentDetails.bookingDetails.allottedBy || 'N/A'}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      
+                      {studentDetails.bookingDetails.allotmentReason && (
+                        <div style={{
+                          marginTop: '15px',
+                          backgroundColor: '#e3f2fd',
+                          padding: '12px 16px',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #bbdefb',
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '8px'
+                        }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginTop: '2px', flexShrink: 0}}>
+                            <path d="M13 16H12V12H11M12 8H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#1976d2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <div>
+                            <span style={{ fontWeight: '600', color: '#1976d2' }}>Allotment Reason: </span>
+                            <span style={{ color: '#333' }}>{studentDetails.bookingDetails.allotmentReason}</span>
+                          </div>
+                        </div>                      )}
                     </div>
-                    <div className="verification-item">
-                      <input
-                        type="checkbox"
-                        id="keys-handed"
-                        checked={documentVerification.keysHandedOver}
-                        onChange={(e) => setDocumentVerification(prev => ({...prev, keysHandedOver: e.target.checked}))}
-                      />
-                      <label htmlFor="keys-handed">Room Keys Handed Over</label>
+                  ) : (
+                    <div style={{
+                      backgroundColor: '#fff8e1',
+                      borderRadius: '8px',
+                      padding: '15px',
+                      border: '1px solid #ffe082',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '15px'
+                    }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#f57c00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 8V12" stroke="#f57c00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 16H12.01" stroke="#f57c00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <p style={{margin: '0', fontSize: '15px', color: '#e65100', fontWeight: '500'}}>
+                        No room allocation found. This student needs to be assigned a room.
+                      </p>
                     </div>
+                  )}
+                </div>
+                  {/* Document verification card */}
+                <div className="document-verification-card" style={{
+                  padding: '25px',
+                  backgroundColor: '#ffffff'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    marginBottom: '20px'
+                  }}>
+                    <div style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      backgroundColor: '#e3f2fd',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#1976d2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M14 2V8H20" stroke="#1976d2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M16 13H8" stroke="#1976d2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M16 17H8" stroke="#1976d2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M10 9H9H8" stroke="#1976d2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <h3 style={{
+                      margin: 0,
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      color: '#1976d2'
+                    }}>
+                      Document Verification
+                    </h3>
+                  </div>
+                  
+                  <div className="verification-form" style={{
+                    backgroundColor: '#f9fafc',
+                    borderRadius: '8px',
+                    padding: '20px 25px',
+                    border: '1px solid #e0e0e0'
+                  }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                      gap: '15px',
+                      marginBottom: '25px'
+                    }}>
+                      <div className="verification-item" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px'
+                      }}>
+                        <input
+                          type="checkbox"
+                          id="anti-ragging"
+                          checked={documentVerification.antiRagging}
+                          onChange={(e) => setDocumentVerification(prev => ({...prev, antiRagging: e.target.checked}))}
+                          style={{
+                            width: '18px',
+                            height: '18px',
+                            accentColor: '#1976d2',
+                            cursor: 'pointer'
+                          }}
+                        />
+                        <label htmlFor="anti-ragging" style={{
+                          fontSize: '15px',
+                          cursor: 'pointer',
+                          fontWeight: '500',
+                          color: '#444'
+                        }}>
+                          Anti-Ragging Declaration
+                        </label>
+                      </div>
+                      
+                      <div className="verification-item" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px'
+                      }}>
+                        <input
+                          type="checkbox"
+                          id="anti-drug"
+                          checked={documentVerification.antiDrug}
+                          onChange={(e) => setDocumentVerification(prev => ({...prev, antiDrug: e.target.checked}))}
+                          style={{
+                            width: '18px',
+                            height: '18px',
+                            accentColor: '#1976d2',
+                            cursor: 'pointer'
+                          }}
+                        />
+                        <label htmlFor="anti-drug" style={{
+                          fontSize: '15px',
+                          cursor: 'pointer',
+                          fontWeight: '500',
+                          color: '#444'
+                        }}>
+                          Anti-Drug Declaration
+                        </label>
+                      </div>
+                      
+                      <div className="verification-item" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px'
+                      }}>
+                        <input
+                          type="checkbox"
+                          id="keys-handed"
+                          checked={documentVerification.keysHandedOver}
+                          onChange={(e) => setDocumentVerification(prev => ({...prev, keysHandedOver: e.target.checked}))}
+                          style={{
+                            width: '18px',
+                            height: '18px',
+                            accentColor: '#1976d2',
+                            cursor: 'pointer'
+                          }}
+                        />
+                        <label htmlFor="keys-handed" style={{
+                          fontSize: '15px',
+                          cursor: 'pointer',
+                          fontWeight: '500',
+                          color: '#444'
+                        }}>
+                          Room Keys Handed Over
+                        </label>
+                      </div>
+                    </div>
+                    
+                    {studentDetails.documentVerification && studentDetails.documentVerification.verifiedAt && (
+                      <div className="verification-timestamp" style={{
+                        backgroundColor: '#e8f5e9',
+                        borderRadius: '6px',
+                        padding: '10px 15px',
+                        marginBottom: '20px',
+                        border: '1px solid #c8e6c9',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px'
+                      }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M20 6L9 17L4 12" stroke="#4caf50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <p style={{margin: 0, fontSize: '14px', color: '#2e7d32', fontWeight: '500'}}>
+                          Last verification: {new Date(studentDetails.documentVerification.verifiedAt).toLocaleString()}
+                        </p>
+                      </div>
+                    )}
                     
                     <button 
                       onClick={submitDocumentVerification}
-                      className="submit-verification-btn"
+                      style={{
+                        backgroundColor: '#1976d2',
+                        color: 'white',
+                        border: 'none',
+                        padding: '12px 25px',
+                        borderRadius: '6px',
+                        fontSize: '15px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
+                        transition: 'background-color 0.2s ease'
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1565c0'}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#1976d2'}
                     >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H15L21 9V19C21 20.1046 20.1046 21 19 21Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M17 21V13H7V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M7 3V7H14" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
                       Update Verification Status
                     </button>
                   </div>
-                  
-                  {studentDetails.documentVerification && studentDetails.documentVerification.verifiedAt && (
-                    <div className="verification-timestamp">
-                      <p>Last verified: {new Date(studentDetails.documentVerification.verifiedAt).toLocaleString()}</p>
-                    </div>
-                  )}
                 </div>
               </div>
             )}

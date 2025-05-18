@@ -35,17 +35,9 @@
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .announcement-item:hover {
+    }    .announcement-item:hover {
       transform: translateX(5px);
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .announcement-item i {
-      margin-right: 12px;
-      color: #3182ce;
-      font-size: 1.1em;
     }
 
     @keyframes slide {
@@ -120,11 +112,9 @@
       container.innerHTML = '';
       
       // Render each announcement
-      announcements.forEach(announcement => {
-        const div = document.createElement('div');
+      announcements.forEach(announcement => {        const div = document.createElement('div');
         div.className = `announcement-item ${announcement.type}`;
         div.innerHTML = `
-          <i class="fas ${announcement.icon}"></i>
           ${announcement.text}
         `;
         container.appendChild(div);
@@ -134,43 +124,35 @@
       const duplicatedAnnouncements = [...container.children];
       duplicatedAnnouncements.forEach(node => {
         const clone = node.cloneNode(true);
-        container.appendChild(clone);
-      });
+        container.appendChild(clone);      });
     }
-
+    
     // Function to render fallback announcements if API fails
     function renderFallbackAnnouncements() {
-      const container = document.getElementById('announcements-container');
-      container.innerHTML = `
+      const container = document.getElementById('announcements-container');      container.innerHTML = `
         <div class="announcement-item urgent">
-          <i class="fas fa-exclamation-circle"></i>
-          Urgent: Fee Payment due May 2nd! Pay now to secure your hostel seat.
+          Urgent: Please Pay the Fees by 31st May 2025.
         </div>
         <div class="announcement-item info">
-          <i class="fas fa-door-open"></i>
-          Room Booking opens April 29th! Check availability in your preferred block.
+          Room Booking Opens from 1st June 2025.
         </div>
         <div class="announcement-item maintenance">
-          <i class="fas fa-wrench"></i>
-          Maintenance: Wing B water shutdown on April 25th (6AM-12PM).
-        </div>
-        <div class="announcement-item event">
-          <i class="fas fa-calendar-alt"></i>
-          Hostel Fest 2025 - Sign up before May 7th for early bird passes!
+          Maintenance: Scheduled water tank cleaning on May 25th (8AM-2PM).
+        </div>        <div class="announcement-item event">
+          Orientation for Freshers on August 5th at Abdul Kalam Auditorium (ECSOE).
         </div>
         <div class="announcement-item info">
-          <i class="fas fa-book"></i>
-          Library extends hours: Now open 24/7 during exam period (May 12-25).
-        </div>
-        
-        <!-- Duplicate for smooth infinite scroll -->
+          Extended library hours during finals: Open From  from May 20-30.
+        </div>          <!-- Duplicate for smooth infinite scroll -->
         <div class="announcement-item urgent">
-          <i class="fas fa-exclamation-circle"></i>
-          Urgent: Fee Payment due May 2nd! Pay now to secure your hostel seat.
+          Urgent: Please Pay the Fees by 31st May 2025.
         </div>
         <div class="announcement-item info">
-          <i class="fas fa-door-open"></i>
-          Room Booking opens April 29th! Check availability in your preferred block.
+          Room Booking Opens from 1st June 2025.
+        </div>        <div class="announcement-item event">
+          Orientation for Freshers on August 5th at Abdul Kalam Auditorium (ECSOE).
+        </div>        <div class="announcement-item info">
+          Extended library hours during finals: Open From from May 20-June 3rd.
         </div>
       `;
     }
