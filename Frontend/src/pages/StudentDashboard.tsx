@@ -1990,8 +1990,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
                     gap: '20px'
-                  }}>
-                    <div className="developer-card" style={{
+                  }}>                    <div className="developer-card" style={{
                       padding: '15px',
                       backgroundColor: '#f9f9f9',
                       borderRadius: '8px',
@@ -2005,12 +2004,17 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         <strong>Email:</strong> <a href="mailto:se22ucse009@mahindrauniversity.edu.in">se22ucse009@mahindrauniversity.edu.in</a>
                       </p>
                       <p style={{
+                        margin: '5px 0 10px 0',
+                        fontSize: '14px'
+                      }}>
+                        <strong>Phone:</strong> <a href="tel:9390788239">9390788239</a>
+                      </p>
+                      <p style={{
                         fontSize: '14px',
                         color: '#666'
-                      }}>Full-stack Developer, UI/UX Design</p>
+                      }}>Backend Developer, Database Management</p>
                     </div>
-                    
-                    <div className="developer-card" style={{
+                      <div className="developer-card" style={{
                       padding: '15px',
                       backgroundColor: '#f9f9f9',
                       borderRadius: '8px',
@@ -2024,18 +2028,23 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         <strong>Email:</strong> <a href="mailto:se22ucse190@mahindrauniversity.edu.in">se22ucse190@mahindrauniversity.edu.in</a>
                       </p>
                       <p style={{
+                        margin: '5px 0 10px 0',
+                        fontSize: '14px'
+                      }}>
+                        <strong>Phone:</strong> <a href="tel:7893956059">7893956059</a>
+                      </p>
+                      <p style={{
                         fontSize: '14px',
                         color: '#666'
-                      }}>Backend Developer, Database Management</p>
+                      }}>Fronted Developer</p>
                     </div>
-                    
-                    <div className="developer-card" style={{
+                      <div className="developer-card" style={{
                       padding: '15px',
                       backgroundColor: '#f9f9f9',
                       borderRadius: '8px',
                       border: '1px solid #eee'
                     }}>
-                      <h4>Kalyan Krishna</h4>
+                      <h4>Kalyan Krishna Pasupuleti</h4>
                       <p style={{
                         margin: '10px 0',
                         fontSize: '14px'
@@ -2043,9 +2052,15 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         <strong>Email:</strong> <a href="mailto:se22ucse302@mahindrauniversity.edu.in">se22ucse302@mahindrauniversity.edu.in</a>
                       </p>
                       <p style={{
+                        margin: '5px 0 10px 0',
+                        fontSize: '14px'
+                      }}>
+                        <strong>Phone:</strong> <a href="tel:9490073264">9490073264</a>
+                      </p>
+                      <p style={{
                         fontSize: '14px',
                         color: '#666'
-                      }}>Frontend Developer, Testing</p>
+                      }}>Frontend Developer, UI/UX</p>
                     </div>
                   </div>
                 </div>

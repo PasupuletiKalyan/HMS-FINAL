@@ -82,7 +82,10 @@ const AdminDashboard: React.FC = () => {
     active: true,
     expiresAt: null
   });
-    const profileRef = useRef<HTMLDivElement | null>(null);
+  
+  const profileRef = useRef<HTMLDivElement | null>(null);
+  const suggestionRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const searchRef = useRef<HTMLDivElement | null>(null);
 
   const navigate = useNavigate();
 
@@ -123,14 +126,48 @@ const AdminDashboard: React.FC = () => {
   const handleClickOutside = (e: MouseEvent) => {
     const target = e.target as Node;
   
+    // ✅ Only hide suggestions if click was truly outside search box
+    if (searchRef.current && !searchRef.current.contains(target)) {
+      setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
+    }
+  
     // ✅ Close profile dropdown if click was outside it
     if (profileRef.current && !profileRef.current.contains(target)) {
       setShowProfileDropdown(false);
     }
   };
   
-  const handleBlockSelect = (blockName: string) => {
+
+  const suggestions = [
+    { name: "Phase-1", gender: "Boys" },
+    { name: "E-wing", gender: "Boys" },
+    { name: "Phase-2", gender: "Boys" },
+    { name: "Phase-4", gender: "Boys" },
+    { name: "Aravalli", gender: "Girls" },
+    { name: "Ajanta", gender: "Girls" },
+    { name: "Himalaya", gender: "Girls" },
+    { name: "Shivalik", gender: "Girls" },
+    { name: "Vindya", gender: "Girls" },
+    { name: "Satpura", gender: "Girls" },
+    { name: "Kailash", gender: "Girls" },
+    { name: "Phase-3", gender: "Girls" },
+  ];
+  const filteredSuggestions = suggestions.filter((s) =>
+    s.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+  
+
+  const handleSuggestionClick = (blockName: string) => {
     setSelectedBlock(blockName);
+    setShowSuggestions(false);
+    setSearchTerm(blockName);
+    setSelectedSuggestionIndex(-1);
 
     const dummyData: Student[] = [
       { name: "Anjali Sharma", roll: "22BCS011", room: "G-102" },
@@ -139,9 +176,37 @@ const AdminDashboard: React.FC = () => {
     ];
     setStudentData(dummyData);
     setFilteredRoomData([]);
-    setRoomSearchTerm("");};
+    setRoomSearchTerm("");
+  };
 
-  // Search bar functionality has been removed
+  useEffect(() => {
+    if (
+      selectedSuggestionIndex >= 0 &&
+      suggestionRefs.current[selectedSuggestionIndex]
+    ) {
+      suggestionRefs.current[selectedSuggestionIndex]?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  }, [selectedSuggestionIndex]);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown") {
+      setSelectedSuggestionIndex((prev) =>
+        prev < filteredSuggestions.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === "ArrowUp") {
+      setSelectedSuggestionIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    } else if (e.key === "Enter" && selectedSuggestionIndex >= 0) {
+      handleSuggestionClick(filteredSuggestions[selectedSuggestionIndex].name);
+    }
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
 
   // Fetch users on component mount
   useEffect(() => {
@@ -1333,7 +1398,19 @@ const AdminDashboard: React.FC = () => {
                 </ul>
               </div>
             )}
-          </div>        </div>
+          </div>
+        </div>
+
+        {/* SECONDARY SEARCH BAR */}
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search by student name, ID, or room..."
+            className="search-bar"
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+        </div>
 
         {/* MAIN CONTENT - Fixed to properly show selected menu content */}
         <div className="dashboard-content">

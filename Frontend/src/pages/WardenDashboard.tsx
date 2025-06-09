@@ -2289,14 +2289,6 @@ const WardenDashboard: React.FC = () => {
                               </span>
                             </div>
                           )}
-                          {studentDetails.formData?.blood_group && (
-                            <div style={{display: 'flex', alignItems: 'center'}}>
-                              <span style={{flex: '0 0 80px', fontSize: '14px', color: '#666'}}>Blood:</span>
-                              <span style={{fontSize: '14px', fontWeight: '500', color: '#333'}}>
-                                {studentDetails.formData?.blood_group}
-                              </span>
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import StudentDashboard from "./pages/StudentDashboard";
 import WardenDashboard from "./pages/WardenDashboard";
@@ -151,7 +150,6 @@ const LocationAwareApp: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
       <Route path="/student-dashboard" element={<StudentDashboard      
         currentUserBooking={currentUserBooking}
         setCurrentUserBooking={setCurrentUserBooking}
