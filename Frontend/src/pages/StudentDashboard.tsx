@@ -2274,11 +2274,10 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </div>
             </div>
           )}
-          
-          {/* Contact Section */}
+            {/* Contact Section */}
           {selectedSection === "Contact" && (
             <div className="contact-section">
-              <h2>Contact Us</h2>
+              <h2>Feedback</h2>
               
               <div className="contact-container" style={{
                 maxWidth: '800px',
@@ -2288,117 +2287,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 borderRadius: '8px',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
               }}>
-                <div className="contact-info">
-                  <h3>Development Team</h3>
-                  <p>If you have any technical issues, suggestions, or questions about the Hostel Management System, please feel free to contact our development team:</p>
-                  
-                  <div className="developer-contacts" style={{
-                    marginTop: '20px',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                    gap: '20px'
-                  }}>                    <div className="developer-card" style={{
-                      padding: '15px',
-                      backgroundColor: '#f9f9f9',
-                      borderRadius: '8px',
-                      border: '1px solid #eee'
-                    }}>
-                      <h4>Om Sai Vikranth</h4>
-                      <p style={{
-                        margin: '10px 0',
-                        fontSize: '14px'
-                      }}>
-                        <strong>Email:</strong> <a href="mailto:se22ucse009@mahindrauniversity.edu.in">se22ucse009@mahindrauniversity.edu.in</a>
-                      </p>
-                      <p style={{
-                        margin: '5px 0 10px 0',
-                        fontSize: '14px'
-                      }}>
-                        <strong>Phone:</strong> <a href="tel:9390788239">9390788239</a>
-                      </p>
-                      <p style={{
-                        fontSize: '14px',
-                        color: '#666'
-                      }}>Backend Developer, Database Management</p>
-                    </div>
-                      <div className="developer-card" style={{
-                      padding: '15px',
-                      backgroundColor: '#f9f9f9',
-                      borderRadius: '8px',
-                      border: '1px solid #eee'
-                    }}>
-                      <h4>Palacharla Sriroop</h4>
-                      <p style={{
-                        margin: '10px 0',
-                        fontSize: '14px'
-                      }}>
-                        <strong>Email:</strong> <a href="mailto:se22ucse190@mahindrauniversity.edu.in">se22ucse190@mahindrauniversity.edu.in</a>
-                      </p>
-                      <p style={{
-                        margin: '5px 0 10px 0',
-                        fontSize: '14px'
-                      }}>
-                        <strong>Phone:</strong> <a href="tel:7893956059">7893956059</a>
-                      </p>
-                      <p style={{
-                        fontSize: '14px',
-                        color: '#666'
-                      }}>Fronted Developer</p>
-                    </div>
-                      <div className="developer-card" style={{
-                      padding: '15px',
-                      backgroundColor: '#f9f9f9',
-                      borderRadius: '8px',
-                      border: '1px solid #eee'
-                    }}>
-                      <h4>Kalyan Krishna Pasupuleti</h4>
-                      <p style={{
-                        margin: '10px 0',
-                        fontSize: '14px'
-                      }}>
-                        <strong>Email:</strong> <a href="mailto:se22ucse302@mahindrauniversity.edu.in">se22ucse302@mahindrauniversity.edu.in</a>
-                      </p>
-                      <p style={{
-                        margin: '5px 0 10px 0',
-                        fontSize: '14px'
-                      }}>
-                        <strong>Phone:</strong> <a href="tel:9490073264">9490073264</a>
-                      </p>
-                      <p style={{
-                        fontSize: '14px',
-                        color: '#666'
-                      }}>Frontend Developer, UI/UX</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="hostel-contact" style={{
-                  marginTop: '30px',
-                  padding: '20px',
-                  backgroundColor: '#f9f9f9',
-                  borderRadius: '8px'
-                }}>
-                  <h3>Hostel Administration Contact</h3>
-                  <p>For general inquiries related to hostel administration:</p>
-                  
-                  <div className="contact-details" style={{marginTop: '15px'}}>
-                    <p><strong>Hostel Office:</strong> Student Affairs Office Main Block, Mahindra University</p>
-                    <p><strong>Email:</strong> hostelcom@mahindrauniversity.edu.in</p>
-                    <p><strong>Phone:</strong> +91 9100947891</p>
-                  </div>
-                  
-                  <p style={{
-                    marginTop: '20px',
-                    padding: '10px',
-                    backgroundColor: '#e8f4fd',
-                    borderRadius: '5px',
-                    fontSize: '14px'
-                  }}>
-                    <strong>Note:</strong> For urgent issues outside office hours, please contact your floor warden directly.
-                  </p>
-                </div>
-                
-                <div className="feedback-section" style={{marginTop: '30px'}}>
+                <div className="feedback-section">
                   <h3>Feedback Form</h3>
                   <p>We value your feedback! Please share your thoughts about the Hostel Management System:</p>
                   
@@ -2649,15 +2538,34 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
       {/* FOOTER */}      <footer className="footer">
         <div style={{marginBottom: '15px'}}>
           <p>&copy; {new Date().getFullYear()} Mahindra University Hostel Management System. All rights reserved.</p>
-        </div>
-        <div style={{
+        </div>        <div style={{
           display: 'flex',
           justifyContent: 'center',
-          gap: '20px',
-          flexWrap: 'wrap'
+          gap: '30px',
+          flexWrap: 'wrap',
+          alignItems: 'center'
         }}>
           <a href="#" onClick={(e) => {e.preventDefault(); setSelectedSection("Contact")}}>Contact</a>
-          <a href="#" onClick={(e) => {e.preventDefault(); setSelectedSection("Privacy")}}>Privacy Policy</a>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+          }}>
+            <span style={{fontSize: '14px'}}>📧</span>
+            <a href="mailto:hostelcom@mahindrauniversity.edu.in" style={{color: '#fff'}}>
+              hostelcom@mahindrauniversity.edu.in
+            </a>
+          </div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+          }}>
+            <span style={{fontSize: '14px'}}>📞</span>
+            <a href="tel:04067135100" style={{color: '#fff'}}>
+              040 – 67135100
+            </a>
+          </div>
         </div>
       </footer>
     </>
