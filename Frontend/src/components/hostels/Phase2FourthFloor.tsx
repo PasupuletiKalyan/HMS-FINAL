@@ -46,14 +46,8 @@ const Phase2FourthFloorPlan: React.FC<FloorPlanProps> = ({
   // No derived positions needed here
   
   // Calculate positions for the Top Horizontal Section - Left Part
-  const wsTopLStartX = 10 + 5*(roomW + hGap) + hGap*2;
-  const wsTopLEndX = wsTopLStartX + roomW * 1.5 + hGap; // End X of first top WS
-  const liftsTopMEndX = wsTopLEndX + hGap + roomW + hGap + roomW; // End X of first top Lifts
   
   // Calculate positions for the Top Horizontal Section - Right Part
-  const startBottomRightX = liftsTopMEndX + hGap; // Start X for second horizontal group
-   const g442EndX = startBottomRightX + 3*(roomW + hGap) + roomW; // End X of room 442
-   const wsTopREndX = g442EndX + hGap * 3 + roomW * 1.5 + hGap; // End X of second top WS (unused)
 
   // Corridor widths and positions
   const corridorWidth = 15;

@@ -6,17 +6,6 @@ import defaultProfilePic from "../assets/default-profile-pic.jpg";
 import HostelFloorPlanViewer from "../components/HostelFloorPlanViewer"; 
 import ProfilePhotoUploader from "../components/ProfilePhotoUploader"; // Import ProfilePhotoUploader component
 
-type Student = {
-  name: string;
-  roll: string;
-  room: string;
-  applicationNumber?: string;
-  phone?: string;
-  parentPhone?: string;
-  emergencyContact?: string;
-  school?: string;
-  profilePic?: string;
-};
 
 type HostelSummary = {
   id: string;
@@ -295,7 +284,7 @@ const initialBoysHostelData = {
 
 const WardenDashboard: React.FC = () => {
   const [selectedMenu, setSelectedMenu] = useState("Overview");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [] = useState("");
   // Remove all unused variables
   // const [studentData, setStudentData] = useState<Student[]>([]);
   // const [roomSearchTerm, setRoomSearchTerm] = useState("");
@@ -334,22 +323,7 @@ const WardenDashboard: React.FC = () => {
     localStorage.clear();
     navigate("/login");
   };
-  const suggestions = [
-    // Boys hostels
-    { name: "Phase 1", gender: "Boys" },
-    { name: "E-wing", gender: "Boys" },
-    { name: "Phase 2", gender: "Boys" },
-    { name: "Phase 2- part 5", gender: "Boys" },
-    { name: "Phase 4", gender: "Boys" },
-    // Girls hostels 
-    { name: "Dorms", gender: "Girls" },
-    { name: "Phase 3-NW", gender: "Girls" },
-    { name: "Phase 3-SW", gender: "Girls" },
-  ];
 
-  const filteredSuggestions = suggestions.filter((s) =>
-    s.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
   const getDummyHostelData = () => {
     return [
       // Boys hostels grouped together (blue)
@@ -462,8 +436,6 @@ const WardenDashboard: React.FC = () => {
   useEffect(() => {
     const fetchApplicationNumber = async () => {
       try {
-        const response = await fetch("/api/warden/application-number");
-        const data = await response.json();
         // Commented out unused state setter
         // setApplicationNumber(data.applicationNumber);
       } catch (error) {
@@ -512,16 +484,6 @@ const WardenDashboard: React.FC = () => {
     }
   };
 
-  const handleSuggestionClick = (blockName: string) => {
-    // setSelectedBlock(blockName);
-    // setShowSuggestions(false);
-    setSearchTerm(blockName);
-    setSelectedSuggestionIndex(-1);
-
-    // setStudentData([]);
-    // setFilteredRoomData([]);
-    // setRoomSearchTerm("");
-  };
 
   // Commented out unused function
   /*
@@ -603,7 +565,7 @@ const WardenDashboard: React.FC = () => {
           // Boys Hostels
           setBoysHostelData(prev => {
             const newData = { ...prev };
-            Object.entries(newData).forEach(([key, block]) => {
+            Object.entries(newData).forEach(([, block]) => {
               block.floors = block.floors.map(floor => 
                 floor.floorNumber === editData.floorNumber ? editData as FloorData : floor
               );

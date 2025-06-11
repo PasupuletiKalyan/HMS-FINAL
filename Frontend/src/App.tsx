@@ -28,7 +28,7 @@ const LocationAwareApp: React.FC = () => {
   // Track the current application number to detect user changes
   const [currentApplicationNo, setCurrentApplicationNo] = useState<string | null>(null);
   // Add state to track completed steps
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [, setCompletedSteps] = useState<number[]>([]);
 
   // Load booking information when the app initializes or location changes
   useEffect(() => {

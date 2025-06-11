@@ -24,11 +24,7 @@ interface CurrentBookingPageProps {
 }
 
 const CurrentBookingPage: React.FC<CurrentBookingPageProps> = ({
-  currentUserBooking,
-  setCurrentUserBooking,
-  occupiedBeds,
-  setOccupiedBeds
-}) => {
+  currentUserBooking}) => {
   const navigate = useNavigate();
 
   // Cancel booking functionality removed since students should only book once

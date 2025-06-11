@@ -170,17 +170,8 @@ const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
     backgroundColor: '#f9f9f9',
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    marginBottom: '20px'
-  };
+    marginBottom: '20px'  };
 
-  const photoPreviewStyle: React.CSSProperties = {
-    width: '120px',
-    height: '120px',
-    borderRadius: '50%',
-    objectFit: 'cover',
-    border: '3px solid #c23535',
-    marginBottom: '15px'
-  };
 
   const buttonStyle: React.CSSProperties = {
     backgroundColor: '#c23535',
