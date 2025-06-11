@@ -50,9 +50,9 @@ const AdminDashboard: React.FC = () => {
   const [newUser, setNewUser] = useState({ name: '', email: '', role: 'student' as const });
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState('');
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  // States for Room Booking Release feature
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);  // States for Room Booking Release feature
   const [hostelBlocks, setHostelBlocks] = useState<RoomBookingBlock[]>([]);
+  const [selectedBlockId, setSelectedBlockId] = useState<string>("");
   
   // States for Announcements feature
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -131,11 +131,12 @@ const AdminDashboard: React.FC = () => {
       { id: '1', name: 'Admin User', email: 'admin@example.com', role: 'admin', createdAt: '2025-01-15' },
       { id: '2', name: 'Warden Singh', email: 'warden@example.com', role: 'warden', createdAt: '2025-02-10' },
       { id: '3', name: 'Student Kumar', email: 'student@example.com', role: 'student', createdAt: '2025-03-05' },
-      { id: '4', name: 'Hostel Manager', email: 'manager@example.com', role: 'warden', createdAt: '2025-01-20' },
-    ];
+      { id: '4', name: 'Hostel Manager', email: 'manager@example.com', role: 'warden', createdAt: '2025-01-20' },    ];
     setUsers(dummyUsers);
     setFilteredUsers(dummyUsers);
-  };  // Updated hostelBlocks structure to match HostelFloorPlanViewer exactly
+  };
+
+  // Updated hostelBlocks structure to match HostelFloorPlanViewer exactly
   const blockConfigs = [
     // Boys Blocks
     { name: "Phase 1", gender: "Boys", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
@@ -155,25 +156,10 @@ const AdminDashboard: React.FC = () => {
     { name: "Nilgiri", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
     { name: "Satpura", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
     { name: "Kailash", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
-  ];
-
-  // Enhanced function to fetch hostel blocks with appropriate number of floors for each block
+  ];  // Enhanced function to fetch hostel blocks with appropriate number of floors for each block
   const fetchHostelBlocks = async () => {
-    try {
-      // Try to fetch from backend first
-      const response = await fetch('http://localhost:5000/api/hostels/blocks-availability');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setHostelBlocks(data.blocks);
-          return;
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching hostel blocks:", error);
-    }
-      // Fallback to generating blocks with proper floor counts
-    const blocks: RoomBookingBlock[] = blockConfigs.map((config, index) => ({
+    // Always start with all available blocks from blockConfigs
+    const allBlocks: RoomBookingBlock[] = blockConfigs.map((config, index) => ({
       id: (index + 1).toString(),
       name: config.name,
       gender: config.gender,
@@ -184,8 +170,41 @@ const AdminDashboard: React.FC = () => {
         isActive: false, // Default to disabled
       })),
     }));
-    
-    // Try to load saved settings from localStorage 
+
+    try {
+      // Try to fetch from backend first to get current settings
+      const response = await fetch('http://localhost:5000/api/hostels/blocks-availability');
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.blocks && Array.isArray(data.blocks)) {
+          // Merge backend data with all available blocks
+          const mergedBlocks = allBlocks.map((block) => {
+            const backendBlock = data.blocks.find((b: any) => b.name === block.name);
+            if (backendBlock) {
+              return {
+                ...block,
+                isActive: backendBlock.floors.some((floor: any) => floor.isActive),
+                floors: block.floors.map((floor, index) => {
+                  const backendFloor = backendBlock.floors.find((f: any) => f.floorNumber === (index + 1));
+                  return {
+                    ...floor,
+                    isActive: backendFloor ? backendFloor.isActive : false
+                  };
+                })
+              };
+            }
+            return block;
+          });
+          setHostelBlocks(mergedBlocks);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching hostel blocks:", error);
+    }
+
+    // Fallback: try to load saved settings from localStorage 
     const savedBlocks = localStorage.getItem('hostel_blocks_config');
     if (savedBlocks) {
       try {
@@ -193,11 +212,31 @@ const AdminDashboard: React.FC = () => {
         setHostelBlocks(parsedBlocks);
       } catch (e) {
         console.error("Error parsing saved hostel blocks:", e);
-        setHostelBlocks(blocks);
+        setHostelBlocks(allBlocks);
       }
     } else {
-      setHostelBlocks(blocks);
+      setHostelBlocks(allBlocks);
     }
+  };
+
+  // Helper function to convert floor numbers to floor names (same as in HostelFloorPlanViewer)
+  const getFloorName = (floorNumber: number): string => {
+    const floorNames: Record<number, string> = {
+      1: "Ground Floor",
+      2: "1st Floor", 
+      3: "2nd Floor",
+      4: "3rd Floor",
+      5: "4th Floor",
+      6: "5th Floor",
+      7: "6th Floor",
+      8: "7th Floor",
+      9: "8th Floor",
+      10: "9th Floor",
+      11: "10th Floor",
+      12: "11th Floor",
+      13: "12th Floor"
+    };
+    return floorNames[floorNumber] || `${floorNumber}th Floor`;
   };
 
   // Function to fetch announcements
@@ -500,17 +539,27 @@ const AdminDashboard: React.FC = () => {
       )
     );
   };
-
   // Enhanced save room booking configuration to persist to both backend and localStorage
   const saveRoomBookingConfiguration = async () => {
     try {
+      // Transform frontend data to backend format
+      const backendBlocks = hostelBlocks.map(block => ({
+        id: block.id,
+        name: block.name,
+        gender: block.gender,
+        floors: block.floors.map((floor, index) => ({
+          floorNumber: index + 1,
+          isActive: floor.isActive
+        }))
+      }));
+
       // Save to backend
       const response = await fetch('http://localhost:5000/api/hostels/blocks-availability', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ blocks: hostelBlocks }),
+        body: JSON.stringify({ blocks: backendBlocks }),
       });
       
       if (response.ok) {
@@ -707,19 +756,53 @@ const AdminDashboard: React.FC = () => {
       </div>
     );
   };
-
   const renderRoomBookingRelease = () => {
+    const selectedBlock = hostelBlocks.find(block => block.id === selectedBlockId);
+
     return (
-      <div className="room-release-container">        <h1>Room Booking Release Controls</h1>        
+      <div className="room-release-container">
+        <h1>Room Booking Release Controls</h1>        
         <p style={{ marginBottom: '20px' }}>
           Control which hostel blocks and floors are available for student booking. 
-          Use the toggle switches on the right side of each floor to activate/deactivate individual floors, or use the "Activate All" and "Deactivate All" buttons to control all floors in a block at once.
+          Select a block from the dropdown below, then use the toggle switches to activate/deactivate individual floors, or use the "Activate All" and "Deactivate All" buttons to control all floors in the selected block.
         </p>
         
-        <div className="blocks-container">
-          {hostelBlocks.map(block => (
+        {/* Block Selection Dropdown */}
+        <div className="block-selector" style={{ marginBottom: '30px' }}>
+          <label htmlFor="block-select" style={{ 
+            display: 'block', 
+            marginBottom: '10px', 
+            fontWeight: 'bold',
+            fontSize: '16px'
+          }}>
+            Select Hostel Block:
+          </label>
+          <select
+            id="block-select"
+            value={selectedBlockId}
+            onChange={(e) => setSelectedBlockId(e.target.value)}
+            style={{
+              width: '300px',
+              padding: '10px',
+              borderRadius: '4px',
+              border: '1px solid #ccc',
+              fontSize: '14px',
+              backgroundColor: 'white'
+            }}
+          >
+            <option value="">-- Select a Block --</option>
+            {hostelBlocks.map(block => (
+              <option key={block.id} value={block.id}>
+                {block.name} ({block.gender})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Selected Block Details */}
+        {selectedBlock ? (
+          <div className="selected-block-container">
             <div 
-              key={block.id} 
               className="hostel-block-card"
               style={{
                 marginBottom: '25px',
@@ -732,27 +815,27 @@ const AdminDashboard: React.FC = () => {
                 className="block-header"
                 style={{
                   padding: '15px',
-                  backgroundColor: block.gender === 'Girls' ? '#FFD6E0' : '#D6E9FF',
+                  backgroundColor: selectedBlock.gender === 'Girls' ? '#FFD6E0' : '#D6E9FF',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}
               >
                 <h3 style={{ margin: '0' }}>
-                  {block.name} 
+                  {selectedBlock.name} 
                   <span style={{ 
                     fontSize: '14px', 
                     fontWeight: 'normal',
                     marginLeft: '10px',
-                    color: block.gender === 'Girls' ? '#FF6B8A' : '#4A90E2'
+                    color: selectedBlock.gender === 'Girls' ? '#FF6B8A' : '#4A90E2'
                   }}>
-                    ({block.gender})
+                    ({selectedBlock.gender})
                   </span>
                 </h3>
-                  <div className="block-actions" style={{ display: 'flex', gap: '10px' }}>
+                <div className="block-actions" style={{ display: 'flex', gap: '10px' }}>
                   <button
-                    onClick={() => activateAllFloors(block.id)}
-                    disabled={block.floors.every(f => f.isActive)}
+                    onClick={() => activateAllFloors(selectedBlock.id)}
+                    disabled={selectedBlock.floors.every(f => f.isActive)}
                     style={{
                       padding: '5px 10px',
                       backgroundColor: '#28a745',
@@ -761,15 +844,15 @@ const AdminDashboard: React.FC = () => {
                       borderRadius: '4px',
                       cursor: 'pointer',
                       fontSize: '12px',
-                      opacity: block.floors.every(f => f.isActive) ? 0.7 : 1
+                      opacity: selectedBlock.floors.every(f => f.isActive) ? 0.7 : 1
                     }}
                   >
                     Activate All
                   </button>
                   
                   <button
-                    onClick={() => deactivateAllFloors(block.id)}
-                    disabled={block.floors.every(f => !f.isActive)}
+                    onClick={() => deactivateAllFloors(selectedBlock.id)}
+                    disabled={selectedBlock.floors.every(f => !f.isActive)}
                     style={{
                       padding: '5px 10px',
                       backgroundColor: '#dc3545',
@@ -778,7 +861,7 @@ const AdminDashboard: React.FC = () => {
                       borderRadius: '4px',
                       cursor: 'pointer',
                       fontSize: '12px',
-                      opacity: block.floors.every(f => !f.isActive) ? 0.7 : 1
+                      opacity: selectedBlock.floors.every(f => !f.isActive) ? 0.7 : 1
                     }}
                   >
                     Deactivate All
@@ -794,7 +877,10 @@ const AdminDashboard: React.FC = () => {
                   display: 'flex',
                   flexWrap: 'wrap',
                   gap: '10px'
-                }}              >                {block.floors.map(floor => (                  <div 
+                }}
+              >
+                {selectedBlock.floors.map(floor => (
+                  <div 
                     key={floor.id}
                     className="floor-item"
                     style={{
@@ -813,7 +899,7 @@ const AdminDashboard: React.FC = () => {
                       <input
                         type="checkbox"
                         checked={floor.isActive}
-                        onChange={() => toggleFloorActivation(block.id, floor.id)}
+                        onChange={() => toggleFloorActivation(selectedBlock.id, floor.id)}
                         style={{ display: 'none' }}
                       />
                       <span
@@ -848,8 +934,21 @@ const AdminDashboard: React.FC = () => {
                 ))}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="no-selection-message" style={{
+            textAlign: 'center',
+            padding: '40px',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '8px',
+            border: '1px dashed #dee2e6'
+          }}>
+            <h3 style={{ color: '#6c757d', marginBottom: '10px' }}>No Block Selected</h3>
+            <p style={{ color: '#6c757d', margin: '0' }}>
+              Please select a hostel block from the dropdown above to manage its floor availability.
+            </p>
+          </div>
+        )}
         
         <div className="save-configuration" style={{ marginTop: '20px', textAlign: 'center' }}>
           <button

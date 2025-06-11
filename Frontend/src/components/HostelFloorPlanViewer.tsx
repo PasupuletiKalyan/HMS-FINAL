@@ -99,15 +99,58 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
   const [showWarningModal, setShowWarningModal] = useState<boolean>(false);
+  // State for available blocks and floors from admin configuration
+  const [availableBlocks, setAvailableBlocks] = useState<any[]>([]);
+  const [isLoadingAvailability, setIsLoadingAvailability] = useState<boolean>(true);
   const [modalRoomInfo, setModalRoomInfo] = useState<ModalRoomInfo>({ 
     number: '', 
     block: '', 
     floor: '', 
     bed: null 
   });
-
+  // Helper function to convert floor numbers to floor names
+  const getFloorName = (floorNumber: number): string => {
+    const floorNames: Record<number, string> = {
+      1: "Ground Floor",
+      2: "1st Floor", 
+      3: "2nd Floor",
+      4: "3rd Floor",
+      5: "4th Floor",
+      6: "5th Floor",
+      7: "6th Floor",
+      8: "7th Floor",
+      9: "8th Floor",
+      10: "9th Floor",
+      11: "10th Floor",
+      12: "11th Floor",
+      13: "12th Floor"
+    };
+    return floorNames[floorNumber] || `${floorNumber}th Floor`;
+  };
+  
   // Load booking data from localStorage when component mounts
   useEffect(() => {
+    // Fetch available blocks from admin configuration
+    const fetchAvailableBlocks = async () => {
+      try {
+        setIsLoadingAvailability(true);        const response = await fetch('http://localhost:5000/api/hostels/available-blocks');
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableBlocks(data.availableBlocks || []);
+        } else {
+          console.error('Failed to fetch available blocks');
+          setAvailableBlocks([]); // No blocks available if fetch fails
+        }
+      } catch (error) {
+        console.error('Error fetching available blocks:', error);
+        setAvailableBlocks([]); // No blocks available if error occurs
+      } finally {
+        setIsLoadingAvailability(false);
+      }
+    };
+
+    fetchAvailableBlocks();
+    
     // Load occupied beds from the backend API
     const fetchOccupiedBeds = async () => {
       try {
@@ -451,9 +494,25 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     const roomKey = `${selectedBlock}_${selectedFloor}_${room}_${bed}`;
     return occupiedBeds[roomKey] || false;
   };
-
   // Render floor plan content
   const renderFloorPlan = (): React.ReactNode => {
+    // Show loading message while fetching availability
+    if (isLoadingAvailability) {
+      return <p className="text-center text-gray-500">Loading available blocks...</p>;
+    }
+    
+    // Show message if no blocks are available
+    if (availableBlocks.length === 0) {
+      return (
+        <div className="text-center p-8 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h3 className="text-lg font-semibold text-yellow-800 mb-2">No Blocks Available for Booking</h3>
+          <p className="text-yellow-700">
+            Room booking is currently not available. Please contact the administration for more information.
+          </p>
+        </div>
+      );
+    }
+
     if (!selectedBlock) {
       return <p className="text-center text-gray-500">Please select a block and floor to see the available rooms.</p>;
     } 
@@ -771,35 +830,27 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
             View My Booking
           </button>
         </div>
-      )}
-      <div className="controls">
+      )}      <div className="controls">
         <div className="control-group">
           <label htmlFor="block-select">Select Block:</label>
           <select 
             id="block-select" 
             value={selectedBlock} 
             onChange={handleBlockChange}
+            disabled={isLoadingAvailability}
           >
-            <option value="">-- Select Block --</option>
-            <option value="Phase 1">Phase 1</option>
-            <option value="Phase 1 E Block">Phase 1 E Block</option>
-            <option value="Phase 2">Phase 2</option>
-            <option value="Phase 2 Part 5">Phase 2 Part 5</option>
-            <option value="Phase 3 North Wing">Phase 3 North Wing</option>
-            <option value="Phase 3 South Wing">Phase 3 South Wing</option>
-            <option value="Phase 4A">Phase 4A</option>
-            <option value="Phase 4B">Phase 4B</option>
-            <option value="Aravali">Aravali</option>
-            <option value="Ajanta">Ajanta</option>
-            <option value="Himalaya">Himalaya</option>
-            <option value="Shivalik">Shivalik</option>
-            <option value="Vindya">Vindya</option>
-            <option value="Nilgiri">Nilgiri</option>
-            <option value="Satpura">Satpura</option>
-            <option value="Kailash">Kailash</option>
+            <option value="">
+              {isLoadingAvailability ? "Loading blocks..." : 
+               availableBlocks.length === 0 ? "No blocks available for booking" : 
+               "-- Select Block --"}
+            </option>
+            {availableBlocks.map(block => (
+              <option key={block.id} value={block.name}>
+                {block.name} ({block.gender})
+              </option>
+            ))}
           </select>
-        </div>
-        <div className="control-group">
+        </div>        <div className="control-group">
           <label htmlFor="floor-select">Select Floor:</label>
           <select 
             id="floor-select" 
@@ -807,12 +858,21 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
             onChange={handleFloorChange}
             disabled={!selectedBlock}
           >
-            <option value="">-- {selectedBlock ? "Select Floor" : "Select Block First"} --</option>
-            {selectedBlock && 
-              Object.keys(hostelData[selectedBlock as keyof typeof hostelData] || {}).map(floor => (
+            <option value="">-- {selectedBlock ? "Select Floor" : "Select Block First"} --</option>            {selectedBlock && (() => {
+              // Find the selected block in available blocks to get its available floors
+              const selectedBlockData = availableBlocks.find(block => block.name === selectedBlock);
+              if (selectedBlockData && selectedBlockData.availableFloors) {
+                return selectedBlockData.availableFloors.map((floor: any) => (
+                  <option key={floor.floorNumber} value={`${getFloorName(floor.floorNumber)}`}>
+                    {getFloorName(floor.floorNumber)}
+                  </option>
+                ));
+              }
+              // Fallback to original behavior if no restriction data
+              return Object.keys(hostelData[selectedBlock as keyof typeof hostelData] || {}).map(floor => (
                 <option key={floor} value={floor}>{floor}</option>
-              ))
-            }
+              ));
+            })()}
           </select>
         </div>
       </div>

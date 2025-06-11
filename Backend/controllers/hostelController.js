@@ -3,6 +3,7 @@
 const Hostel = require('../models/Hostel');
 const HostelDetails = require('../models/HostelDetails');
 const OccupiedBed = require('../models/OccupiedBed');
+const BlockAvailability = require('../models/BlockAvailability');
 
 // Get all hostels
 exports.getAllHostels = async (req, res) => {
@@ -420,5 +421,233 @@ exports.updateHostelStatistics = async (booking) => {
   } catch (error) {
     console.error('Error updating hostel statistics:', error);
     return false;
+  }
+};
+
+// Get block availability settings
+exports.getBlockAvailability = async (req, res) => {
+  try {
+    let blockAvailability = await BlockAvailability.findOne();
+      // If no block availability settings exist, create default ones with ALL blocks
+    if (!blockAvailability) {
+      const defaultBlocks = [
+        // Boys Blocks
+        {
+          id: '1',
+          name: 'Phase 1',
+          gender: 'Boys',
+          floors: Array.from({ length: 5 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '2',
+          name: 'Phase 1 E Block',
+          gender: 'Boys',
+          floors: Array.from({ length: 5 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '3',
+          name: 'Phase 2',
+          gender: 'Boys',
+          floors: Array.from({ length: 13 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '4',
+          name: 'Phase 2 Part 5',
+          gender: 'Boys',
+          floors: Array.from({ length: 13 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '5',
+          name: 'Phase 3 North Wing',
+          gender: 'Girls',
+          floors: Array.from({ length: 10 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '6',
+          name: 'Phase 3 South Wing',
+          gender: 'Girls',
+          floors: Array.from({ length: 10 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '7',
+          name: 'Phase 4A',
+          gender: 'Boys',
+          floors: Array.from({ length: 11 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '8',
+          name: 'Phase 4B',
+          gender: 'Boys',
+          floors: Array.from({ length: 11 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        // Girls Blocks
+        {
+          id: '9',
+          name: 'Aravali',
+          gender: 'Girls',
+          floors: Array.from({ length: 5 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '10',
+          name: 'Ajanta',
+          gender: 'Girls',
+          floors: Array.from({ length: 5 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '11',
+          name: 'Himalaya',
+          gender: 'Girls',
+          floors: Array.from({ length: 5 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '12',
+          name: 'Shivalik',
+          gender: 'Girls',
+          floors: Array.from({ length: 5 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '13',
+          name: 'Vindya',
+          gender: 'Girls',
+          floors: Array.from({ length: 5 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '14',
+          name: 'Nilgiri',
+          gender: 'Girls',
+          floors: Array.from({ length: 5 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '15',
+          name: 'Satpura',
+          gender: 'Girls',
+          floors: Array.from({ length: 5 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        },
+        {
+          id: '16',
+          name: 'Kailash',
+          gender: 'Girls',
+          floors: Array.from({ length: 5 }, (_, i) => ({
+            floorNumber: i + 1,
+            isActive: false
+          }))
+        }
+      ];
+
+      blockAvailability = new BlockAvailability({
+        blocks: defaultBlocks
+      });
+      await blockAvailability.save();
+    }
+
+    res.status(200).json(blockAvailability);
+  } catch (error) {
+    console.error('Error getting block availability:', error);
+    res.status(500).json({ message: 'Failed to get block availability settings' });
+  }
+};
+
+// Update block availability settings
+exports.updateBlockAvailability = async (req, res) => {
+  try {
+    const { blocks } = req.body;
+
+    let blockAvailability = await BlockAvailability.findOne();
+    
+    if (!blockAvailability) {
+      blockAvailability = new BlockAvailability({ blocks });
+    } else {
+      blockAvailability.blocks = blocks;
+    }
+
+    await blockAvailability.save();
+
+    res.status(200).json({ 
+      message: 'Block availability settings updated successfully',
+      blockAvailability 
+    });
+  } catch (error) {
+    console.error('Error updating block availability:', error);
+    res.status(500).json({ message: 'Failed to update block availability settings' });
+  }
+};
+
+// Get available blocks for students (only active blocks/floors)
+exports.getAvailableBlocksForStudents = async (req, res) => {
+  try {
+    const blockAvailability = await BlockAvailability.findOne();
+    
+    if (!blockAvailability) {
+      return res.status(200).json({ availableBlocks: [] });
+    }
+
+    // Filter blocks to only include those with at least one active floor
+    const availableBlocks = blockAvailability.blocks
+      .filter(block => block.floors.some(floor => floor.isActive))
+      .map(block => ({
+        id: block.id,
+        name: block.name,
+        gender: block.gender,
+        availableFloors: block.floors.filter(floor => floor.isActive)
+      }));    res.status(200).json({ availableBlocks });
+  } catch (error) {
+    console.error('Error getting available blocks for students:', error);
+    res.status(500).json({ message: 'Failed to get available blocks' });
+  }
+};
+
+// Reset block availability settings (for testing/admin use)
+exports.resetBlockAvailability = async (req, res) => {
+  try {
+    await BlockAvailability.deleteMany({});
+    res.status(200).json({ message: 'Block availability settings reset successfully' });
+  } catch (error) {
+    console.error('Error resetting block availability:', error);
+    res.status(500).json({ message: 'Failed to reset block availability settings' });
   }
 };
