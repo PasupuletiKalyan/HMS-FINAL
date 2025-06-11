@@ -7,7 +7,16 @@ const hostelController = require('../controllers/hostelController');
 // Get all hostels
 router.get('/', hostelController.getAllHostels);
 
-// Get single hostel by ID
+// Block availability routes (place before /:id route to avoid conflicts)
+router.get('/blocks-availability', hostelController.getBlockAvailability);
+router.post('/blocks-availability', hostelController.updateBlockAvailability);
+router.delete('/blocks-availability', hostelController.resetBlockAvailability);
+router.get('/available-blocks', hostelController.getAvailableBlocksForStudents);
+
+// Statistics routes
+router.get('/statistics/all', hostelController.getHostelStatistics);
+
+// Get single hostel by ID (place after specific routes)
 router.get('/:id', hostelController.getHostelById);
 
 // Add new hostel
@@ -69,8 +78,5 @@ router.post('/room-allotment', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
-// Statistics routes
-router.get('/statistics/all', hostelController.getHostelStatistics);
 
 module.exports = router;
