@@ -503,13 +503,12 @@ exports.getBlockAvailability = async (req, res) => {
             floorNumber: i + 1,
             isActive: false
           }))
-        },
-        // Girls Blocks
+        },        // Girls Blocks
         {
           id: '9',
           name: 'Aravali',
           gender: 'Girls',
-          floors: Array.from({ length: 5 }, (_, i) => ({
+          floors: Array.from({ length: 3 }, (_, i) => ({
             floorNumber: i + 1,
             isActive: false
           }))
@@ -518,7 +517,7 @@ exports.getBlockAvailability = async (req, res) => {
           id: '10',
           name: 'Ajanta',
           gender: 'Girls',
-          floors: Array.from({ length: 5 }, (_, i) => ({
+          floors: Array.from({ length: 3 }, (_, i) => ({
             floorNumber: i + 1,
             isActive: false
           }))
@@ -527,7 +526,7 @@ exports.getBlockAvailability = async (req, res) => {
           id: '11',
           name: 'Himalaya',
           gender: 'Girls',
-          floors: Array.from({ length: 5 }, (_, i) => ({
+          floors: Array.from({ length: 3 }, (_, i) => ({
             floorNumber: i + 1,
             isActive: false
           }))
@@ -536,7 +535,7 @@ exports.getBlockAvailability = async (req, res) => {
           id: '12',
           name: 'Shivalik',
           gender: 'Girls',
-          floors: Array.from({ length: 5 }, (_, i) => ({
+          floors: Array.from({ length: 3 }, (_, i) => ({
             floorNumber: i + 1,
             isActive: false
           }))
@@ -545,7 +544,7 @@ exports.getBlockAvailability = async (req, res) => {
           id: '13',
           name: 'Vindya',
           gender: 'Girls',
-          floors: Array.from({ length: 5 }, (_, i) => ({
+          floors: Array.from({ length: 3 }, (_, i) => ({
             floorNumber: i + 1,
             isActive: false
           }))
@@ -554,7 +553,7 @@ exports.getBlockAvailability = async (req, res) => {
           id: '14',
           name: 'Nilgiri',
           gender: 'Girls',
-          floors: Array.from({ length: 5 }, (_, i) => ({
+          floors: Array.from({ length: 3 }, (_, i) => ({
             floorNumber: i + 1,
             isActive: false
           }))
@@ -563,7 +562,7 @@ exports.getBlockAvailability = async (req, res) => {
           id: '15',
           name: 'Satpura',
           gender: 'Girls',
-          floors: Array.from({ length: 5 }, (_, i) => ({
+          floors: Array.from({ length: 3 }, (_, i) => ({
             floorNumber: i + 1,
             isActive: false
           }))
@@ -572,7 +571,7 @@ exports.getBlockAvailability = async (req, res) => {
           id: '16',
           name: 'Kailash',
           gender: 'Girls',
-          floors: Array.from({ length: 5 }, (_, i) => ({
+          floors: Array.from({ length: 3 }, (_, i) => ({
             floorNumber: i + 1,
             isActive: false
           }))

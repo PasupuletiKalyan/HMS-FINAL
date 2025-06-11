@@ -146,16 +146,15 @@ const AdminDashboard: React.FC = () => {
     { name: "Phase 3 North Wing", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "5th Floor", "6th Floor", "7th Floor", "8th Floor", "9th Floor"] },
     { name: "Phase 3 South Wing", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "5th Floor", "6th Floor", "7th Floor", "8th Floor", "9th Floor"] },
     { name: "Phase 4A", gender: "Boys", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "5th Floor", "6th Floor", "7th Floor", "8th Floor", "9th Floor", "10th Floor"] },
-    { name: "Phase 4B", gender: "Boys", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "5th Floor", "6th Floor", "7th Floor", "8th Floor", "9th Floor", "10th Floor"] },
-    // Girls Blocks
-    { name: "Aravali", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
-    { name: "Ajanta", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
-    { name: "Himalaya", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
-    { name: "Shivalik", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
-    { name: "Vindya", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
-    { name: "Nilgiri", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
-    { name: "Satpura", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
-    { name: "Kailash", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
+    { name: "Phase 4B", gender: "Boys", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "5th Floor", "6th Floor", "7th Floor", "8th Floor", "9th Floor", "10th Floor"] },    // Girls Blocks
+    { name: "Aravali", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor"] },
+    { name: "Ajanta", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor"] },
+    { name: "Himalaya", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor"] },
+    { name: "Shivalik", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor"] },
+    { name: "Vindya", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor"] },
+    { name: "Nilgiri", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor"] },
+    { name: "Satpura", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor"] },
+    { name: "Kailash", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor"] },
   ];  // Enhanced function to fetch hostel blocks with appropriate number of floors for each block
   const fetchHostelBlocks = async () => {
     // Always start with all available blocks from blockConfigs
