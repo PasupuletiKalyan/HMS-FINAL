@@ -27,7 +27,8 @@ const corsOptions = {
     'http://localhost:3000', 
     'https://your-vercel-frontend-url.vercel.app', // Replace with your actual Vercel URL
     /\.vercel\.app$/, // Allow all Vercel subdomains
-    /\.railway\.app$/ // Allow all Railway subdomains
+    /\.railway\.app$/, // Allow all Railway subdomains
+    /\.onrender\.com$/ // Allow all Render subdomains
   ],
   credentials: true,
   optionsSuccessStatus: 200
