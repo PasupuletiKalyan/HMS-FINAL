@@ -5,12 +5,6 @@ import "../styles/WardenDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
 import ResetStudentProgress from "../components/ResetStudentProgress"; // Import the reset component
 
-interface Student {
-  name: string;
-  roll: string;
-  room: string;
-}
-
 // Define interfaces for our new features
 interface User {
   id: string;
@@ -47,10 +41,7 @@ interface Announcement {
 
 const AdminDashboard: React.FC = () => {
   const [selectedMenu, setSelectedMenu] = useState("Overview");
-  const [adminName, setAdminName] = useState("Admin");  const [studentData, setStudentData] = useState<Student[]>([]);
-  const [selectedBlock, setSelectedBlock] = useState<string | null>(null);
-  const [filteredRoomData, setFilteredRoomData] = useState<Student[]>([]);
-  const [roomSearchTerm, setRoomSearchTerm] = useState("");
+  const [adminName, setAdminName] = useState("Admin");  // Removed unused state variables: filteredRoomData, roomSearchTerm
   const [adminID, setAdminID] = useState<string | null>(null);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   
@@ -88,13 +79,7 @@ const AdminDashboard: React.FC = () => {
     localStorage.clear();
     navigate("/login");
   };
-
-  const handleRoomSearch = () => {
-    const results = studentData.filter((s) =>
-      s.room.toLowerCase() === roomSearchTerm.toLowerCase()
-    );
-    setFilteredRoomData(results);
-  };
+  // Removed unused handleRoomSearch function
 
   useEffect(() => {
     const storedAdmin = localStorage.getItem("userName");
@@ -113,20 +98,7 @@ const AdminDashboard: React.FC = () => {
         console.error("Error fetching admin ID:", error);
         setAdminID("Unavailable");
       }
-    };    fetchAdminID();
-  }, []);
-
-  const handleBlockSelect = (blockName: string) => {
-    setSelectedBlock(blockName);
-
-    const dummyData: Student[] = [
-      { name: "Anjali Sharma", roll: "22BCS011", room: "G-102" },
-      { name: "Megha Rani", roll: "22BCE123", room: "G-104" },
-      { name: "Tanya Roy", roll: "22BCS321", room: "G-201" },
-    ];
-    setStudentData(dummyData);
-    setFilteredRoomData([]);
-    setRoomSearchTerm("");};
+    };    fetchAdminID();  }, []);
 
   // Search bar functionality has been removed
 
@@ -163,22 +135,26 @@ const AdminDashboard: React.FC = () => {
     ];
     setUsers(dummyUsers);
     setFilteredUsers(dummyUsers);
-  };
-
-  // Updated hostelBlocks structure to match real-world blocks with accurate floor counts
+  };  // Updated hostelBlocks structure to match HostelFloorPlanViewer exactly
   const blockConfigs = [
-    { name: "Phase-1", gender: "Boys", floors: 4 },
-    { name: "E-wing", gender: "Boys", floors: 4 },
-    { name: "Phase-2", gender: "Boys", floors: 11 },
-    { name: "Phase-4", gender: "Boys", floors: 6 },
-    { name: "Aravalli", gender: "Girls", floors: 5 },
-    { name: "Ajanta", gender: "Girls", floors: 5 },
-    { name: "Himalaya", gender: "Girls", floors: 5 },
-    { name: "Shivalik", gender: "Girls", floors: 5 },
-    { name: "Vindya", gender: "Girls", floors: 5 },
-    { name: "Satpura", gender: "Girls", floors: 5 },
-    { name: "Kailash", gender: "Girls", floors: 5 },
-    { name: "Phase-3", gender: "Girls", floors: 4 },
+    // Boys Blocks
+    { name: "Phase 1", gender: "Boys", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
+    { name: "Phase 1 E Block", gender: "Boys", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
+    { name: "Phase 2", gender: "Boys", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "5th Floor", "6th Floor", "7th Floor", "8th Floor", "9th Floor", "10th Floor", "11th Floor", "12th Floor"] },
+    { name: "Phase 2 Part 5", gender: "Boys", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "5th Floor", "6th Floor", "7th Floor", "8th Floor", "9th Floor", "10th Floor", "11th Floor", "12th Floor"] },
+    { name: "Phase 3 North Wing", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "5th Floor", "6th Floor", "7th Floor", "8th Floor", "9th Floor"] },
+    { name: "Phase 3 South Wing", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "5th Floor", "6th Floor", "7th Floor", "8th Floor", "9th Floor"] },
+    { name: "Phase 4A", gender: "Boys", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "5th Floor", "6th Floor", "7th Floor", "8th Floor", "9th Floor", "10th Floor"] },
+    { name: "Phase 4B", gender: "Boys", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "5th Floor", "6th Floor", "7th Floor", "8th Floor", "9th Floor", "10th Floor"] },
+    // Girls Blocks
+    { name: "Aravali", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
+    { name: "Ajanta", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
+    { name: "Himalaya", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
+    { name: "Shivalik", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
+    { name: "Vindya", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
+    { name: "Nilgiri", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
+    { name: "Satpura", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
+    { name: "Kailash", gender: "Girls", floors: ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"] },
   ];
 
   // Enhanced function to fetch hostel blocks with appropriate number of floors for each block
@@ -196,16 +172,15 @@ const AdminDashboard: React.FC = () => {
     } catch (error) {
       console.error("Error fetching hostel blocks:", error);
     }
-    
-    // Fallback to generating blocks with proper floor counts
+      // Fallback to generating blocks with proper floor counts
     const blocks: RoomBookingBlock[] = blockConfigs.map((config, index) => ({
       id: (index + 1).toString(),
       name: config.name,
       gender: config.gender,
       isActive: false, // Default to disabled
-      floors: Array.from({ length: config.floors }, (_, i) => ({
+      floors: config.floors.map((floorName, i) => ({
         id: `${index + 1}-${i + 1}`,
-        name: `Floor ${i + 1}`,
+        name: floorName,
         isActive: false, // Default to disabled
       })),
     }));
@@ -475,37 +450,7 @@ const AdminDashboard: React.FC = () => {
         user.email.toLowerCase().includes(query.toLowerCase())
       );
       setFilteredUsers(filtered);
-    }
-  };
-
-  // Toggle block activation
-  const toggleBlockActivation = (blockId: string) => {
-    setHostelBlocks(prev => 
-      prev.map(block => 
-        block.id === blockId 
-          ? { ...block, isActive: !block.isActive } 
-          : block
-      )
-    );
-  };
-
-  // Toggle floor activation
-  const toggleFloorActivation = (blockId: string, floorId: string) => {
-    setHostelBlocks(prev => 
-      prev.map(block => 
-        block.id === blockId 
-          ? { 
-              ...block, 
-              floors: block.floors.map(floor => 
-                floor.id === floorId 
-                  ? { ...floor, isActive: !floor.isActive } 
-                  : floor
-              ) 
-            } 
-          : block
-      )
-    );
-  };
+    }  };
 
   // Activate all floors in a block
   const activateAllFloors = (blockId: string) => {
@@ -521,7 +466,6 @@ const AdminDashboard: React.FC = () => {
       )
     );
   };
-
   // Deactivate all floors in a block
   const deactivateAllFloors = (blockId: string) => {
     setHostelBlocks(prev => 
@@ -531,6 +475,26 @@ const AdminDashboard: React.FC = () => {
               ...block, 
               isActive: false,
               floors: block.floors.map(floor => ({ ...floor, isActive: false })) 
+            } 
+          : block
+      )
+    );
+  };
+
+  // Toggle individual floor activation
+  const toggleFloorActivation = (blockId: string, floorId: string) => {
+    setHostelBlocks(prev => 
+      prev.map(block => 
+        block.id === blockId 
+          ? { 
+              ...block, 
+              floors: block.floors.map(floor => 
+                floor.id === floorId 
+                  ? { ...floor, isActive: !floor.isActive } 
+                  : floor
+              ),
+              // Update block status based on floor statuses
+              isActive: block.floors.some(f => f.id === floorId ? !f.isActive : f.isActive)
             } 
           : block
       )
@@ -746,12 +710,10 @@ const AdminDashboard: React.FC = () => {
 
   const renderRoomBookingRelease = () => {
     return (
-      <div className="room-release-container">
-        <h1>Room Booking Release Controls</h1>
-        
+      <div className="room-release-container">        <h1>Room Booking Release Controls</h1>        
         <p style={{ marginBottom: '20px' }}>
           Control which hostel blocks and floors are available for student booking. 
-          Active blocks and floors can be booked by students.
+          Use the toggle switches on the right side of each floor to activate/deactivate individual floors, or use the "Activate All" and "Deactivate All" buttons to control all floors in a block at once.
         </p>
         
         <div className="blocks-container">
@@ -787,49 +749,7 @@ const AdminDashboard: React.FC = () => {
                     ({block.gender})
                   </span>
                 </h3>
-                
-                <div className="block-actions" style={{ display: 'flex', gap: '10px' }}>
-                  <label className="switch" style={{
-                    position: 'relative',
-                    display: 'inline-block',
-                    width: '60px',
-                    height: '28px'
-                  }}>
-                    <input 
-                      type="checkbox" 
-                      checked={block.isActive}
-                      onChange={() => toggleBlockActivation(block.id)}
-                      style={{
-                        opacity: 0,
-                        width: 0,
-                        height: 0
-                      }}
-                    />
-                    <span className="slider" style={{
-                      position: 'absolute',
-                      cursor: 'pointer',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      backgroundColor: block.isActive ? '#28a745' : '#ccc',
-                      borderRadius: '34px',
-                      transition: '.4s'
-                    }}>
-                      <span style={{
-                        position: 'absolute',
-                        content: '',
-                        height: '20px',
-                        width: '20px',
-                        left: block.isActive ? '36px' : '4px',
-                        bottom: '4px',
-                        backgroundColor: 'white',
-                        borderRadius: '50%',
-                        transition: '.4s'
-                      }}></span>
-                    </span>
-                  </label>
-                  
+                  <div className="block-actions" style={{ display: 'flex', gap: '10px' }}>
                   <button
                     onClick={() => activateAllFloors(block.id)}
                     disabled={block.floors.every(f => f.isActive)}
@@ -874,10 +794,7 @@ const AdminDashboard: React.FC = () => {
                   display: 'flex',
                   flexWrap: 'wrap',
                   gap: '10px'
-                }}
-              >
-                {block.floors.map(floor => (
-                  <div 
+                }}              >                {block.floors.map(floor => (                  <div 
                     key={floor.id}
                     className="floor-item"
                     style={{
@@ -888,48 +805,43 @@ const AdminDashboard: React.FC = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      gap: '15px'
+                      minWidth: '180px'
                     }}
                   >
                     <span>{floor.name}</span>
-                    <label className="switch" style={{
-                      position: 'relative',
-                      display: 'inline-block',
-                      width: '40px',
-                      height: '22px'
-                    }}>
-                      <input 
-                        type="checkbox" 
+                    <label className="switch" style={{ marginLeft: '10px' }}>
+                      <input
+                        type="checkbox"
                         checked={floor.isActive}
                         onChange={() => toggleFloorActivation(block.id, floor.id)}
-                        style={{
-                          opacity: 0,
-                          width: 0,
-                          height: 0
-                        }}
+                        style={{ display: 'none' }}
                       />
-                      <span className="slider" style={{
-                        position: 'absolute',
-                        cursor: 'pointer',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: floor.isActive ? '#28a745' : '#ccc',
-                        borderRadius: '34px',
-                        transition: '.4s'
-                      }}>
-                        <span style={{
-                          position: 'absolute',
-                          content: '',
-                          height: '16px',
-                          width: '16px',
-                          left: floor.isActive ? '21px' : '3px',
-                          bottom: '3px',
-                          backgroundColor: 'white',
-                          borderRadius: '50%',
-                          transition: '.4s'
-                        }}></span>
+                      <span
+                        className="slider round"
+                        style={{
+                          position: 'relative',
+                          display: 'inline-block',
+                          width: '44px',
+                          height: '24px',
+                          backgroundColor: floor.isActive ? '#4CAF50' : '#ccc',
+                          borderRadius: '24px',
+                          transition: '0.4s',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <span
+                          style={{
+                            position: 'absolute',
+                            content: '""',
+                            height: '18px',
+                            width: '18px',
+                            left: floor.isActive ? '23px' : '3px',
+                            bottom: '3px',
+                            backgroundColor: 'white',
+                            borderRadius: '50%',
+                            transition: '0.4s'
+                          }}
+                        />
                       </span>
                     </label>
                   </div>
@@ -1320,51 +1232,10 @@ const AdminDashboard: React.FC = () => {
                 </ul>
               </div>
             )}
-          </div>        </div>
-
-        {/* MAIN CONTENT - Fixed to properly show selected menu content */}
+          </div>        </div>        {/* MAIN CONTENT */}
         <div className="dashboard-content">
-          {selectedBlock ? (
-            <>
-              <h2>Students in {selectedBlock}</h2>
-              <div className="centered-room-search">
-                <input
-                  type="text"
-                  placeholder="Search by room number..."
-                  value={roomSearchTerm}
-                  onChange={(e) => setRoomSearchTerm(e.target.value)}
-                  className="search-input"
-                />
-                <button onClick={handleRoomSearch} className="search-button">
-                  Search
-                </button>
-              </div>
-              {roomSearchTerm && (
-                <div className="student-block-list">
-                  {filteredRoomData.length > 0 ? (
-                    filteredRoomData.map((s, index) => (
-                      <div key={index} className="student-card">
-                        <p>
-                          <strong>Name:</strong> {s.name}
-                        </p>
-                        <p>
-                          <strong>Roll No:</strong> {s.roll}
-                        </p>
-                        <p>
-                          <strong>Room No:</strong> {s.room}
-                        </p>
-                      </div>
-                    ))
-                  ) : (
-                    <p>No student found for room {roomSearchTerm}</p>
-                  )}
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              {/* Show content based on selected menu */}
-              {selectedMenu === "Overview" && (
+          {/* Show content based on selected menu */}
+          {selectedMenu === "Overview" && (
                 <div className="overview-content">
                   {/* Admin Tools Section - Part of Overview only */}
                   <div className="admin-tools-section" style={{ marginBottom: '30px' }}>
@@ -1413,15 +1284,12 @@ const AdminDashboard: React.FC = () => {
                     }}>
                       <h3>Announcements</h3>
                       <p className="stat-number">12</p>
-                    </div>
-                  </div>
+                    </div>                  </div>
                 </div>
               )}
               {selectedMenu === "User Management" && renderUserManagement()}
               {selectedMenu === "Room Release" && renderRoomBookingRelease()}
               {selectedMenu === "Announcements" && renderAnnouncementsManagement()}
-            </>
-          )}
         </div>
       </div>
 
