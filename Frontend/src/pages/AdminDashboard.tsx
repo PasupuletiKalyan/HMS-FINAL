@@ -218,25 +218,6 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Helper function to convert floor numbers to floor names (same as in HostelFloorPlanViewer)
-  const getFloorName = (floorNumber: number): string => {
-    const floorNames: Record<number, string> = {
-      1: "Ground Floor",
-      2: "1st Floor", 
-      3: "2nd Floor",
-      4: "3rd Floor",
-      5: "4th Floor",
-      6: "5th Floor",
-      7: "6th Floor",
-      8: "7th Floor",
-      9: "8th Floor",
-      10: "9th Floor",
-      11: "10th Floor",
-      12: "11th Floor",
-      13: "12th Floor"
-    };
-    return floorNames[floorNumber] || `${floorNumber}th Floor`;
-  };
 
   // Function to fetch announcements
   const fetchAnnouncements = async () => {

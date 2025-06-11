@@ -76,11 +76,18 @@ const CurrentBookingPage: React.FC<CurrentBookingPageProps> = ({
           <p style={{ margin: "5px 0" }}>Your room booking has been confirmed and is valid for the current academic year.</p>
         </div>
         
-        {navigateToFloorPlan && (
+        {(navigateToFloorPlan || onCancelBooking) && (
           <div className="booking-actions">
-            <button onClick={navigateToFloorPlan} className="return-btn">
-              Back to Floor Plan
-            </button>
+            {navigateToFloorPlan && (
+              <button onClick={navigateToFloorPlan} className="return-btn">
+                Back to Floor Plan
+              </button>
+            )}
+            {onCancelBooking && (
+              <button onClick={onCancelBooking} className="cancel-btn">
+                Cancel Booking
+              </button>
+            )}
           </div>
         )}
       </div>
