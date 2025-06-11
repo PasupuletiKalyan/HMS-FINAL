@@ -203,7 +203,7 @@ html {
   align-items: center;
   justify-content: space-between;
   background-color: white;
-  padding: 0.8rem 1.5rem;
+  padding: 0.5rem 1.5rem; /* Reduced padding from 0.8rem to 0.5rem */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: fixed;
   top: 0;
@@ -218,7 +218,7 @@ html {
 }
 
 .college-logo-top {
-  height: 4.5rem;
+  height: 3.5rem; /* Reduced from 4.5rem to 3.5rem */
   margin-right: 1rem;
 }
 
@@ -249,11 +249,14 @@ html {
   position: relative;
   cursor: pointer;
   font-weight: 600;
-  transition: color 0.3s;
+  transition: all 0.3s;
+  padding: 5px 8px;
+  border-radius: 4px;
 }
 
 .top-menu li:hover {
   color: var(--primary-color);
+  background-color: rgba(211, 47, 47, 0.05);
 }
 
 /* 🔹 Dropdown */
@@ -288,11 +291,12 @@ html {
 /* 🔹 Active Menu Item */
 .active {
   border-bottom: 2px solid var(--primary-color);
+  background-color: rgba(211, 47, 47, 0.08);
 }
 
 /* 🔹 Dashboard Content */
 .dashboard-content {
-  padding: 6rem 4%;
+  padding: 5rem 4%; /* Reduced from 6rem to 5rem to adjust for smaller nav height */
   background-color: var(--secondary-color);
   margin: 1.5rem auto;
   border-radius: 8px;
@@ -314,23 +318,24 @@ html {
 
 /* 🔹 Footer */
 .footer {
-  background-color: var(--text-color);
-  color: var(--secondary-color);
+  background-color: #333;
+  color: white;
+  padding: 1.5rem 1rem;
+  margin-top: 3rem;
   text-align: center;
-  padding: 1.2rem;
-  margin-top: 2rem;
-  font-size: 1rem;
 }
 
 .footer a {
-  color: var(--secondary-color);
+  color: #fff;
   text-decoration: none;
-  margin: 0 0.8rem;
+  margin: 0 1rem;
   transition: color 0.3s;
+  font-weight: 500;
 }
 
 .footer a:hover {
-  color: var(--primary-color);
+  color: #ff9e9e;
+  text-decoration: underline;
 }
 
 /* 🔹 Personal Details Form */
@@ -1209,6 +1214,76 @@ textarea.no-resize {
   100% {
     box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
   }
+}
+
+/* About Section Styles */
+.about-section h4 {
+  position: relative;
+  padding-left: 15px;
+}
+
+.about-section h4:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 20px;
+  background-color: var(--primary-color);
+  border-radius: 3px;
+}
+
+.team-member-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Enhanced About Section Styling */
+.vision-mission p {
+  border-left: 4px solid #d32f2f;
+  padding-left: 15px;
+  background-color: #fff;
+  padding: 15px 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border-radius: 0 5px 5px 0;
+}
+
+.implementation-section ul {
+  margin-top: 10px;
+}
+
+.implementation-section li {
+  margin-bottom: 8px;
+}
+
+/* Room Change Request Enhanced Styling */
+.room-change-form .form-group label {
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.room-change-container {
+  position: relative;
+}
+
+.room-change-container::after {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 20px;
+  width: 30px;
+  height: 15px;
+  background-color: #d32f2f;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  display: none; /* Hidden by default, can be activated for specific design */
+}
+
+/* Enterprise look enhancements */
+.team-member-card .member-info {
+  border-top: 4px solid #d32f2f;
 }
 
 
