@@ -21,7 +21,17 @@ const app = express();
 app.use(express.json());
 
 // Enable CORS
-app.use(cors());
+const corsOptions = {
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000', 
+    'https://your-vercel-frontend-url.vercel.app', // Replace with your actual Vercel URL
+    /\.vercel\.app$/ // Allow all Vercel subdomains
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 
 // Create uploads directory if it doesn't exist
 const fs = require('fs');
@@ -105,7 +115,7 @@ app.use("/api/hostels", hostelRoutes);
 // Announcement Routes
 app.use("/api/announcements", announcementRoutes);
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

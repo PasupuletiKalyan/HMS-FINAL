@@ -1,0 +1,20 @@
+// API configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+export const API_CONFIG = {
+  BASE_URL: API_BASE_URL,
+  ENDPOINTS: {
+    LOGIN: `${API_BASE_URL}/api/login`,
+    STUDENTS: `${API_BASE_URL}/api/students`,
+    FORM: `${API_BASE_URL}/api/form`,
+    PROGRESS: `${API_BASE_URL}/api/progress`,
+    COMPLAINTS: `${API_BASE_URL}/api/complaints`,
+    HOSTELS: `${API_BASE_URL}/api/hostels`,
+    USERS: `${API_BASE_URL}/api/users`,
+    WARDEN: `${API_BASE_URL}/api/warden`,
+    OCCUPIED_BEDS: `${API_BASE_URL}/api/occupied-beds`,
+    ANNOUNCEMENTS: `${API_BASE_URL}/api/announcements`
+  }
+};
+
+export default API_CONFIG;
