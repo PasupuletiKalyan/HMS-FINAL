@@ -17,4 +17,9 @@ export const API_CONFIG = {
   }
 };
 
+// Helper function to build API URLs
+export const buildApiUrl = (path: string): string => {
+  return `${API_BASE_URL}${path}`;
+};
+
 export default API_CONFIG;
