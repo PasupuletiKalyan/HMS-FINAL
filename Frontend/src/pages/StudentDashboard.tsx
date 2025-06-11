@@ -29,10 +29,7 @@ interface StudentDashboardProps {
 
 const StudentDashboard: React.FC<StudentDashboardProps> = ({
   currentUserBooking: propCurrentUserBooking,
-  setCurrentUserBooking,
-  occupiedBeds,
-  setOccupiedBeds
-}) => {  const [selectedSection, setSelectedSection] = useState("Dashboard"); // Track the selected section
+  setCurrentUserBooking}) => {  const [selectedSection, setSelectedSection] = useState("Dashboard"); // Track the selected section
   const [showProfileDropdown, setShowProfileDropdown] = useState(false); // Track profile dropdown visibility
   const [currentStep, setCurrentStep] = useState<number>(1); // Track the current step (1, 2, or 3)
   const [showForm, setShowForm] = useState(false); // Track whether the form is displayed
@@ -58,23 +55,6 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     setPaymentDetails((prev) => ({ ...prev, [name]: value }));
   };
 
-  const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!/^\d{16}$/.test(paymentDetails.cardNumber)) {
-      newErrors.cardNumber = "Card number must be 16 digits.";
-    }
-    if (!/^\d{2}\/\d{2}$/.test(paymentDetails.expiryDate)) {
-      newErrors.expiryDate = "Expiry date must be in MM/YY format.";
-    }
-    if (!/^\d{3}$/.test(paymentDetails.cvv)) {
-      newErrors.cvv = "CVV must be 3 digits.";
-    }
-    if (!paymentDetails.cardHolderName.trim()) {
-      newErrors.cardHolderName = "Cardholder name is required.";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const profileRef = useRef<HTMLDivElement | null>(null); // Reference for the profile dropdown
   const userName = localStorage.getItem("student_userName") || "Student";
@@ -396,39 +376,6 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     }
   };
   // Add function to mark booking as complete
-  const markBookingComplete = async (bookingDetails: BookingInfo) => {
-    try {
-      // Call API to mark booking as completed for this student
-      const response = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/booking`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          completedAt: new Date().toISOString(),
-          bookingDetails: bookingDetails
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setCompletedSteps(prev => [...prev, 3]); // Mark step 3 as completed
-          // Update both local and parent state with booking info
-          setLocalCurrentUserBooking(bookingDetails);
-          setCurrentUserBooking(bookingDetails);
-        } else {
-          alert("There was an error saving your booking. Please try again.");
-        }
-      } else {
-        const errorData = await response.json();
-        alert(errorData.message || "Failed to save booking. Please try again later.");
-      }
-    } catch (error) {
-      console.error("Error marking booking as complete:", error);
-      alert("An error occurred while saving your booking. Please check your connection and try again.");
-    }
-  };
 
   const validatePhoneNumber = (name: string, value: string) => {
     if (value === "" || /^\d{10}$/.test(value)) {
