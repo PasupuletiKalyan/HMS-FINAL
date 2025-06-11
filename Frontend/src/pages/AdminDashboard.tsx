@@ -60,10 +60,8 @@ const AdminDashboard: React.FC = () => {
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-
   // States for Room Booking Release feature
   const [hostelBlocks, setHostelBlocks] = useState<RoomBookingBlock[]>([]);
-  const [selectedHostelBlock, setSelectedHostelBlock] = useState<string | null>(null);
   
   // States for Announcements feature
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -115,20 +113,9 @@ const AdminDashboard: React.FC = () => {
         console.error("Error fetching admin ID:", error);
         setAdminID("Unavailable");
       }
-    };
-
-    fetchAdminID();
+    };    fetchAdminID();
   }, []);
 
-  const handleClickOutside = (e: MouseEvent) => {
-    const target = e.target as Node;
-  
-    // ✅ Close profile dropdown if click was outside it
-    if (profileRef.current && !profileRef.current.contains(target)) {
-      setShowProfileDropdown(false);
-    }
-  };
-  
   const handleBlockSelect = (blockName: string) => {
     setSelectedBlock(blockName);
 
