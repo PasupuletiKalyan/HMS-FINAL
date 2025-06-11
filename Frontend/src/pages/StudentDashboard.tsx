@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { buildApiUrl } from "../config/api";
 import "../styles/StudentDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
 import defaultProfilePic from "../assets/default-profile-pic.jpg";
@@ -69,12 +70,11 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           setProfilePic(defaultProfilePic);
           return;
         }
-        
-        const response = await fetch(`http://localhost:5000/api/students/${applicationNumber}`);
+          const response = await fetch(buildApiUrl(`/api/students/${applicationNumber}`));
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.student && data.student.profilePhoto) {
-            const photoUrl = `http://localhost:5000${data.student.profilePhoto}`;
+            const photoUrl = buildApiUrl(data.student.profilePhoto);
             setProfilePic(photoUrl);
             localStorage.setItem("profilePic", photoUrl);
             
