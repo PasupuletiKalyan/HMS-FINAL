@@ -74,7 +74,7 @@ app.post("/api/login", async (req, res) => {
       applicationNo: user.applicationNo
     });
   } catch (error) {
-    console.error("🔥 Server Error:", error);
+    console.error("Server Error:", error);
     res.status(500).json({ success: false, message: "Server error. Please try again." });
   }
 });
@@ -89,6 +89,10 @@ app.use("/api/users", userRoutes);
 
 // Complaint Routes
 app.use("/api/complaints", complaintRoutes);
+
+// Room Change Request Routes
+const roomChangeRequestRoutes = require("./routes/roomChangeRequestRoutes");
+app.use("/api/room-change-requests", roomChangeRequestRoutes);
 
 // Student Progress Routes
 app.use("/api/progress", studentProgressRoutes);

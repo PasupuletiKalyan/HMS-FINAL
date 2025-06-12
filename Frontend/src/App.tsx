@@ -51,7 +51,7 @@ const LocationAwareApp: React.FC = () => {
       if (applicationNo) {
         try {
           // First, directly check if the form exists in the database
-          const formResponse = await fetch(buildApiUrl(`/api/form/${applicationNo}`));
+          const formResponse = await fetch(`http://localhost:5000/api/form/${applicationNo}`);
           if (formResponse.ok) {
             const formData = await formResponse.json();
             if (formData.success && formData.form) {
@@ -62,26 +62,19 @@ const LocationAwareApp: React.FC = () => {
           }
 
           // Now get the overall progress
-          const response = await fetch(buildApiUrl(`/api/progress/${applicationNo}`));
+          const response = await fetch(`http://localhost:5000/api/progress/${applicationNo}`);
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
               // Load completed steps from backend
               const backendCompletedSteps = data.progress.completedSteps || [];
-              
-              // If form exists according to first check but not reflected in completedSteps, add it
-              if (localStorage.getItem("formCompleted") === "true" && !backendCompletedSteps.includes(1)) {
-                backendCompletedSteps.push(1);
-                console.log("Adding form step to completed steps based on form existence");
-              }
-              
               setCompletedSteps(backendCompletedSteps);
               
               // Update backend progress if needed
               if (localStorage.getItem("formCompleted") === "true" && !data.progress.formCompleted) {
                 console.log("Updating backend progress to mark form as completed");
                 try {
-                  await fetch(buildApiUrl(`/api/progress/${applicationNo}/form`), {
+                  await fetch(`http://localhost:5000/api/progress/${applicationNo}/form`, {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
@@ -98,13 +91,17 @@ const LocationAwareApp: React.FC = () => {
               // Store in localStorage for persistence
               localStorage.setItem("completedSteps", JSON.stringify(backendCompletedSteps));
               
-              // Set form and payment completion flags in localStorage
+              // Set form and payment completion flags in localStorage based on backend data
               if (data.progress.formCompleted) {
                 localStorage.setItem("formCompleted", "true");
+              } else {
+                localStorage.removeItem("formCompleted");
               }
               
               if (data.progress.paymentCompleted) {
                 localStorage.setItem("paymentCompleted", "true");
+              } else {
+                localStorage.removeItem("paymentCompleted");
               }
               
               if (data.progress.roomBooked && data.progress.bookingDetails) {
@@ -154,8 +151,6 @@ const LocationAwareApp: React.FC = () => {
       <Route path="/student-dashboard" element={<StudentDashboard      
         currentUserBooking={currentUserBooking}
         setCurrentUserBooking={setCurrentUserBooking}
-        occupiedBeds={occupiedBeds}
-        setOccupiedBeds={setOccupiedBeds}
       />} />
       <Route path="/warden-dashboard" element={<WardenDashboard />} /> 
       <Route path="/admin-dashboard" element={<AdminDashboard />} />   
