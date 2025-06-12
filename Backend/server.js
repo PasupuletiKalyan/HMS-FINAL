@@ -90,6 +90,10 @@ app.use("/api/users", userRoutes);
 // Complaint Routes
 app.use("/api/complaints", complaintRoutes);
 
+// Room Change Request Routes
+const roomChangeRequestRoutes = require("./routes/roomChangeRequestRoutes");
+app.use("/api/room-change-requests", roomChangeRequestRoutes);
+
 // Student Progress Routes
 app.use("/api/progress", studentProgressRoutes);
 

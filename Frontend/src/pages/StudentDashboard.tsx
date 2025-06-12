@@ -4,7 +4,6 @@ import "../styles/StudentDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
 import defaultProfilePic from "../assets/default-profile-pic.jpg";
 import ResetStudentProgress from "../components/ResetStudentProgress"; // Import the reset component
-import ProfilePhotoUploader from "../components/ProfilePhotoUploader"; // Import our new component
 import antiDrugPolicy from "../assets/ANTI DRUG.pdf"; // Import the anti-drug policy PDF
 import annexureAntiDrug from "../assets/Annexure Anti Drug.pdf"; // Import the annexure PDF
 
@@ -23,16 +22,12 @@ interface BookingInfo {
 interface StudentDashboardProps {
   currentUserBooking: BookingInfo | null;
   setCurrentUserBooking: React.Dispatch<React.SetStateAction<BookingInfo | null>>;
-  occupiedBeds: Record<string, boolean>;
-  setOccupiedBeds: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
 }
 
 const StudentDashboard: React.FC<StudentDashboardProps> = ({
   currentUserBooking: propCurrentUserBooking,
-  setCurrentUserBooking,
-  occupiedBeds,
-  setOccupiedBeds
-}) => {  const [selectedSection, setSelectedSection] = useState("Dashboard"); // Track the selected section
+  setCurrentUserBooking
+}) => {const [selectedSection, setSelectedSection] = useState("Dashboard"); // Track the selected section
   const [showProfileDropdown, setShowProfileDropdown] = useState(false); // Track profile dropdown visibility
   const [currentStep, setCurrentStep] = useState<number>(1); // Track the current step (1, 2, or 3)
   const [showForm, setShowForm] = useState(false); // Track whether the form is displayed
@@ -46,36 +41,21 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     expiryDate: "",
     cvv: "",
     cardHolderName: "",
-  });
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  });  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [completedSteps, setCompletedSteps] = useState<number[]>([]); // Track completed steps
   const [studentComplaints, setStudentComplaints] = useState<any[]>([]); // Track complaints submitted by the student
   const navigate = useNavigate();
-  const [studentFormData, setStudentFormData] = useState<any>(null); // Add state for storing student form data
+    // Room change request form states
+  const [roomChangeForm, setRoomChangeForm] = useState({
+    reason: '',
+    customReason: '',
+    preferredBlock: ''
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setPaymentDetails((prev) => ({ ...prev, [name]: value }));
   };
-
-  const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!/^\d{16}$/.test(paymentDetails.cardNumber)) {
-      newErrors.cardNumber = "Card number must be 16 digits.";
-    }
-    if (!/^\d{2}\/\d{2}$/.test(paymentDetails.expiryDate)) {
-      newErrors.expiryDate = "Expiry date must be in MM/YY format.";
-    }
-    if (!/^\d{3}$/.test(paymentDetails.cvv)) {
-      newErrors.cvv = "CVV must be 3 digits.";
-    }
-    if (!paymentDetails.cardHolderName.trim()) {
-      newErrors.cardHolderName = "Cardholder name is required.";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const profileRef = useRef<HTMLDivElement | null>(null); // Reference for the profile dropdown
   const userName = localStorage.getItem("student_userName") || "Student";
   const applicationNumber = localStorage.getItem("applicationNo") || "N/A"; // Use actual application number from login
@@ -120,21 +100,6 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     
     loadProfilePhoto();
   }, [applicationNumber]);
-
-  // Handle profile photo updates
-  const handleProfilePhotoUpdate = (photoUrl: string) => {
-    setProfilePic(photoUrl);
-    localStorage.setItem("profilePic", photoUrl);
-    
-    // Update all profile images in the DOM
-    const profileElements = document.querySelectorAll('.profile-circle-image');
-    profileElements.forEach(el => {
-      (el as HTMLImageElement).src = photoUrl;
-    });
-    
-    // Force a re-render of components that might use this image
-    window.dispatchEvent(new Event('storage'));
-  };
 
   // Close the profile dropdown when clicking outside
   useEffect(() => {
@@ -393,42 +358,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     } catch (error) {
       console.error("Error processing payment:", error);
       alert("An error occurred while processing your payment. Please check your connection and try again.");
-    }
-  };
-  // Add function to mark booking as complete
-  const markBookingComplete = async (bookingDetails: BookingInfo) => {
-    try {
-      // Call API to mark booking as completed for this student
-      const response = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/booking`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          completedAt: new Date().toISOString(),
-          bookingDetails: bookingDetails
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setCompletedSteps(prev => [...prev, 3]); // Mark step 3 as completed
-          // Update both local and parent state with booking info
-          setLocalCurrentUserBooking(bookingDetails);
-          setCurrentUserBooking(bookingDetails);
-        } else {
-          alert("There was an error saving your booking. Please try again.");
-        }
-      } else {
-        const errorData = await response.json();
-        alert(errorData.message || "Failed to save booking. Please try again later.");
-      }
-    } catch (error) {
-      console.error("Error marking booking as complete:", error);
-      alert("An error occurred while saving your booking. Please check your connection and try again.");
-    }
-  };
+    }  };
 
   const validatePhoneNumber = (name: string, value: string) => {
     if (value === "" || /^\d{10}$/.test(value)) {
@@ -495,11 +425,10 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const fetchStudentFormData = async () => {
     if (applicationNumber && applicationNumber !== 'N/A') {
       try {
-        const response = await fetch(`http://localhost:5000/api/form/${applicationNumber}`);
-        if (response.ok) {
+        const response = await fetch(`http://localhost:5000/api/form/${applicationNumber}`);        if (response.ok) {
           const data = await response.json();
           if (data.success) {
-            setStudentFormData(data.form);
+            // Form data fetched successfully
           }
         }
       } catch (error) {
@@ -527,8 +456,6 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               "Dashboard",
               "My Booking",
               "Virtual Tour",
-              "Room Change Request",
-              "About",
             ].map((item) => (
               <li
                 key={item}
@@ -553,6 +480,19 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 {item}
               </li>
             ))}
+              {/* Room Change Request as section */}
+            <li
+              className={`top-menu-item ${selectedSection === "Room Change Request" ? "active" : ""}`}
+              onClick={() => {
+                if (localCurrentUserBooking) {
+                  setSelectedSection("Room Change Request");
+                } else {
+                  alert('You need to have an active room booking before you can request a room change.');
+                }
+              }}
+            >
+              Room Change Request
+            </li>
             <li 
               className={`top-menu-item ${selectedSection.includes("Complaints") ? "active" : ""}`}
             >
@@ -561,6 +501,13 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <li onClick={() => setSelectedSection("Complaints-New")}>New Complaints</li>
                 <li onClick={() => setSelectedSection("Complaints-Old")}>Old Complaints</li>
               </ul>
+            </li>
+            <li
+              key="About"
+              className={`top-menu-item ${selectedSection === "About" ? "active" : ""}`}
+              onClick={() => setSelectedSection("About")}
+            >
+              About
             </li>
           </ul>
           <div className="profile-button-container" ref={profileRef}>
@@ -872,7 +819,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         <option value="+1">+1 (USA)</option>
                         <option value="+91" selected>+91 (India)</option>
                         <option value="+44">+44 (UK)</option>
-                        <option value="+61">+61 (Australia)</option>
+                        <option value="+61">+61 (Australia)"</option>
                         <option value="+81">+81 (Japan)"</option>
                         {/* Add more country codes as needed */}
                       </select>
@@ -1248,8 +1195,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </div>
             </div>
           )}
-          
-          {/* Complaints - New */}
+            {/* Complaints - New */}
           {selectedSection === "Complaints-New" && (
             <div className="complaints-section">
               <h2>Submit New Complaint</h2>
@@ -1480,27 +1426,6 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 </div>
                 
                 <div className="form-group">
-                  <label htmlFor="complaint-image">Upload Images (Optional)</label>
-                  <input 
-                    type="file" 
-                    id="complaint-image" 
-                    accept="image/*"
-                    multiple
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      borderRadius: '5px',
-                      border: '1px solid #ddd',
-                      marginTop: '8px',
-                      backgroundColor: '#f9f9f9'
-                    }}
-                  />
-                  <p style={{fontSize: '12px', color: '#666', marginTop: '5px'}}>
-                    Upload images to help us better understand the issue (max 3 images, 5MB each)
-                  </p>
-                </div>
-                
-                <div className="form-group">
                   <label htmlFor="complaint-priority">Priority Level</label>
                   <select 
                     id="complaint-priority" 
@@ -1559,108 +1484,103 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           {selectedSection === "Complaints-Old" && (
             <div className="complaints-history-section">
               <h2>Complaint History</h2>
-              
-              <div className="filter-controls" style={{
+                <div className="filter-controls" style={{
                 display: 'flex',
-                justifyContent: 'space-between',
+                justifyContent: 'flex-end',
                 alignItems: 'center',
                 margin: '20px 0',
                 padding: '15px',
                 backgroundColor: '#f9f9f9',
-                borderRadius: '5px'
+                borderRadius: '8px'
               }}>
-                <div className="filter-group">
-                  <label htmlFor="status-filter" style={{marginRight: '10px'}}>Status:</label>
-                  <select id="status-filter" style={{
-                    padding: '8px',
-                    borderRadius: '4px',
-                    border: '1px solid #ddd'
-                  }}>
-                    <option value="all">All</option>
-                    <option value="pending">Pending</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="resolved">Resolved</option>
-                    <option value="closed">Closed</option>
-                  </select>
-                </div>
-                <div className="search-filter">
+                <div className="search-box">
                   <input 
                     type="text" 
-                    placeholder="Search complaints..." 
+                    placeholder="Search complaints..."
                     style={{
-                      padding: '8px 12px',
-                      borderRadius: '4px',
+                      padding: '8px',
+                      borderRadius: '5px',
                       border: '1px solid #ddd',
-                      width: '250px'
+                      width: '200px'
                     }}
                   />
                 </div>
               </div>
               
-              <div className="complaints-table-container" style={{overflowX: 'auto'}}>
-                {studentComplaints.length > 0 ? (
-                  <table style={{
-                    width: '100%',
-                    borderCollapse: 'collapse',
-                    marginTop: '10px',
-                    textAlign: 'left'
-                  }}>
-                    <thead>
-                      <tr style={{backgroundColor: '#f2f2f2'}}>
-                        <th style={{padding: '12px 15px', borderBottom: '1px solid #ddd'}}>Date</th>
-                        <th style={{padding: '12px 15px', borderBottom: '1px solid #ddd'}}>Subject</th>
-                        <th style={{padding: '12px 15px', borderBottom: '1px solid #ddd'}}>Status</th>
-                        <th style={{padding: '12px 15px', borderBottom: '1px solid #ddd'}}>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {studentComplaints.map((complaint, index) => (
-                        <tr key={index} style={{
-                          borderBottom: '1px solid #ddd',
-                          backgroundColor: index % 2 === 0 ? 'white' : '#f9f9f9'
+              <div className="complaints-list" style={{
+                maxWidth: '900px',
+                margin: '0 auto'
+              }}>
+                {studentComplaints && studentComplaints.length > 0 ? (
+                  studentComplaints.map((complaint, index) => (
+                    <div key={index} className="complaint-card" style={{
+                      backgroundColor: 'white',
+                      padding: '20px',
+                      marginBottom: '15px',
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+                      border: '1px solid #e0e0e0'
+                    }}>
+                      <div className="complaint-header" style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '15px',
+                        borderBottom: '1px solid #f0f0f0',
+                        paddingBottom: '10px'
+                      }}>
+                        <h4 style={{margin: 0, color: '#333', fontSize: '18px'}}>{complaint.subject}</h4>
+                        <span className={`status-badge ${complaint.status.toLowerCase().replace(' ', '-')}`} style={{
+                          padding: '4px 12px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          backgroundColor: complaint.status === 'Pending' ? '#fff3e0' : 
+                                          complaint.status === 'In Progress' ? '#e3f2fd' :
+                                          complaint.status === 'Resolved' ? '#e8f5e8' : '#f3e5f5',
+                          color: complaint.status === 'Pending' ? '#e65100' :
+                                 complaint.status === 'In Progress' ? '#1976d2' :
+                                 complaint.status === 'Resolved' ? '#388e3c' : '#7b1fa2'
                         }}>
-                          <td style={{padding: '12px 15px'}}>{new Date(complaint.date).toLocaleDateString()}</td>
-                          <td style={{padding: '12px 15px'}}>{complaint.subject}</td>
-                          <td style={{padding: '12px 15px'}}>
-                            <span style={{
-                              padding: '5px 10px',
-                              borderRadius: '20px',
-                              fontSize: '12px',
-                              fontWeight: 'bold',
-                              backgroundColor: 
-                                complaint.status === 'Resolved' ? '#d1fae5' : 
-                                complaint.status === 'In Progress' ? '#fef3c7' : 
-                                complaint.status === 'Pending' ? '#fee2e2' : '#e5e7eb',
-                              color:
-                                complaint.status === 'Resolved' ? '#047857' : 
-                                complaint.status === 'In Progress' ? '#b45309' : 
-                                complaint.status === 'Pending' ? '#b91c1c' : '#4b5563'
-                            }}>
-                              {complaint.status}
-                            </span>
-                          </td>
-                          <td style={{padding: '12px 15px'}}>
-                            <button style={{
-                              padding: '5px 10px',
-                              backgroundColor: 'transparent',
-                              border: '1px solid #c23535',
-                              color: '#c23535',
-                              borderRadius: '4px',
-                              cursor: 'pointer'
-                            }}
-                            onClick={() => {
-                              const details = `Description: ${complaint.description}\n` + 
-                                             `Priority: ${complaint.priority}\n` +
-                                             `${complaint.wardenResponse ? `Warden Response: ${complaint.wardenResponse}` : ''}`;
-                              alert(details);
-                            }}>
-                              View Details
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                          {complaint.status}
+                        </span>
+                      </div>
+                      
+                      <div className="complaint-details" style={{marginBottom: '15px'}}>
+                        <p style={{margin: '0 0 10px 0', color: '#666', lineHeight: '1.6'}}>
+                          <strong>Description:</strong> {complaint.description}
+                        </p>
+                        <div className="complaint-meta" style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                          gap: '10px',
+                          fontSize: '14px',
+                          color: '#888'
+                        }}>
+                          <div><strong>Priority:</strong> {complaint.priority}</div>
+                          <div><strong>Date:</strong> {complaint.date}</div>
+                          <div><strong>Room:</strong> {complaint.roomDetails ? 
+                            `${complaint.roomDetails.block}-${complaint.roomDetails.floor}-${complaint.roomDetails.roomNumber}` : 
+                            'Not specified'}</div>
+                        </div>
+                      </div>
+                      
+                      {complaint.wardenResponse && (
+                        <div className="warden-response" style={{
+                          backgroundColor: '#f8f9fa',
+                          padding: '15px',
+                          borderRadius: '5px',
+                          marginTop: '15px',
+                          border: '1px solid #e9ecef'
+                        }}>
+                          <h5 style={{margin: '0 0 8px 0', color: '#495057', fontSize: '14px'}}>Warden Response:</h5>
+                          <p style={{margin: 0, color: '#495057', fontSize: '14px', lineHeight: '1.5'}}>
+                            {complaint.wardenResponse}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ))
                 ) : (
                   <div style={{
                     textAlign: 'center',
@@ -1697,131 +1617,64 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   backgroundColor: '#f9f9f9',
                   borderRadius: '8px'
                 }}>
-                  <div style={{
+                  <div className="current-profile-pic" style={{
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '50%',
+                    backgroundColor: '#c23535',
+                    color: 'white',
                     display: 'flex',
-                    flexDirection: 'column',
                     alignItems: 'center',
-                    flex: '1'
+                    justifyContent: 'center',
+                    fontSize: '24px',
+                    fontWeight: 'bold',
+                    marginRight: '20px'
                   }}>
-                    <h3 style={{color: '#333', marginBottom: '20px'}}>Personal Information</h3>
-                    <div style={{
-                      width: '100%',
-                      maxWidth: '400px'
-                    }}>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        margin: '10px 0',
-                        padding: '10px',
-                        backgroundColor: '#f0f0f0',
-                        borderRadius: '5px'
-                      }}>
-                        <strong>Name:</strong>
-                        <span>{userName}</span>
-                      </div>
-                      
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        margin: '10px 0',
-                        padding: '10px',
-                        backgroundColor: '#f0f0f0',
-                        borderRadius: '5px'
-                      }}>
-                        <strong>Application Number:</strong>
-                        <span>{applicationNumber}</span>
-                      </div>
-                    </div>
+                    {userName.charAt(0).toUpperCase()}
                   </div>
-                </div>
-                
-                {/* Profile Photo Uploader Component */}
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  marginBottom: '30px'
-                }}>
-                  <ProfilePhotoUploader 
-                    applicationNumber={applicationNumber} 
-                    onPhotoUpdate={handleProfilePhotoUpdate}
-                  />
+                  <div>
+                    <h3 style={{margin: '0 0 5px 0'}}>{userName}</h3>
+                    <p style={{margin: 0, color: '#666'}}>Application No: {applicationNumber}</p>
+                  </div>
                 </div>
 
-                {/* Display student form data */}
-                {studentFormData && (
-                  <div className="form-data-container" style={{
-                    marginTop: '30px',
+                <div className="profile-photo-section" style={{marginBottom: '30px'}}>
+                  <h3 style={{marginBottom: '15px'}}>Profile Photo</h3>
+                  <div style={{
                     padding: '20px',
-                    backgroundColor: '#f9f9f9',
-                    borderRadius: '8px'
+                    border: '2px dashed #ddd',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    backgroundColor: '#fafafa'
                   }}>
-                    <h3 style={{marginBottom: '20px', color: '#333'}}>Student Information Form Data</h3>
-                    <div className="form-data-fields" style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr',
-                      gap: '15px'
+                    <p style={{marginBottom: '15px', color: '#666'}}>
+                      Upload your profile photo for identification purposes
+                    </p>
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      style={{
+                        padding: '10px',
+                        border: '1px solid #ddd',
+                        borderRadius: '5px',
+                        marginBottom: '15px'
+                      }}
+                    />
+                    <br />
+                    <button style={{
+                      backgroundColor: '#c23535',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '5px',
+                      padding: '10px 20px',
+                      cursor: 'pointer'
                     }}>
-                      {Object.entries(studentFormData)
-                        .filter(([key]) => {
-                          // Filter out technical ID fields
-                          if (['_id', '__v', 'id'].includes(key)) return false;
-                          
-                          // If key is applicationNo and admission_no exists and is not empty, skip applicationNo
-                          if (key === 'applicationNo' && 
-                              studentFormData.admission_no && 
-                              studentFormData.admission_no.trim() !== '') {
-                            return false;
-                          }
-                          
-                          return true;
-                        })
-                        .map(([key, value]) => {
-                          // Format key for display
-                          const formattedKey = key
-                            .replace(/_/g, ' ')
-                            .split(' ')
-                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                            .join(' ');
-                          
-                          // For admission number, clarify it's also the application number if they match
-                          let displayLabel = formattedKey;
-                          if (key === 'admission_no' && 
-                              studentFormData.applicationNo && 
-                              studentFormData.applicationNo === studentFormData.admission_no) {
-                            displayLabel = 'Application/Admission Number';
-                          }
-                          
-                          return (
-                            <div key={key} style={{
-                              padding: '12px 15px',
-                              backgroundColor: '#fff',
-                              borderRadius: '5px',
-                              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                              display: 'flex'
-                            }}>
-                              <div style={{
-                                width: '200px',
-                                fontWeight: 'bold',
-                                color: '#555',
-                                flexShrink: 0
-                              }}>
-                                {displayLabel}:
-                              </div>
-                              <div style={{
-                                flex: 1,
-                                color: '#333'
-                              }}>
-                                {typeof value === 'string' ? value : String(value || '')}
-                              </div>
-                            </div>
-                          );
-                        })}
-                    </div>
+                      Upload Photo
+                    </button>
                   </div>
-                )}
-                
-                <div style={{
-                  marginTop: '30px',
+                </div>
+
+                <div className="photo-guidelines" style={{
                   padding: '15px',
                   backgroundColor: '#f9f9f9',
                   borderRadius: '8px',
@@ -1848,7 +1701,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 backgroundColor: 'white',
                 borderRadius: '8px',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
-              }}>                <div className="about-content">
+              }}>
+                <div className="about-content">
                   <h3 style={{color: '#d32f2f', marginBottom: '20px', fontSize: '1.5rem', borderBottom: '2px solid #d32f2f', paddingBottom: '10px'}}>About Mahindra University Hostel Management System</h3>
                   
                   <section className="about-section" style={{marginBottom: '30px'}}>
@@ -1860,7 +1714,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       needs of modern university accommodations while maintaining the highest standards of security and performance.
                     </p>
                   </section>
-                    <section className="vision-mission" style={{marginBottom: '30px'}}>
+                  
+                  <section className="vision-mission" style={{marginBottom: '30px'}}>
                     <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '15px'}}>Our Vision</h4>
                     <p style={{lineHeight: '1.8', fontSize: '1rem', marginBottom: '15px', fontStyle: 'italic', color: '#444'}}>
                       "To create the industry's leading residential management platform that transforms the higher education
@@ -1949,45 +1804,42 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       </div>
                     </div>
                   </section>
-                    <section className="tech-section" style={{marginBottom: '40px'}}>
+                  
+                  <section className="tech-section" style={{marginBottom: '40px'}}>
                     <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '15px'}}>Enterprise Architecture</h4>
                     <p style={{lineHeight: '1.8', fontSize: '1rem', marginBottom: '20px'}}>
-                      Built on a modern microservices architecture, our system ensures scalability, resilience, and maintainability.
-                      The solution leverages industry-standard technologies with a focus on security, performance, and user experience.
+                      Built on a robust technological foundation utilizing React.js for dynamic frontend interfaces, Node.js for scalable backend services, 
+                      and MongoDB for high-performance data management. Our architecture ensures optimal performance, security, and scalability to meet 
+                      the evolving needs of a growing university community.
                     </p>
-                    <div className="tech-stack" style={{
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: '10px',
-                      marginTop: '15px'
+                    
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                      gap: '15px',
+                      marginTop: '20px'
                     }}>
                       {[
-                        'React 18', 
-                        'TypeScript', 
-                        'Node.js', 
-                        'Express.js', 
-                        'MongoDB Atlas',
-                        'JWT Authentication',
-                        'RESTful API',
-                        'Responsive Design',
-                        'Cloud Hosting',
-                        'CI/CD Pipeline',
-                        'Docker Containerization',
-                        'AWS Cloud Infrastructure'
-                      ].map(tech => (
-                        <div key={tech} style={{
-                          padding: '8px 12px',
-                          backgroundColor: '#f0f0f0',
-                          borderRadius: '20px',
-                          fontSize: '14px',
-                          border: '1px solid #ddd'
+                        {title: 'Frontend', tech: 'React.js + TypeScript', desc: 'Modern, responsive user interfaces'},
+                        {title: 'Backend', tech: 'Node.js + Express', desc: 'Scalable server-side architecture'},
+                        {title: 'Database', tech: 'MongoDB Atlas', desc: 'Cloud-based document database'},
+                        {title: 'Deployment', tech: 'Production Ready', desc: 'Optimized for enterprise deployment'}
+                      ].map((item, index) => (
+                        <div key={index} style={{
+                          backgroundColor: '#f8f9fa',
+                          padding: '15px',
+                          borderRadius: '8px',
+                          textAlign: 'center',
+                          border: '1px solid #e9ecef'
                         }}>
-                          {tech}
+                          <h6 style={{color: '#d32f2f', margin: '0 0 8px 0'}}>{item.title}</h6>
+                          <p style={{fontWeight: 'bold', margin: '0 0 5px 0', fontSize: '0.9rem'}}>{item.tech}</p>
+                          <p style={{margin: 0, fontSize: '0.8rem', color: '#666'}}>{item.desc}</p>
                         </div>
                       ))}
                     </div>
                   </section>
-                </div>
+                  
                   <section className="implementation-section" style={{marginBottom: '40px'}}>
                     <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '15px'}}>Implementation & Deployment</h4>
                     <p style={{lineHeight: '1.8', fontSize: '1rem'}}>
@@ -1998,238 +1850,168 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     </p>
                     
                     <div style={{marginTop: '25px', backgroundColor: '#f7f7f7', padding: '15px', borderRadius: '8px', border: '1px solid #eee'}}>
-                      <h5 style={{fontSize: '1.1rem', color: '#d32f2f', marginBottom: '10px'}}>Key Implementation Highlights</h5>
-                      <ul style={{paddingLeft: '20px', lineHeight: '1.6'}}>
-                        <li><strong>High Availability Architecture:</strong> 99.9% uptime SLA with redundant systems</li>
-                        <li><strong>Data Protection:</strong> End-to-end encryption and GDPR-compliant data handling</li>
-                        <li><strong>Integration Capabilities:</strong> API-first design with support for third-party integrations</li>
-                        <li><strong>Accessibility:</strong> WCAG 2.1 AA compliant interface design</li>
-                        <li><strong>Monitoring & Analytics:</strong> Comprehensive dashboards and reporting capabilities</li>
+                      <h5 style={{color: '#d32f2f', marginBottom: '12px', fontSize: '1rem'}}>Key Implementation Highlights</h5>
+                      <ul style={{marginLeft: '20px', lineHeight: '1.8'}}>
+                        <li>Comprehensive security measures including data encryption and access controls</li>
+                        <li>Responsive design ensuring seamless experience across all devices and screen sizes</li>
+                        <li>Real-time data synchronization for instant updates across all user interfaces</li>
+                        <li>Automated backup and disaster recovery systems for data protection</li>
+                        <li>Performance optimization for handling high concurrent user loads</li>
                       </ul>
                     </div>
                   </section>
-                
-                <div className="team-section" style={{
-                  marginTop: '40px',
-                  padding: '25px',
-                  backgroundColor: '#f9f9f9',
-                  borderRadius: '8px',
-                  border: '1px solid #eee',
-                  boxShadow: '0 3px 10px rgba(0,0,0,0.05)'
-                }}>
-                  <h3 style={{textAlign: 'center', marginBottom: '25px', color: '#d32f2f', fontSize: '1.3rem'}}>Development Team</h3>
                   
-                  <div className="team-members-grid" style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-                    gap: '25px',
-                    marginBottom: '20px'
-                  }}>
-                    <div className="team-member-card" style={{
-                      backgroundColor: 'white',
-                      borderRadius: '8px',
-                      boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
-                      overflow: 'hidden',
-                      transition: 'transform 0.3s',
-                      border: '1px solid #eee'
-                    }}>
-                      <div className="member-photo" style={{
-                        height: '150px',
-                        backgroundColor: '#e0e0e0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        <div style={{
-                          width: '80px',
-                          height: '80px',
-                          borderRadius: '50%',
-                          backgroundColor: '#d32f2f',
-                          color: 'white',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '1.8rem'
-                        }}>OV</div>
-                      </div>
-                      <div className="member-info" style={{padding: '15px'}}>
-                        <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Om Sai Vikranth</h4>
-                        <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>Backend Lead Developer</p>
-                        <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE009@mahindrauniversity.edu.in</p>
-                      </div>
-                    </div>
+                  <section className="team-section" style={{marginBottom: '30px'}}>
+                    <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '20px'}}>Development Team</h4>
+                    <p style={{marginBottom: '20px', lineHeight: '1.6'}}>
+                      This enterprise solution was developed by a dedicated team of software engineers from Mahindra University, 
+                      combining expertise across multiple domains to deliver a world-class hostel management platform.
+                    </p>
                     
-                    <div className="team-member-card" style={{
-                      backgroundColor: 'white',
-                      borderRadius: '8px',
-                      boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
-                      overflow: 'hidden',
-                      transition: 'transform 0.3s',
-                      border: '1px solid #eee'
+                    <div className="team-grid" style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                      gap: '20px',
+                      marginTop: '25px'
                     }}>
-                      <div className="member-photo" style={{
-                        height: '150px',
-                        backgroundColor: '#e0e0e0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
+                      <div className="team-member-card" style={{
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
+                        overflow: 'hidden',
+                        transition: 'transform 0.3s',
+                        border: '1px solid #eee'
                       }}>
-                        <div style={{
-                          width: '80px',
-                          height: '80px',
-                          borderRadius: '50%',
-                          backgroundColor: '#3f51b5',
-                          color: 'white',
+                        <div className="member-photo" style={{
+                          height: '150px',
+                          backgroundColor: '#e0e0e0',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '1.8rem'
-                        }}>KK</div>
+                          justifyContent: 'center'
+                        }}>
+                          <div style={{
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '50%',
+                            backgroundColor: '#c23535',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.8rem'
+                          }}>OV</div>
+                        </div>
+                        <div className="member-info" style={{padding: '15px'}}>
+                          <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Om Sai Vikranth</h4>
+                          <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>Project Lead & Full Stack Developer</p>
+                          <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE154@mahindrauniversity.edu.in</p>
+                        </div>
                       </div>
-                      <div className="member-info" style={{padding: '15px'}}>
-                        <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Kalyan Krishna</h4>
-                        <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>Frontend Lead Developer</p>
-                        <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE302@mahindrauniversity.edu.in</p>
-                      </div>
-                    </div>
-                    
-                    <div className="team-member-card" style={{
-                      backgroundColor: 'white',
-                      borderRadius: '8px',
-                      boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
-                      overflow: 'hidden',
-                      transition: 'transform 0.3s',
-                      border: '1px solid #eee'
-                    }}>
-                      <div className="member-photo" style={{
-                        height: '150px',
-                        backgroundColor: '#e0e0e0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
+                      
+                      <div className="team-member-card" style={{
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
+                        overflow: 'hidden',
+                        transition: 'transform 0.3s',
+                        border: '1px solid #eee'
                       }}>
-                        <div style={{
-                          width: '80px',
-                          height: '80px',
-                          borderRadius: '50%',
-                          backgroundColor: '#009688',
-                          color: 'white',
+                        <div className="member-photo" style={{
+                          height: '150px',
+                          backgroundColor: '#e0e0e0',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '1.8rem'
-                        }}>PS</div>
+                          justifyContent: 'center'
+                        }}>
+                          <div style={{
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '50%',
+                            backgroundColor: '#3f51b5',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.8rem'
+                          }}>SM</div>
+                        </div>
+                        <div className="member-info" style={{padding: '15px'}}>
+                          <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Srujan Madduri</h4>
+                          <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>Backend Developer & Database Architect</p>
+                          <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE009@mahindrauniversity.edu.in</p>
+                        </div>
                       </div>
-                      <div className="member-info" style={{padding: '15px'}}>
-                        <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Sriroop Palacharla</h4>
-                        <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>UI/UX Designer</p>
-                        <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE190@mahindrauniversity.edu.in</p>
-                      </div>
-                    </div>
-                    
-                    <div className="team-member-card" style={{
-                      backgroundColor: 'white',
-                      borderRadius: '8px',
-                      boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
-                      overflow: 'hidden',
-                      transition: 'transform 0.3s',
-                      border: '1px solid #eee'
-                    }}>
-                      <div className="member-photo" style={{
-                        height: '150px',
-                        backgroundColor: '#e0e0e0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
+                      
+                      <div className="team-member-card" style={{
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
+                        overflow: 'hidden',
+                        transition: 'transform 0.3s',
+                        border: '1px solid #eee'
                       }}>
-                        <div style={{
-                          width: '80px',
-                          height: '80px',
-                          borderRadius: '50%',
-                          backgroundColor: '#ff5722',
-                          color: 'white',
+                        <div className="member-photo" style={{
+                          height: '150px',
+                          backgroundColor: '#e0e0e0',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '1.8rem'
-                        }}>AP</div>
+                          justifyContent: 'center'
+                        }}>
+                          <div style={{
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '50%',
+                            backgroundColor: '#009688',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.8rem'
+                          }}>PS</div>
+                        </div>
+                        <div className="member-info" style={{padding: '15px'}}>
+                          <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Sriroop Palacharla</h4>
+                          <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>Frontend Developer & UI/UX Designer</p>
+                          <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE005@mahindrauniversity.edu.in</p>
+                        </div>
                       </div>
-                      <div className="member-info" style={{padding: '15px'}}>
-                        <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Abhinav Pulluri</h4>
-                        <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>Database Administrator</p>
-                        <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE123@mahindrauniversity.edu.in</p>
-                      </div>
-                    </div>
-                    
-                    <div className="team-member-card" style={{
-                      backgroundColor: 'white',
-                      borderRadius: '8px',
-                      boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
-                      overflow: 'hidden',
-                      transition: 'transform 0.3s',
-                      border: '1px solid #eee'
-                    }}>
-                      <div className="member-photo" style={{
-                        height: '150px',
-                        backgroundColor: '#e0e0e0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
+                      
+                      <div className="team-member-card" style={{
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
+                        overflow: 'hidden',
+                        transition: 'transform 0.3s',
+                        border: '1px solid #eee'
                       }}>
-                        <div style={{
-                          width: '80px',
-                          height: '80px',
-                          borderRadius: '50%',
-                          backgroundColor: '#9c27b0',
-                          color: 'white',
+                        <div className="member-photo" style={{
+                          height: '150px',
+                          backgroundColor: '#e0e0e0',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '1.8rem'
-                        }}>A</div>
-                      </div>
-                      <div className="member-info" style={{padding: '15px'}}>
-                        <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Abhilash</h4>
-                        <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>API Developer</p>
-                        <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE456@mahindrauniversity.edu.in</p>
-                      </div>
-                    </div>
-                    
-                    <div className="team-member-card" style={{
-                      backgroundColor: 'white',
-                      borderRadius: '8px',
-                      boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
-                      overflow: 'hidden',
-                      transition: 'transform 0.3s',
-                      border: '1px solid #eee'
-                    }}>
-                      <div className="member-photo" style={{
-                        height: '150px',
-                        backgroundColor: '#e0e0e0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        <div style={{
-                          width: '80px',
-                          height: '80px',
-                          borderRadius: '50%',
-                          backgroundColor: '#607d8b',
-                          color: 'white',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '1.8rem'
-                        }}>P</div>
-                      </div>
-                      <div className="member-info" style={{padding: '15px'}}>
-                        <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Punith</h4>
-                        <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>QA & Testing Lead</p>
-                        <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE789@mahindrauniversity.edu.in</p>
+                          justifyContent: 'center'
+                        }}>
+                          <div style={{
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '50%',
+                            backgroundColor: '#607d8b',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.8rem'
+                          }}>P</div>
+                        </div>
+                        <div className="member-info" style={{padding: '15px'}}>
+                          <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Punith</h4>
+                          <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>QA & Testing Lead</p>
+                          <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE789@mahindrauniversity.edu.in</p>                        </div>
                       </div>
                     </div>
-                  </div>
-                    <div style={{
+                  </section>
+                  
+                  <div style={{
                     textAlign: 'center',
                     marginTop: '30px',
                     padding: '15px',
@@ -2274,12 +2056,12 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </div>
             </div>
           )}
-            {/* Contact Section */}
-          {selectedSection === "Contact" && (
-            <div className="contact-section">
-              <h2>Feedback</h2>
+            {/* Room Change Request Section */}
+          {selectedSection === "Room Change Request" && (
+            <div className="room-change-section">
+              <h2>Room Change Request</h2>
               
-              <div className="contact-container" style={{
+              <div className="room-change-container" style={{
                 maxWidth: '800px',
                 margin: '20px auto',
                 padding: '25px',
@@ -2287,103 +2069,260 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 borderRadius: '8px',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
               }}>
-                <div className="feedback-section">
-                  <h3>Feedback Form</h3>
-                  <p>We value your feedback! Please share your thoughts about the Hostel Management System:</p>
-                  
-                  <form className="feedback-form" style={{marginTop: '15px'}}>
-                    <div className="form-group">
-                      <label htmlFor="feedback-name">Name (Optional)</label>
-                      <input 
-                        type="text" 
-                        id="feedback-name" 
-                        placeholder="Your Name"
-                        style={{
-                          width: '100%',
-                          padding: '10px',
-                          margin: '5px 0 15px',
-                          borderRadius: '5px',
-                          border: '1px solid #ddd'
-                        }}
-                      />
+                {localCurrentUserBooking ? (
+                  <form className="room-change-form" 
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '20px'
+                    }}
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const form = e.target as HTMLFormElement;
+                      const formData = new FormData(form);
+                      
+                      const reason = formData.get('reason') as string;
+                      const preferredBlock = formData.get('preferredBlock') as string;
+                      
+                      try {
+                        const response = await fetch('http://localhost:5000/api/room-change-requests', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            applicationNo: applicationNumber,
+                            studentName: userName,
+                            currentRoom: {
+                              block: localCurrentUserBooking.block,
+                              floor: localCurrentUserBooking.floor,
+                              roomNumber: localCurrentUserBooking.roomNumber,
+                              bed: localCurrentUserBooking.bed
+                            },
+                            reason: reason,
+                            preferredBlock: preferredBlock || 'No preference',
+                            status: 'Pending',
+                            dateSubmitted: new Date().toISOString().split('T')[0]
+                          }),
+                        });
+                        
+                        if (response.ok) {
+                          alert('Room change request submitted successfully! You will be notified once it is reviewed.');
+                          form.reset();                          // Reset form state
+                          setRoomChangeForm({
+                            reason: '',
+                            customReason: '',
+                            preferredBlock: ''
+                          });
+                        } else {
+                          alert('Failed to submit room change request. Please try again.');
+                        }
+                      } catch (error) {
+                        console.error('Error submitting room change request:', error);
+                        alert('An error occurred. Please try again later.');
+                      }
+                    }}
+                  >
+                    {/* Current Room Information */}
+                    <div className="current-room-info" style={{
+                      backgroundColor: '#f8f9fa',
+                      padding: '20px',
+                      borderRadius: '8px',
+                      border: '1px solid #e9ecef'
+                    }}>
+                      <h3 style={{marginBottom: '15px', color: '#495057', fontSize: '18px'}}>Current Room Details</h3>                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr 1fr 1fr',
+                        gap: '15px',
+                        fontSize: '14px'
+                      }}>
+                        <div>
+                          <span style={{fontWeight: 'bold', color: '#6c757d'}}>Block:</span>
+                          <div style={{marginTop: '5px', color: '#495057'}}>{localCurrentUserBooking.block}</div>
+                        </div>
+                        <div>
+                          <span style={{fontWeight: 'bold', color: '#6c757d'}}>Floor:</span>
+                          <div style={{marginTop: '5px', color: '#495057'}}>{localCurrentUserBooking.floor}</div>
+                        </div>
+                        <div>
+                          <span style={{fontWeight: 'bold', color: '#6c757d'}}>Room:</span>
+                          <div style={{marginTop: '5px', color: '#495057'}}>{localCurrentUserBooking.floor}-{localCurrentUserBooking.roomNumber}</div>
+                        </div>
+                        <div>
+                          <span style={{fontWeight: 'bold', color: '#6c757d'}}>Bed:</span>
+                          <div style={{marginTop: '5px', color: '#495057'}}>{localCurrentUserBooking.bed}</div>
+                        </div>
+                      </div>
                     </div>
-                    
-                    <div className="form-group">
-                      <label htmlFor="feedback-email">Email (Optional)</label>
-                      <input 
-                        type="email" 
-                        id="feedback-email" 
-                        placeholder="Your Email"
-                        style={{
-                          width: '100%',
-                          padding: '10px',
-                          margin: '5px 0 15px',
-                          borderRadius: '5px',
-                          border: '1px solid #ddd'
-                        }}
-                      />
+
+                    {/* Student Information */}
+                    <div style={{display: 'flex', gap: '20px'}}>
+                      <div className="form-group" style={{flex: 1}}>
+                        <label htmlFor="student-name" style={{fontWeight: '600', marginBottom: '8px', color: '#333'}}>
+                          Student Name
+                        </label>
+                        <input 
+                          type="text" 
+                          id="student-name" 
+                          value={userName}
+                          readOnly
+                          style={{
+                            width: '100%',
+                            padding: '12px',
+                            borderRadius: '5px',
+                            border: '1px solid #ddd',
+                            backgroundColor: '#f0f0f0',
+                            marginTop: '8px'
+                          }}
+                        />
+                      </div>
+
+                      <div className="form-group" style={{flex: 1}}>
+                        <label htmlFor="application-no" style={{fontWeight: '600', marginBottom: '8px', color: '#333'}}>
+                          Application Number
+                        </label>
+                        <input 
+                          type="text" 
+                          id="application-no" 
+                          value={applicationNumber}
+                          readOnly
+                          style={{
+                            width: '100%',
+                            padding: '12px',
+                            borderRadius: '5px',
+                            border: '1px solid #ddd',
+                            backgroundColor: '#f0f0f0',
+                            marginTop: '8px'
+                          }}
+                        />
+                      </div>
                     </div>
-                    
+
+                    {/* Reason for Room Change */}
                     <div className="form-group">
-                      <label htmlFor="feedback-type">Feedback Type</label>
-                      <select 
-                        id="feedback-type"
-                        style={{
-                          width: '100%',
-                          padding: '10px',
-                          margin: '5px 0 15px',
-                          borderRadius: '5px',
-                          border: '1px solid #ddd'
-                        }}
-                      >
-                        <option value="">Select type</option>
-                        <option value="bug">Bug Report</option>
-                        <option value="feature">Feature Request</option>
-                        <option value="improvement">Improvement Suggestion</option>
-                        <option value="general">General Feedback</option>
-                      </select>
-                    </div>
-                    
-                    <div className="form-group">
-                      <label htmlFor="feedback-message">Your Feedback</label>
+                      <label htmlFor="reason" style={{fontWeight: '600', marginBottom: '8px', color: '#333'}}>
+                        Reason for Room Change *
+                      </label>
                       <textarea 
-                        id="feedback-message" 
-                        placeholder="Please share your thoughts, suggestions, or report issues..."
-                        rows={5}
+                        name="reason"
+                        id="reason" 
+                        placeholder="Please provide the reason for your room change request..."
+                        rows={4}
+                        required
+                        value={roomChangeForm.reason}
+                        onChange={(e) => setRoomChangeForm(prev => ({...prev, reason: e.target.value}))}
                         style={{
                           width: '100%',
-                          padding: '10px',
-                          margin: '5px 0 15px',
+                          padding: '12px',
                           borderRadius: '5px',
-                          border: '1px solid #ddd',
+                          border: '1px solid #c23535',
+                          marginTop: '8px',
                           resize: 'vertical'
                         }}
-                      ></textarea>
+                      />
                     </div>
-                    
-                    <button 
+
+                    {/* Preferred Block */}
+                    <div className="form-group">
+                      <label htmlFor="preferredBlock" style={{fontWeight: '600', marginBottom: '8px', color: '#333'}}>
+                        Preferred Block (Optional)
+                      </label>
+                      <select 
+                        name="preferredBlock"
+                        id="preferredBlock"
+                        value={roomChangeForm.preferredBlock}
+                        onChange={(e) => setRoomChangeForm(prev => ({...prev, preferredBlock: e.target.value}))}
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          borderRadius: '5px',
+                          border: '1px solid #ddd',
+                          marginTop: '8px'
+                        }}
+                      >
+                        <option value="">No preference</option>
+                        <option value="Phase 1">Phase 1 (Boys)</option>
+                        <option value="Phase 1 E-Wing">Phase 1 E-Wing (Boys)</option>
+                        <option value="Phase 2">Phase 2 (Boys)</option>
+                        <option value="Phase 2 Part 5">Phase 2 Part 5 (Boys)</option>
+                        <option value="Phase 4A">Phase 4A (Boys)</option>
+                        <option value="Phase 4B">Phase 4B (Boys)</option>
+                        <option value="Phase 3 North Wing">Phase 3 North Wing (Girls)</option>
+                        <option value="Phase 3 South Wing">Phase 3 South Wing (Girls)</option>
+                        <option value="Aravali">Aravali (Girls)</option>
+                        <option value="Himalaya">Himalaya (Girls)</option>
+                        <option value="Ajanta">Ajanta (Girls)</option>
+                        <option value="Shivalik">Shivalik (Girls)</option>
+                        <option value="Vindya">Vindya (Girls)</option>
+                        <option value="Niligiri">Niligiri (Girls)</option>
+                        <option value="Satpura">Satpura (Girls)</option>
+                        <option value="Kailash">Kailash (Girls)</option>
+                      </select>
+                      
+                      {/* Warning for designated blocks */}
+                      <div style={{
+                        marginTop: '8px',
+                        padding: '10px',
+                        backgroundColor: '#fff3e0',
+                        borderRadius: '5px',
+                        border: '1px solid #ffcc80',
+                        fontSize: '14px',
+                        color: '#e65100'
+                      }}>
+                        <strong>Important:</strong> Please choose designated blocks only based on your gender. Boys should select boys' hostels and girls should select girls' hostels.
+                      </div>
+                    </div>
+
+                    {/* Important Notice */}
+                    <div className="notice-section" style={{
+                      backgroundColor: '#fff3cd',
+                      padding: '15px',
+                      borderRadius: '8px',
+                      border: '1px solid #ffeaa7',
+                      marginTop: '10px'
+                    }}>
+                      <h4 style={{margin: '0 0 10px 0', color: '#856404', fontSize: '16px'}}>Important Notice:</h4>
+                      <ul style={{margin: '0', paddingLeft: '20px', color: '#856404', fontSize: '14px'}}>
+                        <li>Room change requests are subject to availability and approval</li>
+                        <li>Processing time may take 5-7 business days</li>
+                      </ul>
+                    </div>
+
+                    {/* Submit Button */}                    <button 
                       type="submit"
                       style={{
                         backgroundColor: '#c23535',
                         color: 'white',
-                        padding: '10px 20px',
                         border: 'none',
                         borderRadius: '5px',
+                        padding: '12px 24px',
+                        fontSize: '14px',
+                        fontWeight: '600',
                         cursor: 'pointer',
-                        fontSize: '16px'
+                        width: 'auto',
+                        alignSelf: 'center',
+                        marginTop: '10px',
+                        transition: 'background-color 0.3s'
                       }}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        alert('Thank you for your feedback! We will review it shortly.');
-                        // Reset form
-                        const form = e.target as HTMLFormElement;
-                        form.reset();
-                      }}
+                      onMouseOver={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#a12525'}
+                      onMouseOut={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#c23535'}
                     >
-                      Submit Feedback
+                      Submit Room Change Request
                     </button>
                   </form>
-                </div>
+                ) : (
+                  <div style={{
+                    textAlign: 'center',
+                    padding: '40px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    color: '#6c757d'
+                  }}>
+                    <h3 style={{color: '#dc3545', marginBottom: '15px'}}>No Active Booking Found</h3>
+                    <p>You need to have an active room booking before you can request a room change.</p>
+                    <p>Please complete your hostel booking first.</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -2462,7 +2401,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 </p>
               </div>
             </div>
-          )}        </div>
+          )}
+        </div>
       </div>
 
       {/* Welcome Popup */}
@@ -2493,8 +2433,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               <div className="popup-step">
                 <div className="step-number">3</div>
                 <div className="step-content">
-                  <div className="step-title">Book Your Room</div>
-                  <div className="step-description">Select your preferred hostel block, floor, room, and bed.</div>
+                  <div className="step-title">Book Your Hostel Room</div>
+                  <div className="step-description">Choose your preferred room from available options using our interactive floor plan.</div>
                 </div>
               </div>
             </div>
@@ -2511,10 +2451,11 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
         <div className="popup-overlay">
           <div className="popup-content">
             <span className="popup-close" onClick={() => setShowHostelInfoPopup(false)}>×</span>
-            <h2 className="popup-title">Available Hostel Blocks</h2>
-            <p>Please review the hostel blocks before proceeding to book your room:</p>
+            <h2 className="popup-title">Hostel Information</h2>
+            <p style={{marginBottom: '20px'}}>Please review the hostel blocks available based on your gender before proceeding to room selection.</p>
             
-            <div className="hostel-info-grid">              <div className="hostel-block boys">
+            <div className="hostel-blocks-info" style={{display: 'flex', gap: '20px', marginBottom: '25px'}}>
+              <div className="hostel-block boys">
                 <h3>Boys Hostel</h3>
                 <p><strong>Blocks:</strong> Phase 1, Phase 1 E-Wing, Phase 2, Phase 2 Part 5, Phase 4A, Phase 4B</p>
               </div>
@@ -2534,11 +2475,13 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
         </div>
       )}
-
-      {/* FOOTER */}      <footer className="footer">
+    
+      {/* FOOTER */}
+      <footer className="footer">
         <div style={{marginBottom: '15px'}}>
           <p>&copy; {new Date().getFullYear()} Mahindra University Hostel Management System. All rights reserved.</p>
-        </div>        <div style={{
+        </div>
+        <div style={{
           display: 'flex',
           justifyContent: 'center',
           gap: '30px',
@@ -2562,10 +2505,9 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
             gap: '5px'
           }}>
             <span style={{fontSize: '14px'}}>📞</span>
-            <a href="tel:04067135100" style={{color: '#fff'}}>
-              040 – 67135100
-            </a>
+            <span style={{color: '#fff'}}>+91 40 6722 9000</span>
           </div>
+          <a href="#" onClick={(e) => {e.preventDefault(); setSelectedSection("Privacy")}}>Privacy Policy</a>
         </div>
       </footer>
     </>
