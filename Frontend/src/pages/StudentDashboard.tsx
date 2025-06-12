@@ -227,13 +227,15 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     // Add event listener for future location changes
     window.addEventListener('popstate', handleLocationChange);
     return () => window.removeEventListener('popstate', handleLocationChange);
-  }, []);
-
-  const handleStepClick = (step: number) => {
+  }, []);  const handleStepClick = (step: number) => {
     // Check if we're trying to access the form and if it's completed
     if (step === 1) {
-      // For the first step (form), always navigate to the form page
-      navigate("/hostel-form");
+      // For the first step (form), navigate to the separate form page
+      if (!completedSteps.includes(1)) {
+        navigate("/hostel-form");
+      } else {
+        alert("Form has already been completed!");
+      }
       return;
     }
     
@@ -428,16 +430,15 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     };
     
     fetchStudentComplaints();
-  }, [applicationNumber, selectedSection]);
-  // Function to fetch student form data
+  }, [applicationNumber, selectedSection]);  // Function to fetch student form data
   const fetchStudentFormData = async () => {
     if (applicationNumber && applicationNumber !== 'N/A') {
       try {
         const response = await fetch(`http://localhost:5000/api/form/${applicationNumber}`);
         if (response.ok) {
           const data = await response.json();
-          if (data.success && data.formData) {
-            setStudentFormData(data.formData);
+          if (data.success && data.form) {
+            setStudentFormData(data.form);
           }
         }
       } catch (error) {
@@ -876,9 +877,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       >
                         <option value="+1">+1 (USA)</option>
                         <option value="+91" selected>+91 (India)</option>
-                        <option value="+44">+44 (UK)</option>
-                        <option value="+61">+61 (Australia)"</option>
-                        <option value="+81">+81 (Japan)"</option>
+                        <option value="+44">+44 (UK)</option>                        <option value="+61">+61 (Australia)</option>
+                        <option value="+81">+81 (Japan)</option>
                         {/* Add more country codes as needed */}
                       </select>
                       <input
@@ -903,9 +903,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       >
                         <option value="+1">+1 (USA)</option>
                         <option value="+91" selected>+91 (India)</option>
-                        <option value="+44">+44 (UK)</option>
-                        <option value="+61">+61 (Australia)</option>
-                        <option value="+81">+81 (Japan)"</option>
+                        <option value="+44">+44 (UK)</option>                        <option value="+61">+61 (Australia)</option>
+                        <option value="+81">+81 (Japan)</option>
                         {/* Add more country codes as needed */}
                       </select>
                       <input
@@ -917,24 +916,13 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         onChange={(e) => validatePhoneNumber(e.target.name, e.target.value)} // Validate on change
                       />
                     </div>
-                    {errors.emergency_contact && <p className="error-message">{errors.emergency_contact}</p>} {/* Show error */}
-                  </div>
+                    {errors.emergency_contact && <p className="error-message">{errors.emergency_contact}</p>} {/* Show error */}                  </div>
 
                   <button type="submit" className="submit-button">
                     Submit
                   </button>
-                  <button
-                    type="button"
-                    className="back-button"
-                    onClick={() => {
-                      // Only hide the form without changing step status
-                      setShowForm(false);
-                      // Don't modify currentStep or completedSteps when cancelling
-                    }}
-                  >
-                    Back to Dashboard
-                  </button>
                 </form>
+                </div>
               ) : showPaymentForm ? (
                 <form onSubmit={(e) => e.preventDefault()} className="payment-form">
                   {/* Payment Form Fields */}
@@ -2462,6 +2450,138 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 )}
               </div>
             </div>
+          )}          {/* Feedback Section */}
+          {selectedSection === "Feedback" && (
+            <div className="feedback-section">
+              <h2>Feedback</h2>
+              
+              <div className="feedback-container" style={{
+                maxWidth: '800px',
+                margin: '20px auto',
+                padding: '25px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+              }}>
+                <div className="feedback-intro" style={{marginBottom: '30px'}}>
+                  <p style={{fontSize: '16px', lineHeight: '1.6', color: '#555'}}>
+                    We value your feedback! Your suggestions and comments help us improve the Hostel Management System 
+                    and provide better services to all students. Please share your thoughts below.
+                  </p>
+                </div>                <form className="feedback-form" style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '20px'
+                }}>
+                  <div className="form-group">
+                    <label style={{fontWeight: '600', marginBottom: '8px', color: '#333', display: 'block'}}>
+                      Feedback Category *
+                    </label>
+                    <select 
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        borderRadius: '5px',
+                        border: '1px solid #c23535',
+                        fontSize: '16px'
+                      }}
+                    >
+                      <option value="">Select a category</option>
+                      <option value="system-functionality">System Functionality</option>
+                      <option value="user-interface">User Interface/Experience</option>
+                      <option value="booking-process">Booking Process</option>
+                      <option value="payment-system">Payment System</option>
+                      <option value="general-suggestion">General Suggestion</option>
+                      <option value="bug-report">Bug Report</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label style={{fontWeight: '600', marginBottom: '8px', color: '#333', display: 'block'}}>
+                      Your Feedback *
+                    </label>
+                    <textarea 
+                      placeholder="Please provide your detailed feedback, suggestions, or describe any issues you've encountered..."
+                      rows={6}
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        borderRadius: '5px',
+                        border: '1px solid #c23535',
+                        fontSize: '16px',
+                        resize: 'vertical'
+                      }}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label style={{fontWeight: '600', marginBottom: '8px', color: '#333', display: 'block'}}>
+                      Rating (Optional)
+                    </label>
+                    <select 
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        borderRadius: '5px',
+                        border: '1px solid #ddd',
+                        fontSize: '16px'
+                      }}
+                    >
+                      <option value="">Rate your overall experience</option>
+                      <option value="5">Excellent</option>
+                      <option value="4">Very Good</option>
+                      <option value="3">Good</option>
+                      <option value="2">Fair</option>
+                      <option value="1">Poor</option>
+                    </select>
+                  </div>                  <button 
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      alert('Thank you for your feedback! Your suggestions have been submitted and will be reviewed by our development team.');
+                    }}
+                    style={{
+                      backgroundColor: '#2c5282',
+                      color: 'white',
+                      border: '1px solid #2c5282',
+                      borderRadius: '6px',
+                      padding: '14px 32px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      alignSelf: 'center',
+                      minWidth: '180px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Submit Feedback
+                  </button>
+                </form>
+
+                <div className="feedback-note" style={{
+                  marginTop: '30px',
+                  padding: '15px',
+                  backgroundColor: '#e8f5e8',
+                  borderRadius: '8px',
+                  border: '1px solid #c3e6c3'
+                }}>
+                  <h4 style={{margin: '0 0 10px 0', color: '#2d5a2d'}}>📝 Note:</h4>
+                  <p style={{margin: '0', fontSize: '14px', color: '#2d5a2d', lineHeight: '1.5'}}>
+                    Your feedback is important to us and helps improve the system for all users. 
+                    For urgent technical issues, please contact the support team directly at{' '}
+                    <a href="mailto:hostelcom@mahindrauniversity.edu.in" style={{color: '#c23535'}}>
+                      hostelcom@mahindrauniversity.edu.in
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
           )}
 
           {/* Privacy Policy Section */}
@@ -2611,9 +2731,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
           </div>
         </div>
-      )}
-    
-      {/* FOOTER */}
+      )}      {/* FOOTER */}
       <footer className="footer">
         <div style={{marginBottom: '15px'}}>
           <p>&copy; {new Date().getFullYear()} Mahindra University Hostel Management System. All rights reserved.</p>
@@ -2625,13 +2743,13 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           flexWrap: 'wrap',
           alignItems: 'center'
         }}>
-          <a href="#" onClick={(e) => {e.preventDefault(); setSelectedSection("Contact")}}>Contact</a>
+          <a href="#" onClick={(e) => {e.preventDefault(); setSelectedSection("Feedback");}}>Feedback</a>
           <div style={{
             display: 'flex',
             alignItems: 'center',
             gap: '5px'
           }}>
-            <span style={{fontSize: '14px'}}>📧</span>
+            <span style={{fontSize: '14px'}}></span>
             <a href="mailto:hostelcom@mahindrauniversity.edu.in" style={{color: '#fff'}}>
               hostelcom@mahindrauniversity.edu.in
             </a>
@@ -2643,8 +2761,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           }}>
             <span style={{fontSize: '14px'}}>📞</span>
             <span style={{color: '#fff'}}>+91 40 6722 9000</span>
-          </div>
-          <a href="#" onClick={(e) => {e.preventDefault(); setSelectedSection("Privacy")}}>Privacy Policy</a>
+        </div>
         </div>
       </footer>
     </>
