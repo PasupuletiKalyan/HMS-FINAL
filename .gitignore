@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+build/
+**/dist/
+**/build/
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS and Editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Backend specific
+Backend/uploads/
+
+# Vercel
+.vercel
