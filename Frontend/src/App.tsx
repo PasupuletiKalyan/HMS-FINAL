@@ -47,63 +47,30 @@ const LocationAwareApp: React.FC = () => {
         setCurrentApplicationNo(applicationNo);
       }
       
-      if (applicationNo) {
-        try {
-          // First, directly check if the form exists in the database
-          const formResponse = await fetch(`http://localhost:5000/api/form/${applicationNo}`);
-          if (formResponse.ok) {
-            const formData = await formResponse.json();
-            if (formData.success && formData.form) {
-              // Form exists in the database - make sure this is reflected in localStorage
-              localStorage.setItem("formCompleted", "true");
-              console.log("Form found in database for", applicationNo, "- marked as completed");
-            }
-          }
-
-          // Now get the overall progress
+      if (applicationNo) {        try {
+          // Get the overall progress from backend - this is the single source of truth
           const response = await fetch(`http://localhost:5000/api/progress/${applicationNo}`);
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
               // Load completed steps from backend
               const backendCompletedSteps = data.progress.completedSteps || [];
-              
-              // If form exists according to first check but not reflected in completedSteps, add it
-              if (localStorage.getItem("formCompleted") === "true" && !backendCompletedSteps.includes(1)) {
-                backendCompletedSteps.push(1);
-                console.log("Adding form step to completed steps based on form existence");
-              }
-              
               setCompletedSteps(backendCompletedSteps);
-              
-              // Update backend progress if needed
-              if (localStorage.getItem("formCompleted") === "true" && !data.progress.formCompleted) {
-                console.log("Updating backend progress to mark form as completed");
-                try {
-                  await fetch(`http://localhost:5000/api/progress/${applicationNo}/form`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      completedAt: new Date().toISOString()
-                    }),
-                  });
-                } catch (updateError) {
-                  console.error("Error updating form progress:", updateError);
-                }
-              }
               
               // Store in localStorage for persistence
               localStorage.setItem("completedSteps", JSON.stringify(backendCompletedSteps));
               
-              // Set form and payment completion flags in localStorage
+              // Set form and payment completion flags in localStorage based on backend data
               if (data.progress.formCompleted) {
                 localStorage.setItem("formCompleted", "true");
+              } else {
+                localStorage.removeItem("formCompleted");
               }
               
               if (data.progress.paymentCompleted) {
                 localStorage.setItem("paymentCompleted", "true");
+              } else {
+                localStorage.removeItem("paymentCompleted");
               }
               
               if (data.progress.roomBooked && data.progress.bookingDetails) {

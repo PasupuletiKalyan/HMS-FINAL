@@ -4,6 +4,7 @@ import "../styles/StudentDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
 import defaultProfilePic from "../assets/default-profile-pic.jpg";
 import ResetStudentProgress from "../components/ResetStudentProgress"; // Import the reset component
+import ProfilePhotoUploader from "../components/ProfilePhotoUploader"; // Import the ProfilePhotoUploader component
 import antiDrugPolicy from "../assets/ANTI DRUG.pdf"; // Import the anti-drug policy PDF
 import annexureAntiDrug from "../assets/Annexure Anti Drug.pdf"; // Import the annexure PDF
 
@@ -44,6 +45,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
   });  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [completedSteps, setCompletedSteps] = useState<number[]>([]); // Track completed steps
   const [studentComplaints, setStudentComplaints] = useState<any[]>([]); // Track complaints submitted by the student
+  const [studentFormData, setStudentFormData] = useState<any>(null); // Track student form data
   const navigate = useNavigate();
     // Room change request form states
   const [roomChangeForm, setRoomChangeForm] = useState({
@@ -97,9 +99,23 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
         setProfilePic(defaultProfilePic);
       }
     };
-    
-    loadProfilePhoto();
+      loadProfilePhoto();
   }, [applicationNumber]);
+
+  // Handle profile photo updates
+  const handleProfilePhotoUpdate = (photoUrl: string) => {
+    setProfilePic(photoUrl);
+    localStorage.setItem("profilePic", photoUrl);
+    
+    // Update all profile images in the DOM
+    const profileElements = document.querySelectorAll('.profile-circle-image');
+    profileElements.forEach(el => {
+      (el as HTMLImageElement).src = photoUrl;
+    });
+    
+    // Force a re-render of components that might use this image
+    window.dispatchEvent(new Event('storage'));
+  };
 
   // Close the profile dropdown when clicking outside
   useEffect(() => {
@@ -163,24 +179,17 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 setLocalCurrentUserBooking(bookingFromBackend);
                 setCurrentUserBooking(bookingFromBackend);
               }
-              
-              // Set current step based on progress
+                // Set current step based on progress
               if (data.progress.roomBooked) {
                 setCurrentStep(3);
                 // Don't show form since all steps are complete
                 setShowForm(false);
-                // Store in localStorage that all steps are complete
-                localStorage.setItem("formCompleted", "true");
-                localStorage.setItem("paymentCompleted", "true");
               } else if (data.progress.paymentCompleted) {
                 setCurrentStep(3); // Move to hostel booking step
                 setShowForm(false); // Don't show form since payment is complete
-                localStorage.setItem("formCompleted", "true");
-                localStorage.setItem("paymentCompleted", "true");
               } else if (data.progress.formCompleted) {
                 setCurrentStep(2); // Move to payment step
                 setShowForm(false); // Don't show form since it's already completed
-                localStorage.setItem("formCompleted", "true");
               } else {
                 setCurrentStep(1);
                 // Only show form if user clicks on the form button
@@ -420,15 +429,15 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     
     fetchStudentComplaints();
   }, [applicationNumber, selectedSection]);
-
   // Function to fetch student form data
   const fetchStudentFormData = async () => {
     if (applicationNumber && applicationNumber !== 'N/A') {
       try {
-        const response = await fetch(`http://localhost:5000/api/form/${applicationNumber}`);        if (response.ok) {
+        const response = await fetch(`http://localhost:5000/api/form/${applicationNumber}`);
+        if (response.ok) {
           const data = await response.json();
-          if (data.success) {
-            // Form data fetched successfully
+          if (data.success && data.formData) {
+            setStudentFormData(data.formData);
           }
         }
       } catch (error) {
@@ -689,13 +698,62 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
           {/* Show Form and Status Bar only for Dashboard */}
           {selectedSection === "Dashboard" && (
-            <>
-              {/* Show Form */}
+            <>              {/* Show Form */}
               {showForm ? (
-                <form onSubmit={handleFormSubmit2} className="hostel-form">
-                  {/* Hostel Form Fields */}
-                  {[
-                    { name: "hall_ticket_no", label: "Hall Ticket Number", type: "text", placeholder: "Enter your hall ticket number" },
+                <div className="form-container">
+                  {/* Form Header with Back Button and Print Button */}
+                  <div className="form-header" style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '20px',
+                    padding: '15px 0',
+                    borderBottom: '2px solid #c23535'
+                  }}>
+                    <button
+                      type="button"
+                      className="back-button"
+                      onClick={() => {
+                        // Only hide the form without changing step status
+                        setShowForm(false);
+                        // Don't modify currentStep or completedSteps when cancelling
+                      }}
+                      style={{
+                        padding: '8px 16px',
+                        backgroundColor: '#6c757d',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        fontSize: '14px'
+                      }}
+                    >
+                      ← Back to Dashboard
+                    </button>
+                    
+                    <h2 style={{margin: 0, color: '#c23535'}}>Hostel Application Form</h2>
+                    
+                    <button
+                      type="button"
+                      onClick={() => window.print()}
+                      style={{
+                        padding: '8px 16px',
+                        backgroundColor: '#28a745',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        fontSize: '14px'
+                      }}
+                    >
+                      🖨️ Print Form
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleFormSubmit2} className="hostel-form">
+                    {/* Hostel Form Fields */}
+                    {[
+                      { name: "hall_ticket_no", label: "Hall Ticket Number", type: "text", placeholder: "Enter your hall ticket number" },
                     { name: "batch", label: "Batch", type: "text", placeholder: "Enter your batch (e.g., 2023-2027)" },
                     { name: "programme", label: "Programme", type: "text", placeholder: "Enter your programme (e.g., B.Tech)" },
                     { name: "school", label: "School", type: "text", placeholder: "Enter your school name (e.g., ECOLE,SOM)" },
@@ -1595,8 +1653,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </div>
             </div>
           )}
-          
-          {/* Profile Section - New section for profile photo management */}
+            {/* Profile Section */}
           {selectedSection === "Profile" && (
             <div className="profile-section">
               <h2>Profile Settings</h2>
@@ -1609,6 +1666,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 borderRadius: '8px',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
               }}>
+                {/* Profile Header with Photo */}
                 <div className="profile-header" style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -1618,19 +1676,41 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   borderRadius: '8px'
                 }}>
                   <div className="current-profile-pic" style={{
-                    width: '80px',
-                    height: '80px',
+                    width: '120px',
+                    height: '120px',
                     borderRadius: '50%',
-                    backgroundColor: '#c23535',
-                    color: 'white',
+                    marginRight: '20px',
+                    overflow: 'hidden',
+                    border: '3px solid #c23535',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '24px',
-                    fontWeight: 'bold',
-                    marginRight: '20px'
+                    justifyContent: 'center'
                   }}>
-                    {userName.charAt(0).toUpperCase()}
+                    {profilePic && profilePic !== defaultProfilePic ? (
+                      <img 
+                        src={profilePic} 
+                        alt="Profile" 
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    ) : (
+                      <div style={{
+                        backgroundColor: '#c23535',
+                        color: 'white',
+                        fontSize: '48px',
+                        fontWeight: 'bold',
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {userName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <h3 style={{margin: '0 0 5px 0'}}>{userName}</h3>
@@ -1638,41 +1718,98 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   </div>
                 </div>
 
-                <div className="profile-photo-section" style={{marginBottom: '30px'}}>
-                  <h3 style={{marginBottom: '15px'}}>Profile Photo</h3>
-                  <div style={{
-                    padding: '20px',
-                    border: '2px dashed #ddd',
-                    borderRadius: '8px',
-                    textAlign: 'center',
-                    backgroundColor: '#fafafa'
-                  }}>
-                    <p style={{marginBottom: '15px', color: '#666'}}>
-                      Upload your profile photo for identification purposes
-                    </p>
-                    <input 
-                      type="file" 
-                      accept="image/*"
-                      style={{
-                        padding: '10px',
-                        border: '1px solid #ddd',
-                        borderRadius: '5px',
-                        marginBottom: '15px'
-                      }}
-                    />
-                    <br />
-                    <button style={{
-                      backgroundColor: '#c23535',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '5px',
-                      padding: '10px 20px',
-                      cursor: 'pointer'
+                {/* Profile Photo Management Section */}
+                {profilePic === defaultProfilePic || !profilePic ? (
+                  <div className="profile-photo-upload" style={{marginBottom: '30px'}}>
+                    <h3 style={{marginBottom: '15px'}}>Upload Profile Photo</h3>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      marginBottom: '20px'
                     }}>
-                      Upload Photo
-                    </button>
+                      <ProfilePhotoUploader 
+                        applicationNumber={applicationNumber} 
+                        onPhotoUpdate={handleProfilePhotoUpdate}
+                      />
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="profile-photo-update" style={{marginBottom: '30px'}}>
+                    <h3 style={{marginBottom: '15px'}}>Update Profile Photo</h3>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      marginBottom: '20px'
+                    }}>
+                      <ProfilePhotoUploader 
+                        applicationNumber={applicationNumber} 
+                        onPhotoUpdate={handleProfilePhotoUpdate}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Student Form Data Display */}
+                {studentFormData && (
+                  <div className="form-data-section" style={{marginBottom: '30px'}}>
+                    <h3 style={{marginBottom: '20px', color: '#333', borderBottom: '2px solid #c23535', paddingBottom: '10px'}}>
+                      Personal Information
+                    </h3>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                      gap: '15px'
+                    }}>
+                      {Object.entries(studentFormData)
+                        .filter(([key]) => !['_id', '__v', 'applicationNo', 'createdAt', 'updatedAt'].includes(key))
+                        .map(([key, value]) => {
+                          // Format the key for display
+                          const displayLabel = key
+                            .replace(/_/g, ' ')
+                            .replace(/\b\w/g, l => l.toUpperCase());
+                          
+                          return (
+                            <div key={key} style={{
+                              display: 'flex',
+                              padding: '12px',
+                              backgroundColor: '#f8f9fa',
+                              borderRadius: '5px',
+                              border: '1px solid #e9ecef'
+                            }}>
+                              <div style={{
+                                fontWeight: 'bold',
+                                color: '#495057',
+                                minWidth: '140px',
+                                marginRight: '10px'
+                              }}>
+                                {displayLabel}:
+                              </div>
+                              <div style={{
+                                flex: 1,
+                                color: '#333'
+                              }}>
+                                {typeof value === 'string' ? value : String(value || '')}
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
+
+                {!studentFormData && (
+                  <div style={{
+                    textAlign: 'center',
+                    padding: '30px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    marginBottom: '30px'
+                  }}>
+                    <p style={{color: '#666', fontSize: '16px'}}>
+                      No form data available. Please complete the hostel form first.
+                    </p>
+                  </div>
+                )}
 
                 <div className="photo-guidelines" style={{
                   padding: '15px',
