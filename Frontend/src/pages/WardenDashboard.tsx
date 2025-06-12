@@ -285,15 +285,13 @@ const initialBoysHostelData = {
 const WardenDashboard: React.FC = () => {
   const [selectedMenu, setSelectedMenu] = useState("Overview");
   const [] = useState("");
-  // Remove all unused variables
-  // const [studentData, setStudentData] = useState<Student[]>([]);
-  // const [roomSearchTerm, setRoomSearchTerm] = useState("");
+
   const [wardenName, setWardenName] = useState("Warden");
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [summaryView, setSummaryView] = useState<'summary' | 'girls' | 'boys'>('summary');
   const [hostelSummary, setHostelSummary] = useState<HostelSummary[]>([]);
-  // const [isEditing, setIsEditing] = useState(false);
+  
   const [editData, setEditData] = useState<EditableData | null>(null);
   const [girlsHostelData, setGirlsHostelData] = useState(initialGirlsHostelData);
   const [boysHostelData, setBoysHostelData] = useState(initialBoysHostelData);  const [occupiedBeds, setOccupiedBeds] = useState<{[key: string]: boolean}>({});
