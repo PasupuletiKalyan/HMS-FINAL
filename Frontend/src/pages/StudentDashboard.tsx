@@ -24,6 +24,8 @@ interface BookingInfo {
 interface StudentDashboardProps {
   currentUserBooking: BookingInfo | null;
   setCurrentUserBooking: React.Dispatch<React.SetStateAction<BookingInfo | null>>;
+  occupiedBeds?: any[]; // Add the missing props in the interface
+  setOccupiedBeds?: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
 const StudentDashboard: React.FC<StudentDashboardProps> = ({
@@ -31,7 +33,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
   setCurrentUserBooking,
   occupiedBeds,
   setOccupiedBeds
-}) => {  const [selectedSection, setSelectedSection] = useState("Dashboard"); // Track the selected section
+}) => {const [selectedSection, setSelectedSection] = useState("Dashboard"); // Track the selected section
   const [showProfileDropdown, setShowProfileDropdown] = useState(false); // Track profile dropdown visibility
   const [currentStep, setCurrentStep] = useState<number>(1); // Track the current step (1, 2, or 3)
   const [showForm, setShowForm] = useState(false); // Track whether the form is displayed
@@ -391,12 +393,11 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
       console.error("Error processing payment:", error);
       alert("An error occurred while processing your payment. Please check your connection and try again.");
     }
-  };
-  // Add function to mark booking as complete
+  };  // Add function to mark booking as complete
   const markBookingComplete = async (bookingDetails: BookingInfo) => {
     try {
       // Call API to mark booking as completed for this student
-      const response = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/booking`, {
+      const response = await fetch(buildApiUrl(`/api/progress/${applicationNumber}/booking`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -486,12 +487,11 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     };    
     fetchStudentComplaints();
   }, [applicationNumber, selectedSection]);
-
   // Function to fetch student room change requests
   const fetchStudentRoomRequests = async () => {
     if (applicationNumber && applicationNumber !== 'N/A') {
       try {
-        const response = await fetch(`http://localhost:5000/api/room-change-requests/student/${applicationNumber}`);
+        const response = await fetch(buildApiUrl(`/api/room-change-requests/student/${applicationNumber}`));
         if (response.ok) {
           const data = await response.json();
           if (data.success) {
@@ -713,16 +713,14 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                           completedSteps.includes(step - 1) ? "completed" : ""
                         }`}
                       />
-                    )}
-                    <div
+                    )}                    <div
                       className={`step-dot ${
                         completedSteps.includes(step)
                           ? "completed"
                           : currentStep === step
                           ? "current"
                           : ""
-                      }`
-                    }
+                      }`}
                     />
                   </React.Fragment>
                 ))}
@@ -933,14 +931,14 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
                   <div className="form-group">
                     <label>Father's Mobile</label>
-                    <div className="phone-number-container" style={{ display: "flex", alignItems: "center" }}>
-                      <select
+                    <div className="phone-number-container" style={{ display: "flex", alignItems: "center" }}>                      <select
                         name="country_code_father"
                         required
+                        defaultValue="+91"
                         style={{ width: "80px", marginRight: "10px" }} // Small dropdown to the left
                       >
                         <option value="+1">+1 (USA)</option>
-                        <option value="+91" selected>+91 (India)</option>
+                        <option value="+91">+91 (India)</option>
                         <option value="+44">+44 (UK)</option>
                         <option value="+61">+61 (Australia)</option>
                         <option value="+81">+81 (Japan)</option>
@@ -960,15 +958,15 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
                   <div className="form-group">
                     <label>Mother's Mobile</label>
-                    <div className="phone-number-container" style={{ display: "flex", alignItems: "center" }}>
-                      <select
+                    <div className="phone-number-container" style={{ display: "flex", alignItems: "center" }}>                      <select
                         name="country_code_mother"
                         required
+                        defaultValue="+91"
                         style={{ width: "80px", marginRight: "10px" }} // Small dropdown to the left
                       >
                         <option value="+1">+1 (USA)</option>
-                        <option value="+91" selected>+91 (India)</option>
-                        <option value="+44">+44 (UK)</option>                        <option value="+61">+61 (Australia)</option>
+                        <option value="+91">+91 (India)</option>
+                        <option value="+44">+44 (UK)</option><option value="+61">+61 (Australia)</option>
                         <option value="+81">+81 (Japan)</option>
                         {/* Add more country codes as needed */}
                       </select>
@@ -986,15 +984,15 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
                   <div className="form-group">
                     <label>Emergency Contact</label>
-                    <div className="phone-number-container" style={{ display: "flex", alignItems: "center" }}>
-                      <select
+                    <div className="phone-number-container" style={{ display: "flex", alignItems: "center" }}>                      <select
                         name="country_code_emergency"
                         required
+                        defaultValue="+91"
                         style={{ width: "80px", marginRight: "10px" }} // Small dropdown to the left
                       >
                         <option value="+1">+1 (USA)</option>
-                        <option value="+91" selected>+91 (India)</option>
-                        <option value="+44">+44 (UK)</option>                        <option value="+61">+61 (Australia)</option>
+                        <option value="+91">+91 (India)</option>
+                        <option value="+44">+44 (UK)</option><option value="+61">+61 (Australia)</option>
                         <option value="+81">+81 (Japan)</option>
                         {/* Add more country codes as needed */}
                       </select>
@@ -2450,8 +2448,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       const reason = formData.get('reason') as string;
                       const preferredBlock = formData.get('preferredBlock') as string;
                       
-                      try {
-                        const response = await fetch('http://localhost:5000/api/room-change-requests', {
+                      try {                      const response = await fetch(buildApiUrl('/api/room-change-requests'), {
                           method: 'POST',
                           headers: {
                             'Content-Type': 'application/json',

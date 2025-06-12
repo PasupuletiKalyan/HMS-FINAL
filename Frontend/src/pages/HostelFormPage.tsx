@@ -117,27 +117,29 @@ const HostelFormPage: React.FC = () => {
           }),
         });
 
-      if (progressResponse.ok) {
-        const data = await progressResponse.json();
-        if (data.success) {
-          // Update local state for completed steps
-          const completedSteps = JSON.parse(localStorage.getItem("completedSteps") || "[]");
-          if (!completedSteps.includes(1)) {
-            completedSteps.push(1);
-            localStorage.setItem("completedSteps", JSON.stringify(completedSteps));
+        if (progressResponse.ok) {
+          const data = await progressResponse.json();
+          if (data.success) {
+            // Update local state for completed steps
+            const completedSteps = JSON.parse(localStorage.getItem("completedSteps") || "[]");
+            if (!completedSteps.includes(1)) {
+              completedSteps.push(1);
+              localStorage.setItem("completedSteps", JSON.stringify(completedSteps));
+            }
+            localStorage.setItem("formCompleted", "true");
+            
+            // Show success dialog instead of alert
+            setShowSuccessDialog(true);        
+          } else {
+            alert("There was an error updating your progress. Please try again.");
           }
-          localStorage.setItem("formCompleted", "true");
-          
-          // Show success dialog instead of alert
-          setShowSuccessDialog(true);        } else {
-          alert("There was an error updating your progress. Please try again.");
+        } else {
+          alert("Failed to update progress. Please try again later.");
         }
-      } else {
-        alert("Failed to update progress. Please try again later.");
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        alert("An error occurred while submitting the form. Please check your connection and try again.");
       }
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      alert("An error occurred while submitting the form. Please check your connection and try again.");
     }
   };
 
