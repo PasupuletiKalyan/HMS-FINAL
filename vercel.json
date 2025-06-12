@@ -1,22 +1,14 @@
 {
   "version": 2,
   "name": "hostel-management-frontend",
-  "builds": [
-    {
-      "src": "Frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "Frontend/dist"
-      }
-    }
-  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "cwd": "Frontend",
   "env": {
     "VITE_API_URL": "https://hms-final-33g5.onrender.com",
     "VITE_NODE_ENV": "production"
   },
-  "buildCommand": "cd Frontend && npm ci && npm run build",
-  "installCommand": "cd Frontend && npm install",
-  "outputDirectory": "Frontend/dist",
   "routes": [
     {
       "src": "/(.*)",
