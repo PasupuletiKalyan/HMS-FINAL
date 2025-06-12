@@ -393,6 +393,10 @@ html {
   .personal-details-form {
     max-width: 70vw;
   }
+  .form-container {
+    max-width: 95vw !important;
+    padding: 10px !important;
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -418,9 +422,40 @@ html {
   .personal-details-form {
     max-width: 85vw;
   }
+  .form-container {
+    max-width: 100vw !important;
+    padding: 5px !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}
 
-  .footer {
-    font-size: 0.9rem;
+@media screen and (max-width: 480px) {
+  .form-container {
+    max-width: 100vw !important;
+    padding: 2px !important;
+  }
+  .dashboard-content {
+    padding: 1rem 0.2rem !important;
+  }
+  .dashboard-top-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.2rem !important;
+  }
+  .profile-section {
+    flex-direction: row;
+    gap: 2px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 14px;
+    padding: 8px 4px;
+  }
+  .submit-button, .back-button {
+    font-size: 14px;
+    padding: 8px;
   }
 }
 
