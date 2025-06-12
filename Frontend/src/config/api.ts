@@ -1,6 +1,10 @@
 // API configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+// Log the current API URL for debugging
+console.log('Current API Base URL:', API_BASE_URL);
+console.log('Environment:', import.meta.env.VITE_NODE_ENV || 'development');
+
 export const API_CONFIG = {
   BASE_URL: API_BASE_URL,
   ENDPOINTS: {

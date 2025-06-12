@@ -1,0 +1,18 @@
+{
+  "name": "hostel-management-system",
+  "version": "1.0.0",
+  "description": "Hostel Management System - Frontend deployment",
+  "scripts": {
+    "build": "cd Frontend && npm ci && npm run build",
+    "dev": "cd Frontend && npm run dev",
+    "preview": "cd Frontend && npm run preview",
+    "vercel-build": "cd Frontend && npm ci && npm run build"
+  },
+  "private": true,
+  "workspaces": [
+    "Frontend"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
