@@ -1366,22 +1366,8 @@ const WardenDashboard: React.FC = () => {
                   No complaints found
                 </td>
               </tr>
-            )}
-          </tbody>
+            )}          </tbody>
         </table>
-      </div>      <div className="status-legend" style={{ marginTop: '20px', display: 'flex', gap: '15px', justifyContent: 'center' }}>
-        <div className="legend-item">
-          <span style={{ fontSize: '14px', fontWeight: '500' }}>Pending</span>
-        </div>
-        <div className="legend-item">
-          <span style={{ fontSize: '14px', fontWeight: '500' }}>In Progress</span>
-        </div>
-        <div className="legend-item">
-          <span style={{ fontSize: '14px', fontWeight: '500' }}>Resolved</span>
-        </div>
-        <div className="legend-item">
-          <span style={{ fontSize: '14px', fontWeight: '500' }}>Closed</span>
-        </div>
       </div>
     </div>
   );
@@ -1493,22 +1479,8 @@ ${request.processedDate ? `Processed Date: ${new Date(request.processedDate).toL
                   No room change requests found
                 </td>
               </tr>
-            )}
-          </tbody>
+            )}          </tbody>
         </table>
-      </div>      <div className="status-legend" style={{ marginTop: '20px', display: 'flex', gap: '15px', justifyContent: 'center' }}>
-        <div className="legend-item">
-          <span style={{ fontSize: '14px', fontWeight: '500' }}>Pending</span>
-        </div>
-        <div className="legend-item">
-          <span style={{ fontSize: '14px', fontWeight: '500' }}>Approved</span>
-        </div>
-        <div className="legend-item">
-          <span style={{ fontSize: '14px', fontWeight: '500' }}>Rejected</span>
-        </div>
-        <div className="legend-item">
-          <span className="status-badge completed" style={{ backgroundColor: '#2196f3', color: 'white' }}></span> Completed
-        </div>
       </div>
     </div>
   );

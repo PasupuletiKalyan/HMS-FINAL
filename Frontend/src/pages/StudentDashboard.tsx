@@ -42,10 +42,10 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     expiryDate: "",
     cvv: "",
     cardHolderName: "",
-  });  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]); // Track completed steps
+  });  const [errors, setErrors] = useState<{ [key: string]: string }>({});  const [completedSteps, setCompletedSteps] = useState<number[]>([]); // Track completed steps
   const [studentComplaints, setStudentComplaints] = useState<any[]>([]); // Track complaints submitted by the student
   const [studentFormData, setStudentFormData] = useState<any>(null); // Track student form data
+  const [studentRoomRequests, setStudentRoomRequests] = useState<any[]>([]); // Track room change requests submitted by the student
   const navigate = useNavigate();
     // Room change request form states
   const [roomChangeForm, setRoomChangeForm] = useState({
@@ -427,10 +427,37 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           console.error('Error fetching complaints:', error);
         }
       }
-    };
-    
+    };    
     fetchStudentComplaints();
-  }, [applicationNumber, selectedSection]);  // Function to fetch student form data
+  }, [applicationNumber, selectedSection]);
+
+  // Function to fetch student room change requests
+  const fetchStudentRoomRequests = async () => {
+    if (applicationNumber && applicationNumber !== 'N/A') {
+      try {
+        const response = await fetch(`http://localhost:5000/api/room-change-requests/student/${applicationNumber}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setStudentRoomRequests(data.requests || []);
+          }
+        } else {
+          console.error('Failed to fetch room change requests');
+        }
+      } catch (error) {
+        console.error('Error fetching room change requests:', error);
+      }
+    }
+  };
+
+  // Fetch room change requests when needed
+  useEffect(() => {
+    if (selectedSection === "Room-Change-Old") {
+      fetchStudentRoomRequests();
+    }
+  }, [applicationNumber, selectedSection]);
+
+  // Function to fetch student form data
   const fetchStudentFormData = async () => {
     if (applicationNumber && applicationNumber !== 'N/A') {
       try {
@@ -489,19 +516,27 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               >
                 {item}
               </li>
-            ))}
-              {/* Room Change Request as section */}
-            <li
-              className={`top-menu-item ${selectedSection === "Room Change Request" ? "active" : ""}`}
-              onClick={() => {
-                if (localCurrentUserBooking) {
-                  setSelectedSection("Room Change Request");
-                } else {
-                  alert('You need to have an active room booking before you can request a room change.');
-                }
-              }}
+            ))}              {/* Room Change Request as dropdown */}
+            <li 
+              className={`top-menu-item ${selectedSection.includes("Room-Change") ? "active" : ""}`}
             >
               Room Change Request
+              <ul className="dropdown-bullets-top">
+                <li onClick={() => {
+                  if (localCurrentUserBooking) {
+                    setSelectedSection("Room-Change-New");
+                  } else {
+                    alert('You need to have an active room booking before you can request a room change.');
+                  }
+                }}>New Requests</li>
+                <li onClick={() => {
+                  if (localCurrentUserBooking) {
+                    setSelectedSection("Room-Change-Old");
+                  } else {
+                    alert('You need to have an active room booking before you can view room change requests.');
+                  }
+                }}>Old Requests</li>
+              </ul>
             </li>
             <li 
               className={`top-menu-item ${selectedSection.includes("Complaints") ? "active" : ""}`}
@@ -1525,117 +1560,268 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </form>
             </div>
           )}
-          
-          {/* Complaints - Old */}
+            {/* Complaints - Old */}
           {selectedSection === "Complaints-Old" && (
             <div className="complaints-history-section">
               <h2>Complaint History</h2>
-                <div className="filter-controls" style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                margin: '20px 0',
-                padding: '15px',
-                backgroundColor: '#f9f9f9',
-                borderRadius: '8px'
-              }}>
-                <div className="search-box">
-                  <input 
-                    type="text" 
-                    placeholder="Search complaints..."
-                    style={{
-                      padding: '8px',
-                      borderRadius: '5px',
-                      border: '1px solid #ddd',
-                      width: '200px'
-                    }}
-                  />
-                </div>
-              </div>
               
-              <div className="complaints-list" style={{
-                maxWidth: '900px',
-                margin: '0 auto'
+              <div className="complaints-history-container" style={{
+                maxWidth: '1200px',
+                margin: '20px auto',
+                padding: '25px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
               }}>
                 {studentComplaints && studentComplaints.length > 0 ? (
-                  studentComplaints.map((complaint, index) => (
-                    <div key={index} className="complaint-card" style={{
+                  <div className="complaints-table-container" style={{
+                    overflowX: 'auto',
+                    marginTop: '20px'
+                  }}>
+                    <table style={{
+                      width: '100%',
+                      borderCollapse: 'collapse',
                       backgroundColor: 'white',
-                      padding: '20px',
-                      marginBottom: '15px',
                       borderRadius: '8px',
-                      boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-                      border: '1px solid #e0e0e0'
+                      overflow: 'hidden',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                     }}>
-                      <div className="complaint-header" style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginBottom: '15px',
-                        borderBottom: '1px solid #f0f0f0',
-                        paddingBottom: '10px'
-                      }}>
-                        <h4 style={{margin: 0, color: '#333', fontSize: '18px'}}>{complaint.subject}</h4>
-                        <span className={`status-badge ${complaint.status.toLowerCase().replace(' ', '-')}`} style={{
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontSize: '12px',
-                          fontWeight: 'bold',
-                          backgroundColor: complaint.status === 'Pending' ? '#fff3e0' : 
-                                          complaint.status === 'In Progress' ? '#e3f2fd' :
-                                          complaint.status === 'Resolved' ? '#e8f5e8' : '#f3e5f5',
-                          color: complaint.status === 'Pending' ? '#e65100' :
-                                 complaint.status === 'In Progress' ? '#1976d2' :
-                                 complaint.status === 'Resolved' ? '#388e3c' : '#7b1fa2'
+                      <thead>
+                        <tr style={{
+                          backgroundColor: '#c23535',
+                          color: 'white'
                         }}>
-                          {complaint.status}
-                        </span>
-                      </div>
-                      
-                      <div className="complaint-details" style={{marginBottom: '15px'}}>
-                        <p style={{margin: '0 0 10px 0', color: '#666', lineHeight: '1.6'}}>
-                          <strong>Description:</strong> {complaint.description}
-                        </p>
-                        <div className="complaint-meta" style={{
-                          display: 'grid',
-                          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                          gap: '10px',
-                          fontSize: '14px',
-                          color: '#888'
-                        }}>
-                          <div><strong>Priority:</strong> {complaint.priority}</div>
-                          <div><strong>Date:</strong> {complaint.date}</div>
-                          <div><strong>Room:</strong> {complaint.roomDetails ? 
-                            `${complaint.roomDetails.block}-${complaint.roomDetails.floor}-${complaint.roomDetails.roomNumber}` : 
-                            'Not specified'}</div>
-                        </div>
-                      </div>
-                      
-                      {complaint.wardenResponse && (
-                        <div className="warden-response" style={{
-                          backgroundColor: '#f8f9fa',
-                          padding: '15px',
-                          borderRadius: '5px',
-                          marginTop: '15px',
-                          border: '1px solid #e9ecef'
-                        }}>
-                          <h5 style={{margin: '0 0 8px 0', color: '#495057', fontSize: '14px'}}>Warden Response:</h5>
-                          <p style={{margin: 0, color: '#495057', fontSize: '14px', lineHeight: '1.5'}}>
-                            {complaint.wardenResponse}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ))
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            #
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Date
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Subject
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Room
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Description
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'center',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Priority
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'center',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Status
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px'
+                          }}>
+                            Warden Response
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {studentComplaints.map((complaint, index) => (
+                          <tr key={index} style={{
+                            borderBottom: '1px solid #e9ecef',
+                            backgroundColor: index % 2 === 0 ? '#f8f9fa' : 'white'
+                          }}>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              color: '#495057'
+                            }}>
+                              {index + 1}
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#6c757d'
+                            }}>
+                              {new Date(complaint.date).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              })}
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#495057',
+                              fontWeight: '500',
+                              maxWidth: '200px'
+                            }}>
+                              <div style={{
+                                maxHeight: '60px',
+                                overflowY: 'auto',
+                                lineHeight: '1.4'
+                              }}>
+                                {complaint.subject}
+                              </div>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#495057'
+                            }}>
+                              <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '2px'
+                              }}>
+                                <span style={{fontWeight: '500'}}>{complaint.roomDetails?.block}</span>
+                                <span style={{fontSize: '12px', color: '#6c757d'}}>
+                                  Floor {complaint.roomDetails?.floor} - Room {complaint.roomDetails?.roomNumber}
+                                </span>
+                              </div>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#495057',
+                              maxWidth: '250px'
+                            }}>
+                              <div style={{
+                                maxHeight: '60px',
+                                overflowY: 'auto',
+                                lineHeight: '1.4'
+                              }}>
+                                {complaint.description}
+                              </div>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              textAlign: 'center'
+                            }}>
+                              <span style={{
+                                padding: '6px 12px',
+                                borderRadius: '20px',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                backgroundColor: 
+                                  complaint.priority === 'High' ? '#f8d7da' :
+                                  complaint.priority === 'Medium' ? '#fff3cd' : '#d4edda',
+                                color: 
+                                  complaint.priority === 'High' ? '#721c24' :
+                                  complaint.priority === 'Medium' ? '#856404' : '#155724',
+                                border: `1px solid ${
+                                  complaint.priority === 'High' ? '#f5c6cb' :
+                                  complaint.priority === 'Medium' ? '#ffeaa7' : '#c3e6cb'
+                                }`,
+                                display: 'inline-block'
+                              }}>
+                                {complaint.priority}
+                              </span>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              textAlign: 'center'
+                            }}>
+                              <span style={{
+                                padding: '6px 12px',
+                                borderRadius: '20px',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                backgroundColor: 
+                                  complaint.status === 'Resolved' ? '#d4edda' :
+                                  complaint.status === 'In Progress' ? '#cce5ff' :
+                                  complaint.status === 'Pending' ? '#fff3cd' : '#f8d7da',
+                                color: 
+                                  complaint.status === 'Resolved' ? '#155724' :
+                                  complaint.status === 'In Progress' ? '#0056b3' :
+                                  complaint.status === 'Pending' ? '#856404' : '#721c24',
+                                border: `1px solid ${
+                                  complaint.status === 'Resolved' ? '#c3e6cb' :
+                                  complaint.status === 'In Progress' ? '#b3d9ff' :
+                                  complaint.status === 'Pending' ? '#ffeaa7' : '#f5c6cb'
+                                }`,
+                                display: 'inline-block'
+                              }}>
+                                {complaint.status}
+                              </span>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#6c757d',
+                              maxWidth: '200px'
+                            }}>
+                              {complaint.wardenResponse ? (
+                                <div style={{
+                                  maxHeight: '60px',
+                                  overflowY: 'auto',
+                                  lineHeight: '1.4',
+                                  fontStyle: 'italic'
+                                }}>
+                                  {complaint.wardenResponse}
+                                </div>
+                              ) : (
+                                <span style={{color: '#adb5bd', fontStyle: 'italic'}}>
+                                  No response
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 ) : (
                   <div style={{
                     textAlign: 'center',
-                    padding: '30px',
-                    backgroundColor: '#f9f9f9',
-                    borderRadius: '5px',
-                    color: '#666'
+                    padding: '40px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    color: '#6c757d'
                   }}>
+                    <h3 style={{color: '#6c757d', marginBottom: '15px'}}>No Complaints Found</h3>
                     <p>You haven't submitted any complaints yet.</p>
+                    <p>Click on "New Complaints" to submit your first complaint.</p>
                   </div>
                 )}
               </div>
@@ -2180,11 +2366,10 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 </div>
               </div>
             </div>
-          )}
-            {/* Room Change Request Section */}
-          {selectedSection === "Room Change Request" && (
+          )}          {/* Room Change Request - New */}
+          {selectedSection === "Room-Change-New" && (
             <div className="room-change-section">
-              <h2>Room Change Request</h2>
+              <h2>Submit New Room Change Request</h2>
               
               <div className="room-change-container" style={{
                 maxWidth: '800px',
@@ -2233,12 +2418,15 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         
                         if (response.ok) {
                           alert('Room change request submitted successfully! You will be notified once it is reviewed.');
-                          form.reset();                          // Reset form state
+                          form.reset();
+                          // Reset form state
                           setRoomChangeForm({
                             reason: '',
                             customReason: '',
                             preferredBlock: ''
                           });
+                          // Refresh the room change requests list
+                          fetchStudentRoomRequests();
                         } else {
                           alert('Failed to submit room change request. Please try again.');
                         }
@@ -2255,7 +2443,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       borderRadius: '8px',
                       border: '1px solid #e9ecef'
                     }}>
-                      <h3 style={{marginBottom: '15px', color: '#495057', fontSize: '18px'}}>Current Room Details</h3>                      <div style={{
+                      <h3 style={{marginBottom: '15px', color: '#495057', fontSize: '18px'}}>Current Room Details</h3>
+                      <div style={{
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr 1fr 1fr',
                         gap: '15px',
@@ -2413,7 +2602,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       </ul>
                     </div>
 
-                    {/* Submit Button */}                    <button 
+                    {/* Submit Button */}
+                    <button 
                       type="submit"
                       style={{
                         backgroundColor: '#c23535',
@@ -2450,7 +2640,229 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 )}
               </div>
             </div>
-          )}          {/* Feedback Section */}
+          )}          {/* Room Change Request - Old */}
+          {selectedSection === "Room-Change-Old" && (
+            <div className="room-change-old-section">
+              <h2>Room Change Request History</h2>
+              
+              <div className="room-change-history-container" style={{
+                maxWidth: '1200px',
+                margin: '20px auto',
+                padding: '25px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+              }}>
+                {studentRoomRequests.length > 0 ? (
+                  <div className="requests-table-container" style={{
+                    overflowX: 'auto',
+                    marginTop: '20px'
+                  }}>
+                    <table style={{
+                      width: '100%',
+                      borderCollapse: 'collapse',
+                      backgroundColor: 'white',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                    }}>
+                      <thead>
+                        <tr style={{
+                          backgroundColor: '#c23535',
+                          color: 'white'
+                        }}>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            #
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Date Submitted
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Current Room
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Preferred Block
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Reason
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'center',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Status
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px'
+                          }}>
+                            Admin Comments
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {studentRoomRequests.map((request, index) => (
+                          <tr key={index} style={{
+                            borderBottom: '1px solid #e9ecef',
+                            backgroundColor: index % 2 === 0 ? '#f8f9fa' : 'white'
+                          }}>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              color: '#495057'
+                            }}>
+                              {index + 1}
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#6c757d'
+                            }}>
+                              {new Date(request.dateSubmitted).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              })}
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#495057'
+                            }}>
+                              <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '2px'
+                              }}>
+                                <span style={{fontWeight: '500'}}>{request.currentRoom?.block}</span>
+                                <span style={{fontSize: '12px', color: '#6c757d'}}>
+                                  Floor {request.currentRoom?.floor} - Room {request.currentRoom?.roomNumber} - Bed {request.currentRoom?.bed}
+                                </span>
+                              </div>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#6c757d'
+                            }}>
+                              {request.preferredBlock || 'No preference'}
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#495057',
+                              maxWidth: '200px'
+                            }}>
+                              <div style={{
+                                maxHeight: '60px',
+                                overflowY: 'auto',
+                                lineHeight: '1.4'
+                              }}>
+                                {request.reason}
+                              </div>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              textAlign: 'center'
+                            }}>
+                              <span style={{
+                                padding: '6px 12px',
+                                borderRadius: '20px',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                backgroundColor: 
+                                  request.status === 'Approved' ? '#d4edda' :
+                                  request.status === 'Rejected' ? '#f8d7da' : '#fff3cd',
+                                color: 
+                                  request.status === 'Approved' ? '#155724' :
+                                  request.status === 'Rejected' ? '#721c24' : '#856404',
+                                border: `1px solid ${
+                                  request.status === 'Approved' ? '#c3e6cb' :
+                                  request.status === 'Rejected' ? '#f5c6cb' : '#ffeaa7'
+                                }`,
+                                display: 'inline-block'
+                              }}>
+                                {request.status}
+                              </span>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#6c757d',
+                              maxWidth: '200px'
+                            }}>
+                              {request.adminComments ? (
+                                <div style={{
+                                  maxHeight: '60px',
+                                  overflowY: 'auto',
+                                  lineHeight: '1.4',
+                                  fontStyle: 'italic'
+                                }}>
+                                  {request.adminComments}
+                                </div>
+                              ) : (
+                                <span style={{color: '#adb5bd', fontStyle: 'italic'}}>
+                                  No comments
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div style={{
+                    textAlign: 'center',
+                    padding: '40px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    color: '#6c757d'
+                  }}>
+                    <h3 style={{color: '#6c757d', marginBottom: '15px'}}>No Room Change Requests Found</h3>
+                    <p>You haven't submitted any room change requests yet.</p>
+                    <p>Click on "New Requests" to submit your first room change request.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}{/* Feedback Section */}
           {selectedSection === "Feedback" && (
             <div className="feedback-section">
               <h2>Feedback</h2>

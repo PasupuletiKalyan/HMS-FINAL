@@ -74,7 +74,7 @@ app.post("/api/login", async (req, res) => {
       applicationNo: user.applicationNo
     });
   } catch (error) {
-    console.error("🔥 Server Error:", error);
+    console.error("Server Error:", error);
     res.status(500).json({ success: false, message: "Server error. Please try again." });
   }
 });
