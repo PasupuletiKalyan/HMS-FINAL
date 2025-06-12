@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { buildApiUrl } from '../config/api';
 // Import from TypeScript component file
 import HostelFloorPlanViewer from '../components/HostelFloorPlanViewer';
 import '../styles/HostelBookingPage.css';
@@ -47,7 +48,7 @@ const HostelBookingPage: React.FC<HostelBookingPageProps> = ({
         }
         
         // Fetch progress from the server
-        const response = await fetch(`http://localhost:5000/api/progress/${applicationNumber}`);
+        const response = await fetch(buildApiUrl(`/api/progress/${applicationNumber}`));
         
         if (response.ok) {
           const data = await response.json();

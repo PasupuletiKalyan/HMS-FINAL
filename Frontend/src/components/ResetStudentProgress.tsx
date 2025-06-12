@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { buildApiUrl } from '../config/api';
 
 /**
  * Component to reset student progress (form filling and payment status)
@@ -46,7 +47,7 @@ const ResetStudentProgress: React.FC = () => {
     setMessage(null);
     
     try {
-      const response = await fetch('http://localhost:5000/api/progress/reset/all', {
+      const response = await fetch(buildApiUrl('/api/progress/reset/all'), {
         method: 'DELETE',
       });
       
@@ -80,7 +81,7 @@ const ResetStudentProgress: React.FC = () => {
     setMessage(null);
     
     try {
-      const response = await fetch('http://localhost:5000/api/occupied-beds', {
+      const response = await fetch(buildApiUrl('/api/occupied-beds'), {
         method: 'DELETE',
       });
       

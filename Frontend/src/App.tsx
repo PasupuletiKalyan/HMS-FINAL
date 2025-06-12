@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { buildApiUrl } from "./config/api";
 import LoginPage from "./pages/LoginPage";
 import StudentDashboard from "./pages/StudentDashboard";
 import WardenDashboard from "./pages/WardenDashboard";
@@ -50,7 +51,7 @@ const LocationAwareApp: React.FC = () => {
       if (applicationNo) {
         try {
           // First, directly check if the form exists in the database
-          const formResponse = await fetch(`http://localhost:5000/api/form/${applicationNo}`);
+          const formResponse = await fetch(buildApiUrl(`/api/form/${applicationNo}`));
           if (formResponse.ok) {
             const formData = await formResponse.json();
             if (formData.success && formData.form) {
@@ -61,7 +62,7 @@ const LocationAwareApp: React.FC = () => {
           }
 
           // Now get the overall progress
-          const response = await fetch(`http://localhost:5000/api/progress/${applicationNo}`);
+          const response = await fetch(buildApiUrl(`/api/progress/${applicationNo}`));
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
@@ -80,7 +81,7 @@ const LocationAwareApp: React.FC = () => {
               if (localStorage.getItem("formCompleted") === "true" && !data.progress.formCompleted) {
                 console.log("Updating backend progress to mark form as completed");
                 try {
-                  await fetch(`http://localhost:5000/api/progress/${applicationNo}/form`, {
+                  await fetch(buildApiUrl(`/api/progress/${applicationNo}/form`), {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',

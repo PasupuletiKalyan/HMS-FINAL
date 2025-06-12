@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { buildApiUrl } from "../config/api";
 import "../styles/AuthStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
 
@@ -18,7 +19,7 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/login", {
+      const response = await axios.post(buildApiUrl("/api/login"), {
         identifier,
         password,
       });

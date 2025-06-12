@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { buildApiUrl } from '../config/api';
 import {
   Phase1FloorPlan,
   Phase1EBlockFloorPlan,
@@ -133,7 +134,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     // Fetch available blocks from admin configuration
     const fetchAvailableBlocks = async () => {
       try {
-        setIsLoadingAvailability(true);        const response = await fetch('http://localhost:5000/api/hostels/available-blocks');
+        setIsLoadingAvailability(true);        const response = await fetch(buildApiUrl('/api/hostels/available-blocks'));
         if (response.ok) {
           const data = await response.json();
           setAvailableBlocks(data.availableBlocks || []);
@@ -154,7 +155,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
     // Load occupied beds from the backend API
     const fetchOccupiedBeds = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/occupied-beds');
+        const response = await fetch(buildApiUrl('/api/occupied-beds'));
         if (response.ok) {
           const data = await response.json();
           if (data.success) {
@@ -358,7 +359,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
       }
       
       // 1. Save to the OccupiedBeds collection in the database
-      const occupiedBedResponse = await fetch('http://localhost:5000/api/occupied-beds', {
+      const occupiedBedResponse = await fetch(buildApiUrl('/api/occupied-beds'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -380,7 +381,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
         // If the bed is already occupied, refresh the occupied beds data
         if (errorData.message === "This bed is already occupied") {
           // Refresh occupied beds from server
-          const refreshResponse = await fetch('http://localhost:5000/api/occupied-beds');
+          const refreshResponse = await fetch(buildApiUrl('/api/occupied-beds'));
           if (refreshResponse.ok) {
             const refreshData = await refreshResponse.json();
             if (refreshData.success) {
@@ -425,7 +426,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
       setCurrentUserBooking(bookingInfo);
       
       // 4. Update the booking status in the student progress
-      const progressResponse = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/booking`, {
+      const progressResponse = await fetch(buildApiUrl(`/api/progress/${applicationNumber}/booking`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -456,7 +457,7 @@ const HostelFloorPlanViewer: React.FC<HostelFloorPlanViewerProps> = ({
       try {
         // This fetch doesn't need to return anything to the client
         // It just triggers the backend to recalculate statistics
-        await fetch('http://localhost:5000/api/hostels/statistics/all');
+        await fetch(buildApiUrl('/api/hostels/statistics/all'));
       } catch (err) {
         console.error("Error refreshing hostel statistics:", err);
         // Non-blocking error - continue with booking process

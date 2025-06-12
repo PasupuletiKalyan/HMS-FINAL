@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { buildApiUrl } from "../config/api";
 import "../styles/WardenDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
 import defaultProfilePic from "../assets/default-profile-pic.jpg";
@@ -593,7 +594,7 @@ const WardenDashboard: React.FC = () => {
   
     try {
       // Make API call to allocate room in the backend
-      const response = await fetch('http://localhost:5000/api/hostels/allot-room', {
+      const response = await fetch(buildApiUrl('/api/hostels/allot-room'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -640,7 +641,7 @@ const WardenDashboard: React.FC = () => {
 
       // Refresh occupied beds from server to make sure UI is in sync
       try {
-        const refreshResponse = await fetch('http://localhost:5000/api/occupied-beds');
+        const refreshResponse = await fetch(buildApiUrl('/api/occupied-beds'));
         if (refreshResponse.ok) {
           const refreshData = await refreshResponse.json();
           if (refreshData.success) {
@@ -1106,7 +1107,7 @@ const WardenDashboard: React.FC = () => {
     if (selectedMenu !== "Maintenance Complaints") return;
     
     try {
-      const response = await fetch('http://localhost:5000/api/complaints');
+      const response = await fetch(buildApiUrl('/api/complaints'));
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.complaints) {
@@ -1128,7 +1129,7 @@ const WardenDashboard: React.FC = () => {
         updateData.wardenResponse = response;
       }
       
-      const res = await fetch(`http://localhost:5000/api/complaints/${id}`, {
+      const res = await fetch(buildApiUrl(`/api/complaints/${id}`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -1278,7 +1279,7 @@ const WardenDashboard: React.FC = () => {
     
     try {
       console.log(`Searching for student with application number: ${studentSearchQuery.trim()}`);
-      const response = await fetch(`http://localhost:5000/api/warden/student/${studentSearchQuery.trim()}`);
+      const response = await fetch(buildApiUrl(`/api/warden/student/${studentSearchQuery.trim()}`));
       
       console.log('Response status:', response.status);
       
@@ -1332,7 +1333,7 @@ const WardenDashboard: React.FC = () => {
     if (!window.confirm(confirmMsg)) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/warden/student/${studentSearchQuery}/verify-documents`, {
+      const response = await fetch(buildApiUrl(`/api/warden/student/${studentSearchQuery}/verify-documents`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1387,7 +1388,7 @@ const WardenDashboard: React.FC = () => {
   const fetchHostelStatistics = async () => {
     try {
       // First try to fetch real data from the server
-      const response = await fetch('http://localhost:5000/api/hostels/statistics/all');
+      const response = await fetch(buildApiUrl('/api/hostels/statistics/all'));
       if (!response.ok) {
         throw new Error('Failed to fetch hostel statistics');
       }
@@ -1576,11 +1577,11 @@ const WardenDashboard: React.FC = () => {
   // Add this function to fetch profile photo from the server
   const fetchProfilePhoto = async (userId: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/warden/profile-photo/${userId}`);
+      const response = await fetch(buildApiUrl(`/api/warden/profile-photo/${userId}`));
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.profilePhoto) {
-          const photoUrl = `http://localhost:5000${data.profilePhoto}`;
+          const photoUrl = `${buildApiUrl('')}${data.profilePhoto}`;
           setProfilePic(photoUrl);
           localStorage.setItem("profilePic", photoUrl);
         }
@@ -1943,7 +1944,7 @@ const WardenDashboard: React.FC = () => {
                     }}>
                       {studentDetails.profilePhoto ? (
                         <img
-                          src={`http://localhost:5000${studentDetails.profilePhoto}?t=${new Date().getTime()}`}
+                          src={`${buildApiUrl('')}${studentDetails.profilePhoto}?t=${new Date().getTime()}`}
                           alt="Student Profile"
                           style={{
                             width: '100%',

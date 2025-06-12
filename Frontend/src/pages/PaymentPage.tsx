@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { buildApiUrl } from "../config/api";
 import "../styles/PayFeeStyles.css"; // Import styles for the payment page
 
 const PaymentPage: React.FC = () => {
@@ -83,7 +84,7 @@ const PaymentPage: React.FC = () => {
         }
         
         // Call API to update payment status in the database
-        const response = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/payment`, {
+        const response = await fetch(buildApiUrl(`/api/progress/${applicationNumber}/payment`), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

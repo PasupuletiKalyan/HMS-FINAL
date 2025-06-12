@@ -144,7 +144,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     const fetchStudentProgress = async () => {
       if (applicationNumber && applicationNumber !== 'N/A') {
         try {
-          const response = await fetch(`http://localhost:5000/api/progress/${applicationNumber}`);
+          const response = await fetch(buildApiUrl(`/api/progress/${applicationNumber}`));
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
@@ -298,7 +298,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     if (confirmSubmission) {
       try {
         // First, save the form data
-        const formResponse = await fetch('http://localhost:5000/api/form', {
+        const formResponse = await fetch(buildApiUrl('/api/form'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -312,7 +312,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
         }
         
         // After form is saved, update the progress
-        const progressResponse = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/form`, {
+        const progressResponse = await fetch(buildApiUrl(`/api/progress/${applicationNumber}/form`), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -347,7 +347,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const markPaymentComplete = async () => {
     try {
       // Call API to mark payment as completed for this student
-      const response = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/payment`, {
+      const response = await fetch(buildApiUrl(`/api/progress/${applicationNumber}/payment`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -420,7 +420,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     const fetchStudentComplaints = async () => {
       if (applicationNumber && applicationNumber !== 'N/A') {
         try {
-          const response = await fetch(`http://localhost:5000/api/complaints/student/${applicationNumber}`);
+          const response = await fetch(buildApiUrl(`/api/complaints/student/${applicationNumber}`));
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
@@ -442,7 +442,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const fetchStudentFormData = async () => {
     if (applicationNumber && applicationNumber !== 'N/A') {
       try {
-        const response = await fetch(`http://localhost:5000/api/form/${applicationNumber}`);
+        const response = await fetch(buildApiUrl(`/api/form/${applicationNumber}`));
         if (response.ok) {
           const data = await response.json();
           if (data.success) {
@@ -1226,7 +1226,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   }
                   
                   try {
-                    const response = await fetch('http://localhost:5000/api/complaints', {
+                    const response = await fetch(buildApiUrl('/api/complaints'), {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
