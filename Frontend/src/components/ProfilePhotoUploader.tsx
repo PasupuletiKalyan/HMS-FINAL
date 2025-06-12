@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { buildApiUrl } from '../config/api';
 import defaultProfilePic from '../assets/default-profile-pic.jpg';
 
 // Define props interface
@@ -37,9 +38,8 @@ const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
       console.log(`Fetching profile photo for ${userType} with ID: ${applicationNumber}`);
       
       // Use the appropriate API endpoint based on user type
-      const endpoint = userType === 'warden' 
-        ? `http://localhost:5000/api/warden/profile-photo/${applicationNumber}` 
-        : `http://localhost:5000/api/students/${applicationNumber}/profile-photo`;
+      const endpoint = userType === 'warden'        ? buildApiUrl(`/api/warden/profile-photo/${applicationNumber}`) 
+        : buildApiUrl(`/api/students/${applicationNumber}/profile-photo`);
       
       const response = await fetch(endpoint);
       console.log('Profile photo fetch response status:', response.status);
@@ -53,7 +53,7 @@ const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
           const photoPath = data.profilePhoto;
             
           if (photoPath) {
-            const photoUrl = `http://localhost:5000${photoPath}`;
+            const photoUrl = `${buildApiUrl('')}${photoPath}`;
             console.log('Setting photo URL to:', photoUrl);
             
             // Verify the image exists by attempting to load it
@@ -115,9 +115,8 @@ const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
       console.log(`Uploading profile photo for ${userType} with ID: ${applicationNumber}`);
       
       // Use the appropriate API endpoint based on user type
-      const endpoint = userType === 'warden'
-        ? `http://localhost:5000/api/warden/profile-photo/${applicationNumber}`
-        : `http://localhost:5000/api/students/${applicationNumber}/profile-photo`;
+      const endpoint = userType === 'warden'        ? buildApiUrl(`/api/warden/profile-photo/${applicationNumber}`)
+        : buildApiUrl(`/api/students/${applicationNumber}/profile-photo`);
       
       console.log('Upload endpoint:', endpoint);
       
@@ -133,7 +132,7 @@ const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
       
       if (response.ok && data.success) {
         // Update to use full URL including server
-        const fullPhotoUrl = `http://localhost:5000${data.profilePhoto}`;
+        const fullPhotoUrl = `${buildApiUrl('')}${data.profilePhoto}`;
         console.log('Full photo URL:', fullPhotoUrl);
         
         // Add a timestamp to bust cache
@@ -170,17 +169,8 @@ const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
     backgroundColor: '#f9f9f9',
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    marginBottom: '20px'
-  };
+    marginBottom: '20px'  };
 
-  const photoPreviewStyle: React.CSSProperties = {
-    width: '120px',
-    height: '120px',
-    borderRadius: '50%',
-    objectFit: 'cover',
-    border: '3px solid #c23535',
-    marginBottom: '15px'
-  };
 
   const buttonStyle: React.CSSProperties = {
     backgroundColor: '#c23535',

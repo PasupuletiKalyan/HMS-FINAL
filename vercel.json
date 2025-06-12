@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "name": "hostel-management-frontend",
+  "builds": [
+    {
+      "src": "Frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "https://hms-final-33g5.onrender.com",
+    "VITE_NODE_ENV": "production"
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}

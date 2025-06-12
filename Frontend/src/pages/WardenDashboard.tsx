@@ -1,22 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { buildApiUrl } from "../config/api";
 import "../styles/WardenDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
 import defaultProfilePic from "../assets/default-profile-pic.jpg";
 import HostelFloorPlanViewer from "../components/HostelFloorPlanViewer"; 
 import ProfilePhotoUploader from "../components/ProfilePhotoUploader"; // Import ProfilePhotoUploader component
 
-type Student = {
-  name: string;
-  roll: string;
-  room: string;
-  applicationNumber?: string;
-  phone?: string;
-  parentPhone?: string;
-  emergencyContact?: string;
-  school?: string;
-  profilePic?: string;
-};
 
 type HostelSummary = {
   id: string;
@@ -81,6 +71,33 @@ type Complaint = {
   wardenResponse?: string;
   date: string;
   createdAt: string;
+};
+
+// Room Change Request type
+type RoomChangeRequest = {
+  _id: string;
+  applicationNo: string;
+  studentName: string;
+  currentRoom: {
+    block: string;
+    floor: string;
+    roomNumber: string;
+    bed: string;
+  };
+  reason: string;
+  customReason?: string;
+  preferredBlock?: string;
+  additionalDetails?: string;
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Completed';
+  wardenResponse?: string;
+  requestDate: string;
+  processedDate?: string;
+  newRoom?: {
+    block: string;
+    floor: string;
+    roomNumber: string;
+    bed: string;
+  };
 };
 
 const createEmptyTotals = (): Omit<FloorData, 'floorNumber'> => ({
@@ -295,16 +312,14 @@ const initialBoysHostelData = {
 
 const WardenDashboard: React.FC = () => {
   const [selectedMenu, setSelectedMenu] = useState("Overview");
-  const [searchTerm, setSearchTerm] = useState("");
-  // Remove all unused variables
-  // const [studentData, setStudentData] = useState<Student[]>([]);
-  // const [roomSearchTerm, setRoomSearchTerm] = useState("");
+  const [] = useState("");
+
   const [wardenName, setWardenName] = useState("Warden");
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [summaryView, setSummaryView] = useState<'summary' | 'girls' | 'boys'>('summary');
   const [hostelSummary, setHostelSummary] = useState<HostelSummary[]>([]);
-  // const [isEditing, setIsEditing] = useState(false);
+  
   const [editData, setEditData] = useState<EditableData | null>(null);
   const [girlsHostelData, setGirlsHostelData] = useState(initialGirlsHostelData);
   const [boysHostelData, setBoysHostelData] = useState(initialBoysHostelData);  const [occupiedBeds, setOccupiedBeds] = useState<{[key: string]: boolean}>({});
@@ -319,12 +334,12 @@ const WardenDashboard: React.FC = () => {
     keysHandedOver: false
   });
   const [profilePic, setProfilePic] = useState<string>(defaultProfilePic);
-  const [wardenEmail, setWardenEmail] = useState<string>("");
-  const [complaints, setComplaints] = useState<Complaint[]>([
+  const [wardenEmail, setWardenEmail] = useState<string>("");  const [complaints, setComplaints] = useState<Complaint[]>([
     { _id: "1", applicationNo: "123", studentName: "Om Sai Vikranth", subject: "AC Not Working", description: "AC in my room is not working since last week.", priority: "High", roomDetails: { block: "A", floor: "1", roomNumber: "101" }, status: "Pending", date: "2023-10-01", createdAt: "2023-10-01T10:00:00Z" },
     { _id: "2", applicationNo: "124", studentName: "Mohana Krishna", subject: "Washroom Issue", description: "Smell From Washroom Spreading all over corridor", priority: "Medium", roomDetails: { block: "A", floor: "1", roomNumber: "102" }, status: "Pending", date: "2023-10-02", createdAt: "2023-10-02T11:00:00Z" },
     { _id: "3", applicationNo: "125", studentName: "SJ Satwik", subject: "Light Flickering", description: "Flickering light in room", priority: "Low", roomDetails: { block: "B", floor: "2", roomNumber: "201" }, status: "Resolved", date: "2023-10-03", createdAt: "2023-10-03T12:00:00Z" },
   ]);
+  const [roomChangeRequests, setRoomChangeRequests] = useState<RoomChangeRequest[]>([]);
   const navigate = useNavigate();
 
   const suggestionRefs = useRef<(HTMLLIElement | null)[]>([]);
@@ -334,22 +349,7 @@ const WardenDashboard: React.FC = () => {
     localStorage.clear();
     navigate("/login");
   };
-  const suggestions = [
-    // Boys hostels
-    { name: "Phase 1", gender: "Boys" },
-    { name: "E-wing", gender: "Boys" },
-    { name: "Phase 2", gender: "Boys" },
-    { name: "Phase 2- part 5", gender: "Boys" },
-    { name: "Phase 4", gender: "Boys" },
-    // Girls hostels 
-    { name: "Dorms", gender: "Girls" },
-    { name: "Phase 3-NW", gender: "Girls" },
-    { name: "Phase 3-SW", gender: "Girls" },
-  ];
 
-  const filteredSuggestions = suggestions.filter((s) =>
-    s.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
   const getDummyHostelData = () => {
     return [
       // Boys hostels grouped together (blue)
@@ -462,8 +462,6 @@ const WardenDashboard: React.FC = () => {
   useEffect(() => {
     const fetchApplicationNumber = async () => {
       try {
-        const response = await fetch("/api/warden/application-number");
-        const data = await response.json();
         // Commented out unused state setter
         // setApplicationNumber(data.applicationNumber);
       } catch (error) {
@@ -512,17 +510,6 @@ const WardenDashboard: React.FC = () => {
     }
   };
 
-  const handleSuggestionClick = (blockName: string) => {
-    setSearchTerm(blockName);
-    setSelectedSuggestionIndex(-1);
-    
-    // Filter hostel data based on block name
-    if (blockName.toLowerCase().includes('phase 3') || blockName === 'Dorms') {
-      setSummaryView('girls');
-    } else {
-      setSummaryView('boys');
-    }
-  };
 
   // Commented out unused function
   /*
@@ -604,7 +591,7 @@ const WardenDashboard: React.FC = () => {
           // Boys Hostels
           setBoysHostelData(prev => {
             const newData = { ...prev };
-            Object.entries(newData).forEach(([key, block]) => {
+            Object.entries(newData).forEach(([, block]) => {
               block.floors = block.floors.map(floor => 
                 floor.floorNumber === editData.floorNumber ? editData as FloorData : floor
               );
@@ -634,7 +621,7 @@ const WardenDashboard: React.FC = () => {
   
     try {
       // Make API call to allocate room in the backend
-      const response = await fetch('http://localhost:5000/api/hostels/allot-room', {
+      const response = await fetch(buildApiUrl('/api/hostels/allot-room'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -681,7 +668,7 @@ const WardenDashboard: React.FC = () => {
 
       // Refresh occupied beds from server to make sure UI is in sync
       try {
-        const refreshResponse = await fetch('http://localhost:5000/api/occupied-beds');
+        const refreshResponse = await fetch(buildApiUrl('/api/occupied-beds'));
         if (refreshResponse.ok) {
           const refreshData = await refreshResponse.json();
           if (refreshData.success) {
@@ -1136,10 +1123,10 @@ const WardenDashboard: React.FC = () => {
       </div>
     );
   };
-
   // Add useEffect to fetch complaints when component mounts
   useEffect(() => {
     fetchComplaints();
+    fetchRoomChangeRequests();
   }, [selectedMenu]);
 
   // Function to fetch complaints from the server
@@ -1147,7 +1134,7 @@ const WardenDashboard: React.FC = () => {
     if (selectedMenu !== "Maintenance Complaints") return;
     
     try {
-      const response = await fetch('http://localhost:5000/api/complaints');
+      const response = await fetch(buildApiUrl('/api/complaints'));
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.complaints) {
@@ -1169,7 +1156,7 @@ const WardenDashboard: React.FC = () => {
         updateData.wardenResponse = response;
       }
       
-      const res = await fetch(`http://localhost:5000/api/complaints/${id}`, {
+      const res = await fetch(buildApiUrl(`/api/complaints/${id}`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -1188,10 +1175,65 @@ const WardenDashboard: React.FC = () => {
       } else {
         const errorData = await res.json();
         alert(`Failed to update complaint status: ${errorData.message || 'Unknown error'}`);
-      }
-    } catch (error) {
+      }    } catch (error) {
       console.error('Error updating complaint status:', error);
       alert('An error occurred while updating the complaint');
+    }
+  };
+
+  // Function to fetch room change requests from the server
+  const fetchRoomChangeRequests = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/room-change-requests');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setRoomChangeRequests(data.requests);
+        }
+      } else {
+        console.error('Failed to fetch room change requests');
+      }
+    } catch (error) {
+      console.error('Error fetching room change requests:', error);
+    }
+  };
+
+  // Function to update room change request status
+  const updateRoomChangeRequestStatus = async (requestId: string, status: string, wardenResponse?: string, newRoom?: any) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/room-change-requests/${requestId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status,
+          wardenResponse,
+          newRoom,
+          processedDate: new Date().toISOString()
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          // Update local state
+          setRoomChangeRequests(prev => 
+            prev.map(request => 
+              request._id === requestId 
+                ? { ...request, status: status as any, wardenResponse, processedDate: new Date().toISOString(), newRoom }
+                : request
+            )
+          );
+          alert(`Room change request ${status.toLowerCase()} successfully!`);
+        }
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to update request status');
+      }
+    } catch (error) {
+      console.error('Error updating room change request status:', error);
+      alert('Failed to update request status');
     }
   };
 
@@ -1239,9 +1281,8 @@ const WardenDashboard: React.FC = () => {
                       {complaint.priority}
                     </span>
                   </td>
-                  <td>{new Date(complaint.date).toLocaleDateString()}</td>
-                  <td>
-                    <span className={`status-badge ${complaint.status.toLowerCase().replace(' ', '-')}`}>
+                  <td>{new Date(complaint.date).toLocaleDateString()}</td>                  <td>
+                    <span style={{ fontSize: '14px', fontWeight: '500' }}>
                       {complaint.status}
                     </span>
                   </td>
@@ -1286,23 +1327,121 @@ const WardenDashboard: React.FC = () => {
                   No complaints found
                 </td>
               </tr>
-            )}
-          </tbody>
+            )}          </tbody>
         </table>
       </div>
-      <div className="status-legend" style={{ marginTop: '20px', display: 'flex', gap: '15px', justifyContent: 'center' }}>
-        <div className="legend-item">
-          <span className="status-badge pending"></span> Pending
-        </div>
-        <div className="legend-item">
-          <span className="status-badge in-progress"></span> In Progress
-        </div>
-        <div className="legend-item">
-          <span className="status-badge resolved"></span> Resolved
-        </div>
-        <div className="legend-item">
-          <span className="status-badge closed"></span> Closed
-        </div>
+    </div>
+  );
+
+  // Function to render room change requests content
+  const renderRoomChangeRequestsContent = () => (
+    <div className="complaints-container">
+      <div className="table-responsive">
+        <table className="complaints-table">
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Application No.</th>
+              <th>Current Room</th>
+              <th>Reason</th>
+              <th>Preferred Block</th>
+              <th>Request Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {roomChangeRequests.length > 0 ? (
+              roomChangeRequests.map(request => (
+                <tr key={request._id}>
+                  <td>{request.studentName}</td>
+                  <td>{request.applicationNo}</td>
+                  <td>
+                    {`${request.currentRoom.block}-${request.currentRoom.floor}-${request.currentRoom.roomNumber}-${request.currentRoom.bed}`}
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '14px' }}>
+                      {request.reason === 'Other' ? request.customReason : request.reason}
+                    </span>
+                  </td>
+                  <td>{request.preferredBlock || 'No preference'}</td>
+                  <td>{new Date(request.requestDate).toLocaleDateString()}</td>                  <td>
+                    <span style={{ fontSize: '14px', fontWeight: '500' }}>
+                      {request.status}
+                    </span>
+                  </td>
+                  <td>
+                    {request.status === "Pending" && (
+                      <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                        <button
+                          className="action-btn resolve"
+                          style={{ backgroundColor: '#4caf50', fontSize: '12px', padding: '5px 10px' }}
+                          onClick={() => {
+                            const response = prompt('Enter approval message (optional):');
+                            updateRoomChangeRequestStatus(request._id, "Approved", response || undefined);
+                          }}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          className="action-btn close"
+                          style={{ backgroundColor: '#f44336', fontSize: '12px', padding: '5px 10px' }}
+                          onClick={() => {
+                            const response = prompt('Enter rejection reason:');
+                            if (response) {
+                              updateRoomChangeRequestStatus(request._id, "Rejected", response);
+                            }
+                          }}
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    )}
+                    {request.status === "Approved" && (
+                      <button
+                        className="action-btn resolve"
+                        style={{ backgroundColor: '#2196f3', fontSize: '12px', padding: '5px 10px' }}
+                        onClick={() => {
+                          // In a real implementation, you would integrate with room allocation
+                          alert('Room allocation functionality would be integrated here');
+                          updateRoomChangeRequestStatus(request._id, "Completed", "Room successfully allocated");
+                        }}
+                      >
+                        Allocate Room
+                      </button>
+                    )}
+                    
+                    <button
+                      className="action-btn view"
+                      style={{ fontSize: '12px', padding: '5px 10px' }}
+                      onClick={() => {
+                        const details = `
+Student: ${request.studentName}
+Application No: ${request.applicationNo}
+Current Room: ${request.currentRoom.block}-${request.currentRoom.floor}-${request.currentRoom.roomNumber}-${request.currentRoom.bed}
+Reason: ${request.reason === 'Other' ? request.customReason : request.reason}
+Preferred Block: ${request.preferredBlock || 'No preference'}
+Additional Details: ${request.additionalDetails || 'None'}
+Request Date: ${new Date(request.requestDate).toLocaleString()}
+${request.wardenResponse ? `Warden Response: ${request.wardenResponse}` : ''}
+${request.processedDate ? `Processed Date: ${new Date(request.processedDate).toLocaleString()}` : ''}
+                        `;
+                        alert(details);
+                      }}
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={8} style={{ textAlign: 'center', padding: '20px' }}>
+                  No room change requests found
+                </td>
+              </tr>
+            )}          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -1319,7 +1458,7 @@ const WardenDashboard: React.FC = () => {
     
     try {
       console.log(`Searching for student with application number: ${studentSearchQuery.trim()}`);
-      const response = await fetch(`http://localhost:5000/api/warden/student/${studentSearchQuery.trim()}`);
+      const response = await fetch(buildApiUrl(`/api/warden/student/${studentSearchQuery.trim()}`));
       
       console.log('Response status:', response.status);
       
@@ -1373,7 +1512,7 @@ const WardenDashboard: React.FC = () => {
     if (!window.confirm(confirmMsg)) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/warden/student/${studentSearchQuery}/verify-documents`, {
+      const response = await fetch(buildApiUrl(`/api/warden/student/${studentSearchQuery}/verify-documents`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1428,7 +1567,7 @@ const WardenDashboard: React.FC = () => {
   const fetchHostelStatistics = async () => {
     try {
       // First try to fetch real data from the server
-      const response = await fetch('http://localhost:5000/api/hostels/statistics/all');
+      const response = await fetch(buildApiUrl('/api/hostels/statistics/all'));
       if (!response.ok) {
         throw new Error('Failed to fetch hostel statistics');
       }
@@ -1617,11 +1756,11 @@ const WardenDashboard: React.FC = () => {
   // Add this function to fetch profile photo from the server
   const fetchProfilePhoto = async (userId: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/warden/profile-photo/${userId}`);
+      const response = await fetch(buildApiUrl(`/api/warden/profile-photo/${userId}`));
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.profilePhoto) {
-          const photoUrl = `http://localhost:5000${data.profilePhoto}`;
+          const photoUrl = `${buildApiUrl('')}${data.profilePhoto}`;
           setProfilePic(photoUrl);
           localStorage.setItem("profilePic", photoUrl);
         }
@@ -1955,18 +2094,17 @@ const WardenDashboard: React.FC = () => {
             className={`top-menu-item ${selectedMenu === "Student Search" ? "active" : ""}`}            onClick={() => setSelectedMenu("Student Search")}
           >
             Student Search
-          </li>
-          <li
-            className={`top-menu-item ${selectedMenu === "Room Search" ? "active" : ""}`}
-            onClick={() => setSelectedMenu("Room Search")}
-          >
-            Room Search
-          </li>
-          <li
+          </li>          <li
             className={`top-menu-item ${selectedMenu === "Maintenance Complaints" ? "active" : ""}`}
             onClick={() => setSelectedMenu("Maintenance Complaints")}
           >
             Complaints
+          </li>
+          <li
+            className={`top-menu-item ${selectedMenu === "Room Change Requests" ? "active" : ""}`}
+            onClick={() => setSelectedMenu("Room Change Requests")}
+          >
+            Room Change Requests
           </li>
         </ul>
         <div className="profile-button-container" ref={profileRef}>
@@ -2271,7 +2409,7 @@ const WardenDashboard: React.FC = () => {
                     }}>
                       {studentDetails.profilePhoto ? (
                         <img
-                          src={`http://localhost:5000${studentDetails.profilePhoto}?t=${new Date().getTime()}`}
+                          src={`${buildApiUrl('')}${studentDetails.profilePhoto}?t=${new Date().getTime()}`}
                           alt="Student Profile"
                           style={{
                             width: '100%',
@@ -2955,6 +3093,7 @@ const WardenDashboard: React.FC = () => {
           </div>
         )}        {selectedMenu === "Room Search" && renderRoomSearchContent()}
         {selectedMenu === "Maintenance Complaints" && renderComplaintsContent()}
+        {selectedMenu === "Room Change Requests" && renderRoomChangeRequestsContent()}
         
         {selectedMenu === "Profile" && (
           <div className="profile-section">
@@ -3018,8 +3157,37 @@ const WardenDashboard: React.FC = () => {
       </div>
 
       {/* FOOTER */}
-      <footer className="dashboard-footer">
-        <p>&copy; {new Date().getFullYear()} Hostel Management System. All rights reserved.</p>
+      <footer className="footer">
+        <div style={{marginBottom: '15px'}}>
+          <p>&copy; {new Date().getFullYear()} Mahindra University Hostel Management System. All rights reserved.</p>
+        </div>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '30px',
+          flexWrap: 'wrap',
+          alignItems: 'center'
+        }}>
+          <a href="#" onClick={(e) => {e.preventDefault(); setSelectedMenu("Feedback");}}>Feedback</a>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+          }}>
+            <span style={{fontSize: '14px'}}></span>
+            <a href="mailto:hostelcom@mahindrauniversity.edu.in" style={{color: '#fff'}}>
+              hostelcom@mahindrauniversity.edu.in
+            </a>
+          </div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+          }}>
+            <span style={{fontSize: '14px'}}>📞</span>
+            <span style={{color: '#fff'}}>+91 40 6722 9000</span>
+        </div>
+        </div>
       </footer>
     </div>
   );

@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { buildApiUrl } from "../config/api";
 import "../styles/StudentDashboardStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
 import defaultProfilePic from "../assets/default-profile-pic.jpg";
 import ResetStudentProgress from "../components/ResetStudentProgress"; // Import the reset component
-import ProfilePhotoUploader from "../components/ProfilePhotoUploader"; // Import our new component
+import ProfilePhotoUploader from "../components/ProfilePhotoUploader"; // Import the ProfilePhotoUploader component
 import antiDrugPolicy from "../assets/ANTI DRUG.pdf"; // Import the anti-drug policy PDF
 import annexureAntiDrug from "../assets/Annexure Anti Drug.pdf"; // Import the annexure PDF
 
@@ -23,8 +24,8 @@ interface BookingInfo {
 interface StudentDashboardProps {
   currentUserBooking: BookingInfo | null;
   setCurrentUserBooking: React.Dispatch<React.SetStateAction<BookingInfo | null>>;
-  occupiedBeds: Record<string, boolean>;
-  setOccupiedBeds: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  occupiedBeds?: any[]; // Add the missing props in the interface
+  setOccupiedBeds?: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
 const StudentDashboard: React.FC<StudentDashboardProps> = ({
@@ -32,7 +33,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
   setCurrentUserBooking,
   occupiedBeds,
   setOccupiedBeds
-}) => {  const [selectedSection, setSelectedSection] = useState("Dashboard"); // Track the selected section
+}) => {const [selectedSection, setSelectedSection] = useState("Dashboard"); // Track the selected section
   const [showProfileDropdown, setShowProfileDropdown] = useState(false); // Track profile dropdown visibility
   const [currentStep, setCurrentStep] = useState<number>(1); // Track the current step (1, 2, or 3)
   const [showForm, setShowForm] = useState(false); // Track whether the form is displayed
@@ -46,12 +47,17 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     expiryDate: "",
     cvv: "",
     cardHolderName: "",
-  });
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]); // Track completed steps
+  });  const [errors, setErrors] = useState<{ [key: string]: string }>({});  const [completedSteps, setCompletedSteps] = useState<number[]>([]); // Track completed steps
   const [studentComplaints, setStudentComplaints] = useState<any[]>([]); // Track complaints submitted by the student
+  const [studentFormData, setStudentFormData] = useState<any>(null); // Track student form data
+  const [studentRoomRequests, setStudentRoomRequests] = useState<any[]>([]); // Track room change requests submitted by the student
   const navigate = useNavigate();
-  const [studentFormData, setStudentFormData] = useState<any>(null); // Add state for storing student form data
+    // Room change request form states
+  const [roomChangeForm, setRoomChangeForm] = useState({
+    reason: '',
+    customReason: '',
+    preferredBlock: ''
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -89,12 +95,11 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           setProfilePic(defaultProfilePic);
           return;
         }
-        
-        const response = await fetch(`http://localhost:5000/api/students/${applicationNumber}`);
+          const response = await fetch(buildApiUrl(`/api/students/${applicationNumber}`));
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.student && data.student.profilePhoto) {
-            const photoUrl = `http://localhost:5000${data.student.profilePhoto}`;
+            const photoUrl = buildApiUrl(data.student.profilePhoto);
             setProfilePic(photoUrl);
             localStorage.setItem("profilePic", photoUrl);
             
@@ -117,8 +122,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
         setProfilePic(defaultProfilePic);
       }
     };
-    
-    loadProfilePhoto();
+      loadProfilePhoto();
   }, [applicationNumber]);
 
   // Handle profile photo updates
@@ -164,7 +168,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     const fetchStudentProgress = async () => {
       if (applicationNumber && applicationNumber !== 'N/A') {
         try {
-          const response = await fetch(`http://localhost:5000/api/progress/${applicationNumber}`);
+          const response = await fetch(buildApiUrl(`/api/progress/${applicationNumber}`));
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
@@ -198,24 +202,17 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 setLocalCurrentUserBooking(bookingFromBackend);
                 setCurrentUserBooking(bookingFromBackend);
               }
-              
-              // Set current step based on progress
+                // Set current step based on progress
               if (data.progress.roomBooked) {
                 setCurrentStep(3);
                 // Don't show form since all steps are complete
                 setShowForm(false);
-                // Store in localStorage that all steps are complete
-                localStorage.setItem("formCompleted", "true");
-                localStorage.setItem("paymentCompleted", "true");
               } else if (data.progress.paymentCompleted) {
                 setCurrentStep(3); // Move to hostel booking step
                 setShowForm(false); // Don't show form since payment is complete
-                localStorage.setItem("formCompleted", "true");
-                localStorage.setItem("paymentCompleted", "true");
               } else if (data.progress.formCompleted) {
                 setCurrentStep(2); // Move to payment step
                 setShowForm(false); // Don't show form since it's already completed
-                localStorage.setItem("formCompleted", "true");
               } else {
                 setCurrentStep(1);
                 // Only show form if user clicks on the form button
@@ -253,13 +250,15 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     // Add event listener for future location changes
     window.addEventListener('popstate', handleLocationChange);
     return () => window.removeEventListener('popstate', handleLocationChange);
-  }, []);
-
-  const handleStepClick = (step: number) => {
+  }, []);  const handleStepClick = (step: number) => {
     // Check if we're trying to access the form and if it's completed
     if (step === 1) {
-      // For the first step (form), always navigate to the form page
-      navigate("/hostel-form");
+      // For the first step (form), navigate to the separate form page
+      if (!completedSteps.includes(1)) {
+        navigate("/hostel-form");
+      } else {
+        alert("Form has already been completed!");
+      }
       return;
     }
     
@@ -318,7 +317,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     if (confirmSubmission) {
       try {
         // First, save the form data
-        const formResponse = await fetch('http://localhost:5000/api/form', {
+        const formResponse = await fetch(buildApiUrl('/api/form'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -332,7 +331,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
         }
         
         // After form is saved, update the progress
-        const progressResponse = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/form`, {
+        const progressResponse = await fetch(buildApiUrl(`/api/progress/${applicationNumber}/form`), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -367,7 +366,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const markPaymentComplete = async () => {
     try {
       // Call API to mark payment as completed for this student
-      const response = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/payment`, {
+      const response = await fetch(buildApiUrl(`/api/progress/${applicationNumber}/payment`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -394,12 +393,11 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
       console.error("Error processing payment:", error);
       alert("An error occurred while processing your payment. Please check your connection and try again.");
     }
-  };
-  // Add function to mark booking as complete
+  };  // Add function to mark booking as complete
   const markBookingComplete = async (bookingDetails: BookingInfo) => {
     try {
       // Call API to mark booking as completed for this student
-      const response = await fetch(`http://localhost:5000/api/progress/${applicationNumber}/booking`, {
+      const response = await fetch(buildApiUrl(`/api/progress/${applicationNumber}/booking`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -473,7 +471,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     const fetchStudentComplaints = async () => {
       if (applicationNumber && applicationNumber !== 'N/A') {
         try {
-          const response = await fetch(`http://localhost:5000/api/complaints/student/${applicationNumber}`);
+          const response = await fetch(buildApiUrl(`/api/complaints/student/${applicationNumber}`));
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
@@ -486,19 +484,43 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           console.error('Error fetching complaints:', error);
         }
       }
-    };
-    
+    };    
     fetchStudentComplaints();
+  }, [applicationNumber, selectedSection]);
+  // Function to fetch student room change requests
+  const fetchStudentRoomRequests = async () => {
+    if (applicationNumber && applicationNumber !== 'N/A') {
+      try {
+        const response = await fetch(buildApiUrl(`/api/room-change-requests/student/${applicationNumber}`));
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setStudentRoomRequests(data.requests || []);
+          }
+        } else {
+          console.error('Failed to fetch room change requests');
+        }
+      } catch (error) {
+        console.error('Error fetching room change requests:', error);
+      }
+    }
+  };
+
+  // Fetch room change requests when needed
+  useEffect(() => {
+    if (selectedSection === "Room-Change-Old") {
+      fetchStudentRoomRequests();
+    }
   }, [applicationNumber, selectedSection]);
 
   // Function to fetch student form data
   const fetchStudentFormData = async () => {
     if (applicationNumber && applicationNumber !== 'N/A') {
       try {
-        const response = await fetch(`http://localhost:5000/api/form/${applicationNumber}`);
+        const response = await fetch(buildApiUrl(`/api/form/${applicationNumber}`));
         if (response.ok) {
           const data = await response.json();
-          if (data.success) {
+          if (data.success && data.form) {
             setStudentFormData(data.form);
           }
         }
@@ -522,8 +544,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
         <div className="dashboard-top-nav">
           <div className="profile-section-top">
             <img src={collegeLogo} alt="College Logo" className="college-logo-top" />
-          </div>
-          <ul className="top-menu">
+          </div>          <ul className="top-menu">
             { [
               "Dashboard",
               "My Booking",
@@ -551,7 +572,28 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               >
                 {item}
               </li>
-            ))}
+            ))}              {/* Room Change Request as dropdown */}
+            <li 
+              className={`top-menu-item ${selectedSection.includes("Room-Change") ? "active" : ""}`}
+            >
+              Room Change Request
+              <ul className="dropdown-bullets-top">
+                <li onClick={() => {
+                  if (localCurrentUserBooking) {
+                    setSelectedSection("Room-Change-New");
+                  } else {
+                    alert('You need to have an active room booking before you can request a room change.');
+                  }
+                }}>New Requests</li>
+                <li onClick={() => {
+                  if (localCurrentUserBooking) {
+                    setSelectedSection("Room-Change-Old");
+                  } else {
+                    alert('You need to have an active room booking before you can view room change requests.');
+                  }
+                }}>Old Requests</li>
+              </ul>
+            </li>
             <li 
               className={`top-menu-item ${selectedSection.includes("Complaints") ? "active" : ""}`}
             >
@@ -560,6 +602,13 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <li onClick={() => setSelectedSection("Complaints-New")}>New Complaints</li>
                 <li onClick={() => setSelectedSection("Complaints-Old")}>Old Complaints</li>
               </ul>
+            </li>
+            <li
+              key="About"
+              className={`top-menu-item ${selectedSection === "About" ? "active" : ""}`}
+              onClick={() => setSelectedSection("About")}
+            >
+              About
             </li>
           </ul>
           <div className="profile-button-container" ref={profileRef}>
@@ -699,16 +748,14 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                           completedSteps.includes(step - 1) ? "completed" : ""
                         }`}
                       />
-                    )}
-                    <div
+                    )}                    <div
                       className={`step-dot ${
                         completedSteps.includes(step)
                           ? "completed"
                           : currentStep === step
                           ? "current"
                           : ""
-                      }`
-                    }
+                      }`}
                     />
                   </React.Fragment>
                 ))}
@@ -776,13 +823,62 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
           {/* Show Form and Status Bar only for Dashboard */}
           {selectedSection === "Dashboard" && (
-            <>
-              {/* Show Form */}
+            <>              {/* Show Form */}
               {showForm ? (
-                <form onSubmit={handleFormSubmit2} className="hostel-form">
-                  {/* Hostel Form Fields */}
-                  {[
-                    { name: "hall_ticket_no", label: "Hall Ticket Number", type: "text", placeholder: "Enter your hall ticket number" },
+                <div className="form-container">
+                  {/* Form Header with Back Button and Print Button */}
+                  <div className="form-header" style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '20px',
+                    padding: '15px 0',
+                    borderBottom: '2px solid #c23535'
+                  }}>
+                    <button
+                      type="button"
+                      className="back-button"
+                      onClick={() => {
+                        // Only hide the form without changing step status
+                        setShowForm(false);
+                        // Don't modify currentStep or completedSteps when cancelling
+                      }}
+                      style={{
+                        padding: '8px 16px',
+                        backgroundColor: '#6c757d',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        fontSize: '14px'
+                      }}
+                    >
+                      ← Back to Dashboard
+                    </button>
+                    
+                    <h2 style={{margin: 0, color: '#c23535'}}>Hostel Application Form</h2>
+                    
+                    <button
+                      type="button"
+                      onClick={() => window.print()}
+                      style={{
+                        padding: '8px 16px',
+                        backgroundColor: '#28a745',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        fontSize: '14px'
+                      }}
+                    >
+                      🖨️ Print Form
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleFormSubmit2} className="hostel-form">
+                    {/* Hostel Form Fields */}
+                    {[
+                      { name: "hall_ticket_no", label: "Hall Ticket Number", type: "text", placeholder: "Enter your hall ticket number" },
                     { name: "batch", label: "Batch", type: "text", placeholder: "Enter your batch (e.g., 2023-2027)" },
                     { name: "programme", label: "Programme", type: "text", placeholder: "Enter your programme (e.g., B.Tech)" },
                     { name: "school", label: "School", type: "text", placeholder: "Enter your school name (e.g., ECOLE,SOM)" },
@@ -870,14 +966,14 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
                   <div className="form-group">
                     <label>Father's Mobile</label>
-                    <div className="phone-number-container" style={{ display: "flex", alignItems: "center" }}>
-                      <select
+                    <div className="phone-number-container" style={{ display: "flex", alignItems: "center" }}>                      <select
                         name="country_code_father"
                         required
+                        defaultValue="+91"
                         style={{ width: "80px", marginRight: "10px" }} // Small dropdown to the left
                       >
                         <option value="+1">+1 (USA)</option>
-                        <option value="+91" selected>+91 (India)</option>
+                        <option value="+91">+91 (India)</option>
                         <option value="+44">+44 (UK)</option>
                         <option value="+61">+61 (Australia)</option>
                         <option value="+81">+81 (Japan)</option>
@@ -897,16 +993,15 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
                   <div className="form-group">
                     <label>Mother's Mobile</label>
-                    <div className="phone-number-container" style={{ display: "flex", alignItems: "center" }}>
-                      <select
+                    <div className="phone-number-container" style={{ display: "flex", alignItems: "center" }}>                      <select
                         name="country_code_mother"
                         required
+                        defaultValue="+91"
                         style={{ width: "80px", marginRight: "10px" }} // Small dropdown to the left
                       >
                         <option value="+1">+1 (USA)</option>
-                        <option value="+91" selected>+91 (India)</option>
-                        <option value="+44">+44 (UK)</option>
-                        <option value="+61">+61 (Australia)"</option>
+                        <option value="+91">+91 (India)</option>
+                        <option value="+44">+44 (UK)</option><option value="+61">+61 (Australia)</option>
                         <option value="+81">+81 (Japan)</option>
                         {/* Add more country codes as needed */}
                       </select>
@@ -924,17 +1019,16 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
                   <div className="form-group">
                     <label>Emergency Contact</label>
-                    <div className="phone-number-container" style={{ display: "flex", alignItems: "center" }}>
-                      <select
+                    <div className="phone-number-container" style={{ display: "flex", alignItems: "center" }}>                      <select
                         name="country_code_emergency"
                         required
+                        defaultValue="+91"
                         style={{ width: "80px", marginRight: "10px" }} // Small dropdown to the left
                       >
                         <option value="+1">+1 (USA)</option>
-                        <option value="+91" selected>+91 (India)</option>
-                        <option value="+44">+44 (UK)</option>
-                        <option value="+61">+61 (Australia)</option>
-                        <option value="+81">+81 (Japan)"</option>
+                        <option value="+91">+91 (India)</option>
+                        <option value="+44">+44 (UK)</option><option value="+61">+61 (Australia)</option>
+                        <option value="+81">+81 (Japan)</option>
                         {/* Add more country codes as needed */}
                       </select>
                       <input
@@ -946,24 +1040,13 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         onChange={(e) => validatePhoneNumber(e.target.name, e.target.value)} // Validate on change
                       />
                     </div>
-                    {errors.emergency_contact && <p className="error-message">{errors.emergency_contact}</p>} {/* Show error */}
-                  </div>
+                    {errors.emergency_contact && <p className="error-message">{errors.emergency_contact}</p>} {/* Show error */}                  </div>
 
                   <button type="submit" className="submit-button">
                     Submit
                   </button>
-                  <button
-                    type="button"
-                    className="back-button"
-                    onClick={() => {
-                      // Only hide the form without changing step status
-                      setShowForm(false);
-                      // Don't modify currentStep or completedSteps when cancelling
-                    }}
-                  >
-                    Back to Dashboard
-                  </button>
                 </form>
+                </div>
               ) : showPaymentForm ? (
                 <form onSubmit={(e) => e.preventDefault()} className="payment-form">
                   {/* Payment Form Fields */}
@@ -1282,8 +1365,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </div>
             </div>
           )}
-          
-          {/* Complaints - New */}
+            {/* Complaints - New */}
           {selectedSection === "Complaints-New" && (
             <div className="complaints-section">
               <h2>Submit New Complaint</h2>
@@ -1314,7 +1396,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   }
                   
                   try {
-                    const response = await fetch('http://localhost:5000/api/complaints', {
+                    const response = await fetch(buildApiUrl('/api/complaints'), {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
@@ -1514,27 +1596,6 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 </div>
                 
                 <div className="form-group">
-                  <label htmlFor="complaint-image">Upload Images (Optional)</label>
-                  <input 
-                    type="file" 
-                    id="complaint-image" 
-                    accept="image/*"
-                    multiple
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      borderRadius: '5px',
-                      border: '1px solid #ddd',
-                      marginTop: '8px',
-                      backgroundColor: '#f9f9f9'
-                    }}
-                  />
-                  <p style={{fontSize: '12px', color: '#666', marginTop: '5px'}}>
-                    Upload images to help us better understand the issue (max 3 images, 5MB each)
-                  </p>
-                </div>
-                
-                <div className="form-group">
                   <label htmlFor="complaint-priority">Priority Level</label>
                   <select 
                     id="complaint-priority" 
@@ -1588,129 +1649,274 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </form>
             </div>
           )}
-          
-          {/* Complaints - Old */}
+            {/* Complaints - Old */}
           {selectedSection === "Complaints-Old" && (
             <div className="complaints-history-section">
               <h2>Complaint History</h2>
               
-              <div className="filter-controls" style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                margin: '20px 0',
-                padding: '15px',
-                backgroundColor: '#f9f9f9',
-                borderRadius: '5px'
+              <div className="complaints-history-container" style={{
+                maxWidth: '1200px',
+                margin: '20px auto',
+                padding: '25px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
               }}>
-                <div className="filter-group">
-                  <label htmlFor="status-filter" style={{marginRight: '10px'}}>Status:</label>
-                  <select id="status-filter" style={{
-                    padding: '8px',
-                    borderRadius: '4px',
-                    border: '1px solid #ddd'
+                {studentComplaints && studentComplaints.length > 0 ? (
+                  <div className="complaints-table-container" style={{
+                    overflowX: 'auto',
+                    marginTop: '20px'
                   }}>
-                    <option value="all">All</option>
-                    <option value="pending">Pending</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="resolved">Resolved</option>
-                    <option value="closed">Closed</option>
-                  </select>
-                </div>
-                <div className="search-filter">
-                  <input 
-                    type="text" 
-                    placeholder="Search complaints..." 
-                    style={{
-                      padding: '8px 12px',
-                      borderRadius: '4px',
-                      border: '1px solid #ddd',
-                      width: '250px'
-                    }}
-                  />
-                </div>
-              </div>
-              
-              <div className="complaints-table-container" style={{overflowX: 'auto'}}>
-                {studentComplaints.length > 0 ? (
-                  <table style={{
-                    width: '100%',
-                    borderCollapse: 'collapse',
-                    marginTop: '10px',
-                    textAlign: 'left'
-                  }}>
-                    <thead>
-                      <tr style={{backgroundColor: '#f2f2f2'}}>
-                        <th style={{padding: '12px 15px', borderBottom: '1px solid #ddd'}}>Date</th>
-                        <th style={{padding: '12px 15px', borderBottom: '1px solid #ddd'}}>Subject</th>
-                        <th style={{padding: '12px 15px', borderBottom: '1px solid #ddd'}}>Status</th>
-                        <th style={{padding: '12px 15px', borderBottom: '1px solid #ddd'}}>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {studentComplaints.map((complaint, index) => (
-                        <tr key={index} style={{
-                          borderBottom: '1px solid #ddd',
-                          backgroundColor: index % 2 === 0 ? 'white' : '#f9f9f9'
+                    <table style={{
+                      width: '100%',
+                      borderCollapse: 'collapse',
+                      backgroundColor: 'white',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                    }}>
+                      <thead>
+                        <tr style={{
+                          backgroundColor: '#c23535',
+                          color: 'white'
                         }}>
-                          <td style={{padding: '12px 15px'}}>{new Date(complaint.date).toLocaleDateString()}</td>
-                          <td style={{padding: '12px 15px'}}>{complaint.subject}</td>
-                          <td style={{padding: '12px 15px'}}>
-                            <span style={{
-                              padding: '5px 10px',
-                              borderRadius: '20px',
-                              fontSize: '12px',
-                              fontWeight: 'bold',
-                              backgroundColor: 
-                                complaint.status === 'Resolved' ? '#d1fae5' : 
-                                complaint.status === 'In Progress' ? '#fef3c7' : 
-                                complaint.status === 'Pending' ? '#fee2e2' : '#e5e7eb',
-                              color:
-                                complaint.status === 'Resolved' ? '#047857' : 
-                                complaint.status === 'In Progress' ? '#b45309' : 
-                                complaint.status === 'Pending' ? '#b91c1c' : '#4b5563'
-                            }}>
-                              {complaint.status}
-                            </span>
-                          </td>
-                          <td style={{padding: '12px 15px'}}>
-                            <button style={{
-                              padding: '5px 10px',
-                              backgroundColor: 'transparent',
-                              border: '1px solid #c23535',
-                              color: '#c23535',
-                              borderRadius: '4px',
-                              cursor: 'pointer'
-                            }}
-                            onClick={() => {
-                              const details = `Description: ${complaint.description}\n` + 
-                                             `Priority: ${complaint.priority}\n` +
-                                             `${complaint.wardenResponse ? `Warden Response: ${complaint.wardenResponse}` : ''}`;
-                              alert(details);
-                            }}>
-                              View Details
-                            </button>
-                          </td>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            #
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Date
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Subject
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Room
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Description
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'center',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Priority
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'center',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Status
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px'
+                          }}>
+                            Warden Response
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {studentComplaints.map((complaint, index) => (
+                          <tr key={index} style={{
+                            borderBottom: '1px solid #e9ecef',
+                            backgroundColor: index % 2 === 0 ? '#f8f9fa' : 'white'
+                          }}>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              color: '#495057'
+                            }}>
+                              {index + 1}
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#6c757d'
+                            }}>
+                              {new Date(complaint.date).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              })}
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#495057',
+                              fontWeight: '500',
+                              maxWidth: '200px'
+                            }}>
+                              <div style={{
+                                maxHeight: '60px',
+                                overflowY: 'auto',
+                                lineHeight: '1.4'
+                              }}>
+                                {complaint.subject}
+                              </div>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#495057'
+                            }}>
+                              <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '2px'
+                              }}>
+                                <span style={{fontWeight: '500'}}>{complaint.roomDetails?.block}</span>
+                                <span style={{fontSize: '12px', color: '#6c757d'}}>
+                                  Floor {complaint.roomDetails?.floor} - Room {complaint.roomDetails?.roomNumber}
+                                </span>
+                              </div>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#495057',
+                              maxWidth: '250px'
+                            }}>
+                              <div style={{
+                                maxHeight: '60px',
+                                overflowY: 'auto',
+                                lineHeight: '1.4'
+                              }}>
+                                {complaint.description}
+                              </div>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              textAlign: 'center'
+                            }}>
+                              <span style={{
+                                padding: '6px 12px',
+                                borderRadius: '20px',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                backgroundColor: 
+                                  complaint.priority === 'High' ? '#f8d7da' :
+                                  complaint.priority === 'Medium' ? '#fff3cd' : '#d4edda',
+                                color: 
+                                  complaint.priority === 'High' ? '#721c24' :
+                                  complaint.priority === 'Medium' ? '#856404' : '#155724',
+                                border: `1px solid ${
+                                  complaint.priority === 'High' ? '#f5c6cb' :
+                                  complaint.priority === 'Medium' ? '#ffeaa7' : '#c3e6cb'
+                                }`,
+                                display: 'inline-block'
+                              }}>
+                                {complaint.priority}
+                              </span>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              textAlign: 'center'
+                            }}>
+                              <span style={{
+                                padding: '6px 12px',
+                                borderRadius: '20px',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                backgroundColor: 
+                                  complaint.status === 'Resolved' ? '#d4edda' :
+                                  complaint.status === 'In Progress' ? '#cce5ff' :
+                                  complaint.status === 'Pending' ? '#fff3cd' : '#f8d7da',
+                                color: 
+                                  complaint.status === 'Resolved' ? '#155724' :
+                                  complaint.status === 'In Progress' ? '#0056b3' :
+                                  complaint.status === 'Pending' ? '#856404' : '#721c24',
+                                border: `1px solid ${
+                                  complaint.status === 'Resolved' ? '#c3e6cb' :
+                                  complaint.status === 'In Progress' ? '#b3d9ff' :
+                                  complaint.status === 'Pending' ? '#ffeaa7' : '#f5c6cb'
+                                }`,
+                                display: 'inline-block'
+                              }}>
+                                {complaint.status}
+                              </span>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#6c757d',
+                              maxWidth: '200px'
+                            }}>
+                              {complaint.wardenResponse ? (
+                                <div style={{
+                                  maxHeight: '60px',
+                                  overflowY: 'auto',
+                                  lineHeight: '1.4',
+                                  fontStyle: 'italic'
+                                }}>
+                                  {complaint.wardenResponse}
+                                </div>
+                              ) : (
+                                <span style={{color: '#adb5bd', fontStyle: 'italic'}}>
+                                  No response
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 ) : (
                   <div style={{
                     textAlign: 'center',
-                    padding: '30px',
-                    backgroundColor: '#f9f9f9',
-                    borderRadius: '5px',
-                    color: '#666'
+                    padding: '40px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    color: '#6c757d'
                   }}>
+                    <h3 style={{color: '#6c757d', marginBottom: '15px'}}>No Complaints Found</h3>
                     <p>You haven't submitted any complaints yet.</p>
+                    <p>Click on "New Complaints" to submit your first complaint.</p>
                   </div>
                 )}
               </div>
             </div>
           )}
-          
-          {/* Profile Section - New section for profile photo management */}
+            {/* Profile Section */}
           {selectedSection === "Profile" && (
             <div className="profile-section">
               <h2>Profile Settings</h2>
@@ -1723,6 +1929,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 borderRadius: '8px',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
               }}>
+                {/* Profile Header with Photo */}
                 <div className="profile-header" style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -1731,113 +1938,112 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   backgroundColor: '#f9f9f9',
                   borderRadius: '8px'
                 }}>
-                  <div style={{
+                  <div className="current-profile-pic" style={{
+                    width: '120px',
+                    height: '120px',
+                    borderRadius: '50%',
+                    marginRight: '20px',
+                    overflow: 'hidden',
+                    border: '3px solid #c23535',
                     display: 'flex',
-                    flexDirection: 'column',
                     alignItems: 'center',
-                    flex: '1'
+                    justifyContent: 'center'
                   }}>
-                    <h3 style={{color: '#333', marginBottom: '20px'}}>Personal Information</h3>
-                    <div style={{
-                      width: '100%',
-                      maxWidth: '400px'
-                    }}>
+                    {profilePic && profilePic !== defaultProfilePic ? (
+                      <img 
+                        src={profilePic} 
+                        alt="Profile" 
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    ) : (
                       <div style={{
+                        backgroundColor: '#c23535',
+                        color: 'white',
+                        fontSize: '48px',
+                        fontWeight: 'bold',
+                        width: '100%',
+                        height: '100%',
                         display: 'flex',
-                        justifyContent: 'space-between',
-                        margin: '10px 0',
-                        padding: '10px',
-                        backgroundColor: '#f0f0f0',
-                        borderRadius: '5px'
+                        alignItems: 'center',
+                        justifyContent: 'center'
                       }}>
-                        <strong>Name:</strong>
-                        <span>{userName}</span>
+                        {userName.charAt(0).toUpperCase()}
                       </div>
-                      
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        margin: '10px 0',
-                        padding: '10px',
-                        backgroundColor: '#f0f0f0',
-                        borderRadius: '5px'
-                      }}>
-                        <strong>Application Number:</strong>
-                        <span>{applicationNumber}</span>
-                      </div>
-                    </div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 style={{margin: '0 0 5px 0'}}>{userName}</h3>
+                    <p style={{margin: 0, color: '#666'}}>Application No: {applicationNumber}</p>
                   </div>
                 </div>
-                
-                {/* Profile Photo Uploader Component */}
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  marginBottom: '30px'
-                }}>
-                  <ProfilePhotoUploader 
-                    applicationNumber={applicationNumber} 
-                    onPhotoUpdate={handleProfilePhotoUpdate}
-                  />
-                </div>
 
-                {/* Display student form data */}
+                {/* Profile Photo Management Section */}
+                {profilePic === defaultProfilePic || !profilePic ? (
+                  <div className="profile-photo-upload" style={{marginBottom: '30px'}}>
+                    <h3 style={{marginBottom: '15px'}}>Upload Profile Photo</h3>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      marginBottom: '20px'
+                    }}>
+                      <ProfilePhotoUploader 
+                        applicationNumber={applicationNumber} 
+                        onPhotoUpdate={handleProfilePhotoUpdate}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="profile-photo-update" style={{marginBottom: '30px'}}>
+                    <h3 style={{marginBottom: '15px'}}>Update Profile Photo</h3>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      marginBottom: '20px'
+                    }}>
+                      <ProfilePhotoUploader 
+                        applicationNumber={applicationNumber} 
+                        onPhotoUpdate={handleProfilePhotoUpdate}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Student Form Data Display */}
                 {studentFormData && (
-                  <div className="form-data-container" style={{
-                    marginTop: '30px',
-                    padding: '20px',
-                    backgroundColor: '#f9f9f9',
-                    borderRadius: '8px'
-                  }}>
-                    <h3 style={{marginBottom: '20px', color: '#333'}}>Student Information Form Data</h3>
-                    <div className="form-data-fields" style={{
+                  <div className="form-data-section" style={{marginBottom: '30px'}}>
+                    <h3 style={{marginBottom: '20px', color: '#333', borderBottom: '2px solid #c23535', paddingBottom: '10px'}}>
+                      Personal Information
+                    </h3>
+                    <div style={{
                       display: 'grid',
-                      gridTemplateColumns: '1fr',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
                       gap: '15px'
                     }}>
                       {Object.entries(studentFormData)
-                        .filter(([key]) => {
-                          // Filter out technical ID fields
-                          if (['_id', '__v', 'id'].includes(key)) return false;
-                          
-                          // If key is applicationNo and admission_no exists and is not empty, skip applicationNo
-                          if (key === 'applicationNo' && 
-                              studentFormData.admission_no && 
-                              studentFormData.admission_no.trim() !== '') {
-                            return false;
-                          }
-                          
-                          return true;
-                        })
+                        .filter(([key]) => !['_id', '__v', 'applicationNo', 'createdAt', 'updatedAt'].includes(key))
                         .map(([key, value]) => {
-                          // Format key for display
-                          const formattedKey = key
+                          // Format the key for display
+                          const displayLabel = key
                             .replace(/_/g, ' ')
-                            .split(' ')
-                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                            .join(' ');
-                          
-                          // For admission number, clarify it's also the application number if they match
-                          let displayLabel = formattedKey;
-                          if (key === 'admission_no' && 
-                              studentFormData.applicationNo && 
-                              studentFormData.applicationNo === studentFormData.admission_no) {
-                            displayLabel = 'Application/Admission Number';
-                          }
+                            .replace(/\b\w/g, l => l.toUpperCase());
                           
                           return (
                             <div key={key} style={{
-                              padding: '12px 15px',
-                              backgroundColor: '#fff',
+                              display: 'flex',
+                              padding: '12px',
+                              backgroundColor: '#f8f9fa',
                               borderRadius: '5px',
-                              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                              display: 'flex'
+                              border: '1px solid #e9ecef'
                             }}>
                               <div style={{
-                                width: '200px',
                                 fontWeight: 'bold',
-                                color: '#555',
-                                flexShrink: 0
+                                color: '#495057',
+                                minWidth: '140px',
+                                marginRight: '10px'
                               }}>
                                 {displayLabel}:
                               </div>
@@ -1853,9 +2059,22 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     </div>
                   </div>
                 )}
-                
-                <div style={{
-                  marginTop: '30px',
+
+                {!studentFormData && (
+                  <div style={{
+                    textAlign: 'center',
+                    padding: '30px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    marginBottom: '30px'
+                  }}>
+                    <p style={{color: '#666', fontSize: '16px'}}>
+                      No form data available. Please complete the hostel form first.
+                    </p>
+                  </div>
+                )}
+
+                <div className="photo-guidelines" style={{
                   padding: '15px',
                   backgroundColor: '#f9f9f9',
                   borderRadius: '8px',
@@ -1884,130 +2103,364 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
               }}>
                 <div className="about-content">
-                  <h3>Our Project</h3>
-                  <p>
-                    The Hostel Management System is a comprehensive web-based application designed to streamline and automate 
-                    the entire hostel management process at Mahindra University. Our platform provides an end-to-end solution 
-                    for students, wardens, and administrators to manage hostel allocations, room bookings, complaints, and more.
-                  </p>
+                  <h3 style={{color: '#d32f2f', marginBottom: '20px', fontSize: '1.5rem', borderBottom: '2px solid #d32f2f', paddingBottom: '10px'}}>About Mahindra University Hostel Management System</h3>
                   
-                  <h3 style={{marginTop: '25px'}}>Key Features</h3>
-                  <ul style={{
-                    paddingLeft: '20px',
-                    lineHeight: '1.6'
-                  }}>
-                    <li><strong>Online Form Submission:</strong> Digital student registration with all necessary information</li>
-                    <li><strong>Fee Payment:</strong> Secure online payment processing for hostel fees</li>
-                    <li><strong>Room Selection:</strong> Interactive floor plans for students to select and book rooms</li>
-                    <li><strong>Complaint Management:</strong> Digital system for submitting and tracking maintenance requests</li>
-                    <li><strong>Warden Dashboard:</strong> Comprehensive tools for wardens to manage student allocations</li>
-                    <li><strong>Admin Controls:</strong> Advanced features for system administrators</li>
-                    <li><strong>Profile Management:</strong> Personalized profiles for students with photo upload capability</li>
-                  </ul>
+                  <section className="about-section" style={{marginBottom: '30px'}}>
+                    <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '15px'}}>Enterprise Solution</h4>
+                    <p style={{lineHeight: '1.8', fontSize: '1rem'}}>
+                      The Mahindra University Hostel Management System is an enterprise-grade solution built to transform 
+                      residential facility management in higher education. Developed in collaboration with industry experts 
+                      and institutional stakeholders, our system delivers a comprehensive platform that addresses the complex 
+                      needs of modern university accommodations while maintaining the highest standards of security and performance.
+                    </p>
+                  </section>
                   
-                  <h3 style={{marginTop: '25px'}}>Technologies Used</h3>
-                  <div className="tech-stack" style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '10px',
-                    marginTop: '15px'
-                  }}>
-                    {['React', 'TypeScript', 'Node.js', 'Express', 'MongoDB', 'JWT Authentication'].map(tech => (
-                      <div key={tech} style={{
-                        padding: '8px 12px',
-                        backgroundColor: '#f0f0f0',
-                        borderRadius: '20px',
-                        fontSize: '14px'
+                  <section className="vision-mission" style={{marginBottom: '30px'}}>
+                    <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '15px'}}>Our Vision</h4>
+                    <p style={{lineHeight: '1.8', fontSize: '1rem', marginBottom: '15px', fontStyle: 'italic', color: '#444'}}>
+                      "To create the industry's leading residential management platform that transforms the higher education
+                      housing experience through innovative technology, enhanced security, and exceptional user satisfaction."
+                    </p>
+                  </section>
+                  
+                  <section className="project-overview" style={{marginBottom: '30px', backgroundColor: '#f7f7f7', padding: '20px', borderRadius: '8px'}}>
+                    <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '15px'}}>Enterprise Solution Overview</h4>
+                    <p style={{lineHeight: '1.6', fontSize: '1rem', marginBottom: '15px'}}>
+                      Our system delivers an enterprise-grade solution tailored precisely for the demanding requirements of Mahindra University's 
+                      residential ecosystem. Through seamless integration of advanced technologies and human-centered design principles, 
+                      we've developed a comprehensive platform that optimizes all facets of hostel operations and management:
+                    </p>
+                    
+                    <div className="features-grid" style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                      gap: '20px',
+                      marginTop: '20px'
+                    }}>
+                      <div className="feature-card" style={{
+                        backgroundColor: 'white',
+                        padding: '15px',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                        border: '1px solid #eee'
                       }}>
-                        {tech}
+                        <h5 style={{color: '#d32f2f', marginBottom: '10px'}}>Student Information Management</h5>
+                        <p>Comprehensive digital student records with photo ID verification and secure storage of personal information</p>
                       </div>
-                    ))}
-                  </div>
+                      
+                      <div className="feature-card" style={{
+                        backgroundColor: 'white',
+                        padding: '15px',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                        border: '1px solid #eee'
+                      }}>
+                        <h5 style={{color: '#d32f2f', marginBottom: '10px'}}>Room Allocation System</h5>
+                        <p>Interactive floor plans with real-time availability updates and intelligent room assignment algorithms</p>
+                      </div>
+                      
+                      <div className="feature-card" style={{
+                        backgroundColor: 'white',
+                        padding: '15px',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                        border: '1px solid #eee'
+                      }}>
+                        <h5 style={{color: '#d32f2f', marginBottom: '10px'}}>Fee Management</h5>
+                        <p>Secure online payment processing with multiple payment options and automated receipt generation</p>
+                      </div>
+                      
+                      <div className="feature-card" style={{
+                        backgroundColor: 'white',
+                        padding: '15px',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                        border: '1px solid #eee'
+                      }}>
+                        <h5 style={{color: '#d32f2f', marginBottom: '10px'}}>Complaint Management</h5>
+                        <p>Streamlined submission, tracking, and resolution system for maintenance requests and student concerns</p>
+                      </div>
+                      
+                      <div className="feature-card" style={{
+                        backgroundColor: 'white',
+                        padding: '15px',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                        border: '1px solid #eee'
+                      }}>
+                        <h5 style={{color: '#d32f2f', marginBottom: '10px'}}>Room Change Management</h5>
+                        <p>Formal request and approval workflow for room changes with justification and documentation</p>
+                      </div>
+                      
+                      <div className="feature-card" style={{
+                        backgroundColor: 'white',
+                        padding: '15px',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                        border: '1px solid #eee'
+                      }}>
+                        <h5 style={{color: '#d32f2f', marginBottom: '10px'}}>Administrative Dashboards</h5>
+                        <p>Role-specific interfaces for wardens and administrators with real-time analytics and reporting</p>
+                      </div>
+                    </div>
+                  </section>
                   
-                  <h3 style={{marginTop: '25px'}}>Our Goal</h3>
-                  <p>
-                    Our project aims to transform the traditional hostel management process by eliminating paperwork,
-                    reducing administrative overhead, and providing a seamless experience for all stakeholders. 
-                    We've focused on creating an intuitive interface with real-time updates and interactive elements
-                    to make hostel allocation more efficient and transparent.
-                  </p>
-                </div>
-                
-                <div className="team-section" style={{
-                  marginTop: '30px',
-                  padding: '20px',
-                  backgroundColor: '#f9f9f9',
-                  borderRadius: '8px'
-                }}>
-                  <h3 style={{textAlign: 'center', marginBottom: '20px'}}>Project Team</h3>
-                  <div className="team-members" style={{
-                    display: 'flex',
-                    justifyContent: 'center',                    flexWrap: 'wrap',
-                    gap: '20px'
+                  <section className="tech-section" style={{marginBottom: '40px'}}>
+                    <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '15px'}}>Enterprise Architecture</h4>
+                    <p style={{lineHeight: '1.8', fontSize: '1rem', marginBottom: '20px'}}>
+                      Built on a robust technological foundation utilizing React.js for dynamic frontend interfaces, Node.js for scalable backend services, 
+                      and MongoDB for high-performance data management. Our architecture ensures optimal performance, security, and scalability to meet 
+                      the evolving needs of a growing university community.
+                    </p>
+                    
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                      gap: '15px',
+                      marginTop: '20px'
+                    }}>
+                      {[
+                        {title: 'Frontend', tech: 'React.js + TypeScript', desc: 'Modern, responsive user interfaces'},
+                        {title: 'Backend', tech: 'Node.js + Express', desc: 'Scalable server-side architecture'},
+                        {title: 'Database', tech: 'MongoDB Atlas', desc: 'Cloud-based document database'},
+                        {title: 'Deployment', tech: 'Production Ready', desc: 'Optimized for enterprise deployment'}
+                      ].map((item, index) => (
+                        <div key={index} style={{
+                          backgroundColor: '#f8f9fa',
+                          padding: '15px',
+                          borderRadius: '8px',
+                          textAlign: 'center',
+                          border: '1px solid #e9ecef'
+                        }}>
+                          <h6 style={{color: '#d32f2f', margin: '0 0 8px 0'}}>{item.title}</h6>
+                          <p style={{fontWeight: 'bold', margin: '0 0 5px 0', fontSize: '0.9rem'}}>{item.tech}</p>
+                          <p style={{margin: 0, fontSize: '0.8rem', color: '#666'}}>{item.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                  
+                  <section className="implementation-section" style={{marginBottom: '40px'}}>
+                    <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '15px'}}>Implementation & Deployment</h4>
+                    <p style={{lineHeight: '1.8', fontSize: '1rem'}}>
+                      Our solution follows industry best practices throughout the software development lifecycle. From initial requirements 
+                      gathering to continuous deployment, we've implemented rigorous quality assurance processes to ensure a robust, 
+                      secure, and user-friendly system. The platform undergoes regular security audits and performance optimizations to 
+                      maintain optimal operation even during peak usage periods.
+                    </p>
+                    
+                    <div style={{marginTop: '25px', backgroundColor: '#f7f7f7', padding: '15px', borderRadius: '8px', border: '1px solid #eee'}}>
+                      <h5 style={{color: '#d32f2f', marginBottom: '12px', fontSize: '1rem'}}>Key Implementation Highlights</h5>
+                      <ul style={{marginLeft: '20px', lineHeight: '1.8'}}>
+                        <li>Comprehensive security measures including data encryption and access controls</li>
+                        <li>Responsive design ensuring seamless experience across all devices and screen sizes</li>
+                        <li>Real-time data synchronization for instant updates across all user interfaces</li>
+                        <li>Automated backup and disaster recovery systems for data protection</li>
+                        <li>Performance optimization for handling high concurrent user loads</li>
+                      </ul>
+                    </div>
+                  </section>
+                  
+                  <section className="team-section" style={{marginBottom: '30px'}}>
+                    <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '20px'}}>Development Team</h4>
+                    <p style={{marginBottom: '20px', lineHeight: '1.6'}}>
+                      This enterprise solution was developed by a dedicated team of software engineers from Mahindra University, 
+                      combining expertise across multiple domains to deliver a world-class hostel management platform.
+                    </p>
+                    
+                    <div className="team-grid" style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                      gap: '20px',
+                      marginTop: '25px'
+                    }}>
+                      <div className="team-member-card" style={{
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
+                        overflow: 'hidden',
+                        transition: 'transform 0.3s',
+                        border: '1px solid #eee'
+                      }}>
+                        <div className="member-photo" style={{
+                          height: '150px',
+                          backgroundColor: '#e0e0e0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <div style={{
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '50%',
+                            backgroundColor: '#c23535',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.8rem'
+                          }}>OV</div>
+                        </div>
+                        <div className="member-info" style={{padding: '15px'}}>
+                          <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Om Sai Vikranth</h4>
+                          <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>Project Lead & Full Stack Developer</p>
+                          <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE154@mahindrauniversity.edu.in</p>
+                        </div>
+                      </div>
+                      
+                      <div className="team-member-card" style={{
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
+                        overflow: 'hidden',
+                        transition: 'transform 0.3s',
+                        border: '1px solid #eee'
+                      }}>
+                        <div className="member-photo" style={{
+                          height: '150px',
+                          backgroundColor: '#e0e0e0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <div style={{
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '50%',
+                            backgroundColor: '#3f51b5',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.8rem'
+                          }}>SM</div>
+                        </div>
+                        <div className="member-info" style={{padding: '15px'}}>
+                          <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Srujan Madduri</h4>
+                          <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>Backend Developer & Database Architect</p>
+                          <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE009@mahindrauniversity.edu.in</p>
+                        </div>
+                      </div>
+                      
+                      <div className="team-member-card" style={{
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
+                        overflow: 'hidden',
+                        transition: 'transform 0.3s',
+                        border: '1px solid #eee'
+                      }}>
+                        <div className="member-photo" style={{
+                          height: '150px',
+                          backgroundColor: '#e0e0e0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <div style={{
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '50%',
+                            backgroundColor: '#009688',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.8rem'
+                          }}>PS</div>
+                        </div>
+                        <div className="member-info" style={{padding: '15px'}}>
+                          <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Sriroop Palacharla</h4>
+                          <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>Frontend Developer & UI/UX Designer</p>
+                          <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE005@mahindrauniversity.edu.in</p>
+                        </div>
+                      </div>
+                      
+                      <div className="team-member-card" style={{
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
+                        overflow: 'hidden',
+                        transition: 'transform 0.3s',
+                        border: '1px solid #eee'
+                      }}>
+                        <div className="member-photo" style={{
+                          height: '150px',
+                          backgroundColor: '#e0e0e0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <div style={{
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '50%',
+                            backgroundColor: '#607d8b',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.8rem'
+                          }}>P</div>
+                        </div>
+                        <div className="member-info" style={{padding: '15px'}}>
+                          <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Punith</h4>
+                          <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>QA & Testing Lead</p>
+                          <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE789@mahindrauniversity.edu.in</p>                        </div>
+                      </div>
+                    </div>
+                  </section>
+                  
+                  <div style={{
+                    textAlign: 'center',
+                    marginTop: '30px',
+                    padding: '15px',
+                    backgroundColor: '#efefef',
+                    borderRadius: '8px'
                   }}>
-                    <div className="team-member" style={{textAlign: 'center'}}>
-                      <h4 style={{margin: '5px 0'}}>Om Sai Vikranth</h4>
-                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE009</p>
-                    </div>
-                    
-                    <div className="team-member" style={{textAlign: 'center'}}>
-                      <h4 style={{margin: '5px 0'}}>Palacharla Sriroop</h4>
-                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE190</p>
-                    </div>
-                    
-                    <div className="team-member" style={{textAlign: 'center'}}>
-                      <h4 style={{margin: '5px 0'}}>Kalyan Krishna</h4>
-                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE302</p>
-                    </div>
-                    
-                    <div className="team-member" style={{textAlign: 'center'}}>
-                      <h4 style={{margin: '5px 0'}}>Chandra</h4>
-                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE134</p>
-                    </div>
-                    
-                    <div className="team-member" style={{textAlign: 'center'}}>
-                      <h4 style={{margin: '5px 0'}}>Mohana Krishna</h4>
-                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE173</p>
-                    </div>
-                    
-                    <div className="team-member" style={{textAlign: 'center'}}>
-                      <h4 style={{margin: '5px 0'}}>Varun</h4>
-                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE069</p>
-                    </div>
-                    
-                    <div className="team-member" style={{textAlign: 'center'}}>
-                      <h4 style={{margin: '5px 0'}}>Mukund</h4>
-                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE075</p>
-                    </div>
-                    
-                    <div className="team-member" style={{textAlign: 'center'}}>
-                      <h4 style={{margin: '5px 0'}}>Tejas</h4>
-                      <p style={{margin: '5px 0', color: '#666'}}>SE22UCSE270</p>
-                    </div>
+                    <p style={{
+                      fontSize: '0.9rem',
+                      color: '#555',
+                      fontStyle: 'italic',
+                      margin: '0'
+                    }}>
+                      This enterprise-grade hostel management system was developed by a cross-functional team of software engineers 
+                      from Mahindra University's School of Computing, combining expertise in frontend and backend development, 
+                      database design, UI/UX principles, and quality assurance.
+                    </p>
                   </div>
                   
                   <div style={{
-                    marginTop: '20px',
-                    padding: '15px',
-                    backgroundColor: '#f0f0f0',
+                    marginTop: '30px',
+                    padding: '20px',
+                    backgroundColor: '#fff',
                     borderRadius: '8px',
-                    textAlign: 'center',
-                    fontSize: '14px',
-                    color: '#555'
+                    border: '1px solid #e0e0e0',
+                    textAlign: 'center'
                   }}>
-                    <p>Our team of 8 members collaborated across frontend development, backend architecture, database design, UI/UX, and testing to deliver this comprehensive hostel management solution.</p>
+                    <h4 style={{color: '#333', marginBottom: '15px', fontSize: '1.1rem'}}>System Support</h4>
+                    <p style={{margin: '0 0 15px 0', fontSize: '0.95rem'}}>For technical support or inquiries about the Hostel Management System, please contact:</p>
+                    <div style={{
+                      backgroundColor: '#f9f9f9',
+                      padding: '15px',
+                      display: 'inline-block',
+                      borderRadius: '8px',
+                      border: '1px solid #eee'
+                    }}>
+                      <p style={{margin: '0 0 5px 0', fontWeight: 'bold'}}>Technical Support Team</p>
+                      <p style={{margin: '0 0 5px 0'}}>Email: <a href="mailto:hostel.support@mahindrauniversity.edu.in" style={{color: '#d32f2f'}}>hostel.support@mahindrauniversity.edu.in</a></p>
+                      <p style={{margin: '0'}}>Phone: +91 40 6722 9000</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          )}
-          
-          {/* Contact Section */}
-          {selectedSection === "Contact" && (
-            <div className="contact-section">
-              <h2>Contact Us</h2>
+          )}          {/* Room Change Request - New */}
+          {selectedSection === "Room-Change-New" && (
+            <div className="room-change-section">
+              <h2>Submit New Room Change Request</h2>
               
-              <div className="contact-container" style={{
+              <div className="room-change-container" style={{
                 maxWidth: '800px',
                 margin: '20px auto',
                 padding: '25px',
@@ -2015,212 +2468,617 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 borderRadius: '8px',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
               }}>
-                <div className="contact-info">
-                  <h3>Development Team</h3>
-                  <p>If you have any technical issues, suggestions, or questions about the Hostel Management System, please feel free to contact our development team:</p>
-                  
-                  <div className="developer-contacts" style={{
-                    marginTop: '20px',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                    gap: '20px'
-                  }}>                    <div className="developer-card" style={{
-                      padding: '15px',
-                      backgroundColor: '#f9f9f9',
+                {localCurrentUserBooking ? (
+                  <form className="room-change-form" 
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '20px'
+                    }}
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const form = e.target as HTMLFormElement;
+                      const formData = new FormData(form);
+                      
+                      const reason = formData.get('reason') as string;
+                      const preferredBlock = formData.get('preferredBlock') as string;
+                      
+                      try {                      const response = await fetch(buildApiUrl('/api/room-change-requests'), {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            applicationNo: applicationNumber,
+                            studentName: userName,
+                            currentRoom: {
+                              block: localCurrentUserBooking.block,
+                              floor: localCurrentUserBooking.floor,
+                              roomNumber: localCurrentUserBooking.roomNumber,
+                              bed: localCurrentUserBooking.bed
+                            },
+                            reason: reason,
+                            preferredBlock: preferredBlock || 'No preference',
+                            status: 'Pending',
+                            dateSubmitted: new Date().toISOString().split('T')[0]
+                          }),
+                        });
+                        
+                        if (response.ok) {
+                          alert('Room change request submitted successfully! You will be notified once it is reviewed.');
+                          form.reset();
+                          // Reset form state
+                          setRoomChangeForm({
+                            reason: '',
+                            customReason: '',
+                            preferredBlock: ''
+                          });
+                          // Refresh the room change requests list
+                          fetchStudentRoomRequests();
+                        } else {
+                          alert('Failed to submit room change request. Please try again.');
+                        }
+                      } catch (error) {
+                        console.error('Error submitting room change request:', error);
+                        alert('An error occurred. Please try again later.');
+                      }
+                    }}
+                  >
+                    {/* Current Room Information */}
+                    <div className="current-room-info" style={{
+                      backgroundColor: '#f8f9fa',
+                      padding: '20px',
                       borderRadius: '8px',
-                      border: '1px solid #eee'
+                      border: '1px solid #e9ecef'
                     }}>
-                      <h4>Om Sai Vikranth</h4>
-                      <p style={{
-                        margin: '10px 0',
+                      <h3 style={{marginBottom: '15px', color: '#495057', fontSize: '18px'}}>Current Room Details</h3>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr 1fr 1fr',
+                        gap: '15px',
                         fontSize: '14px'
                       }}>
-                        <strong>Email:</strong> <a href="mailto:se22ucse009@mahindrauniversity.edu.in">se22ucse009@mahindrauniversity.edu.in</a>
-                      </p>
-                      <p style={{
-                        margin: '5px 0 10px 0',
-                        fontSize: '14px'
-                      }}>
-                        <strong>Phone:</strong> <a href="tel:9390788239">9390788239</a>
-                      </p>
-                      <p style={{
-                        fontSize: '14px',
-                        color: '#666'
-                      }}>Backend Developer, Database Management</p>
+                        <div>
+                          <span style={{fontWeight: 'bold', color: '#6c757d'}}>Block:</span>
+                          <div style={{marginTop: '5px', color: '#495057'}}>{localCurrentUserBooking.block}</div>
+                        </div>
+                        <div>
+                          <span style={{fontWeight: 'bold', color: '#6c757d'}}>Floor:</span>
+                          <div style={{marginTop: '5px', color: '#495057'}}>{localCurrentUserBooking.floor}</div>
+                        </div>
+                        <div>
+                          <span style={{fontWeight: 'bold', color: '#6c757d'}}>Room:</span>
+                          <div style={{marginTop: '5px', color: '#495057'}}>{localCurrentUserBooking.floor}-{localCurrentUserBooking.roomNumber}</div>
+                        </div>
+                        <div>
+                          <span style={{fontWeight: 'bold', color: '#6c757d'}}>Bed:</span>
+                          <div style={{marginTop: '5px', color: '#495057'}}>{localCurrentUserBooking.bed}</div>
+                        </div>
+                      </div>
                     </div>
-                      <div className="developer-card" style={{
-                      padding: '15px',
-                      backgroundColor: '#f9f9f9',
-                      borderRadius: '8px',
-                      border: '1px solid #eee'
-                    }}>
-                      <h4>Palacharla Sriroop</h4>
-                      <p style={{
-                        margin: '10px 0',
-                        fontSize: '14px'
-                      }}>
-                        <strong>Email:</strong> <a href="mailto:se22ucse190@mahindrauniversity.edu.in">se22ucse190@mahindrauniversity.edu.in</a>
-                      </p>
-                      <p style={{
-                        margin: '5px 0 10px 0',
-                        fontSize: '14px'
-                      }}>
-                        <strong>Phone:</strong> <a href="tel:7893956059">7893956059</a>
-                      </p>
-                      <p style={{
-                        fontSize: '14px',
-                        color: '#666'
-                      }}>Fronted Developer</p>
+
+                    {/* Student Information */}
+                    <div style={{display: 'flex', gap: '20px'}}>
+                      <div className="form-group" style={{flex: 1}}>
+                        <label htmlFor="student-name" style={{fontWeight: '600', marginBottom: '8px', color: '#333'}}>
+                          Student Name
+                        </label>
+                        <input 
+                          type="text" 
+                          id="student-name" 
+                          value={userName}
+                          readOnly
+                          style={{
+                            width: '100%',
+                            padding: '12px',
+                            borderRadius: '5px',
+                            border: '1px solid #ddd',
+                            backgroundColor: '#f0f0f0',
+                            marginTop: '8px'
+                          }}
+                        />
+                      </div>
+
+                      <div className="form-group" style={{flex: 1}}>
+                        <label htmlFor="application-no" style={{fontWeight: '600', marginBottom: '8px', color: '#333'}}>
+                          Application Number
+                        </label>
+                        <input 
+                          type="text" 
+                          id="application-no" 
+                          value={applicationNumber}
+                          readOnly
+                          style={{
+                            width: '100%',
+                            padding: '12px',
+                            borderRadius: '5px',
+                            border: '1px solid #ddd',
+                            backgroundColor: '#f0f0f0',
+                            marginTop: '8px'
+                          }}
+                        />
+                      </div>
                     </div>
-                      <div className="developer-card" style={{
-                      padding: '15px',
-                      backgroundColor: '#f9f9f9',
-                      borderRadius: '8px',
-                      border: '1px solid #eee'
-                    }}>
-                      <h4>Kalyan Krishna Pasupuleti</h4>
-                      <p style={{
-                        margin: '10px 0',
-                        fontSize: '14px'
-                      }}>
-                        <strong>Email:</strong> <a href="mailto:se22ucse302@mahindrauniversity.edu.in">se22ucse302@mahindrauniversity.edu.in</a>
-                      </p>
-                      <p style={{
-                        margin: '5px 0 10px 0',
-                        fontSize: '14px'
-                      }}>
-                        <strong>Phone:</strong> <a href="tel:9490073264">9490073264</a>
-                      </p>
-                      <p style={{
-                        fontSize: '14px',
-                        color: '#666'
-                      }}>Frontend Developer, UI/UX</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="hostel-contact" style={{
-                  marginTop: '30px',
-                  padding: '20px',
-                  backgroundColor: '#f9f9f9',
-                  borderRadius: '8px'
-                }}>
-                  <h3>Hostel Administration Contact</h3>
-                  <p>For general inquiries related to hostel administration:</p>
-                  
-                  <div className="contact-details" style={{marginTop: '15px'}}>
-                    <p><strong>Hostel Office:</strong> Student Affairs Office Main Block, Mahindra University</p>
-                    <p><strong>Email:</strong> hostelcom@mahindrauniversity.edu.in</p>
-                    <p><strong>Phone:</strong> +91 9100947891</p>
-                  </div>
-                  
-                  <p style={{
-                    marginTop: '20px',
-                    padding: '10px',
-                    backgroundColor: '#e8f4fd',
-                    borderRadius: '5px',
-                    fontSize: '14px'
-                  }}>
-                    <strong>Note:</strong> For urgent issues outside office hours, please contact your floor warden directly.
-                  </p>
-                </div>
-                
-                <div className="feedback-section" style={{marginTop: '30px'}}>
-                  <h3>Feedback Form</h3>
-                  <p>We value your feedback! Please share your thoughts about the Hostel Management System:</p>
-                  
-                  <form className="feedback-form" style={{marginTop: '15px'}}>
+
+                    {/* Reason for Room Change */}
                     <div className="form-group">
-                      <label htmlFor="feedback-name">Name (Optional)</label>
-                      <input 
-                        type="text" 
-                        id="feedback-name" 
-                        placeholder="Your Name"
-                        style={{
-                          width: '100%',
-                          padding: '10px',
-                          margin: '5px 0 15px',
-                          borderRadius: '5px',
-                          border: '1px solid #ddd'
-                        }}
-                      />
-                    </div>
-                    
-                    <div className="form-group">
-                      <label htmlFor="feedback-email">Email (Optional)</label>
-                      <input 
-                        type="email" 
-                        id="feedback-email" 
-                        placeholder="Your Email"
-                        style={{
-                          width: '100%',
-                          padding: '10px',
-                          margin: '5px 0 15px',
-                          borderRadius: '5px',
-                          border: '1px solid #ddd'
-                        }}
-                      />
-                    </div>
-                    
-                    <div className="form-group">
-                      <label htmlFor="feedback-type">Feedback Type</label>
-                      <select 
-                        id="feedback-type"
-                        style={{
-                          width: '100%',
-                          padding: '10px',
-                          margin: '5px 0 15px',
-                          borderRadius: '5px',
-                          border: '1px solid #ddd'
-                        }}
-                      >
-                        <option value="">Select type</option>
-                        <option value="bug">Bug Report</option>
-                        <option value="feature">Feature Request</option>
-                        <option value="improvement">Improvement Suggestion</option>
-                        <option value="general">General Feedback</option>
-                      </select>
-                    </div>
-                    
-                    <div className="form-group">
-                      <label htmlFor="feedback-message">Your Feedback</label>
+                      <label htmlFor="reason" style={{fontWeight: '600', marginBottom: '8px', color: '#333'}}>
+                        Reason for Room Change *
+                      </label>
                       <textarea 
-                        id="feedback-message" 
-                        placeholder="Please share your thoughts, suggestions, or report issues..."
-                        rows={5}
+                        name="reason"
+                        id="reason" 
+                        placeholder="Please provide the reason for your room change request..."
+                        rows={4}
+                        required
+                        value={roomChangeForm.reason}
+                        onChange={(e) => setRoomChangeForm(prev => ({...prev, reason: e.target.value}))}
                         style={{
                           width: '100%',
-                          padding: '10px',
-                          margin: '5px 0 15px',
+                          padding: '12px',
                           borderRadius: '5px',
-                          border: '1px solid #ddd',
+                          border: '1px solid #c23535',
+                          marginTop: '8px',
                           resize: 'vertical'
                         }}
-                      ></textarea>
+                      />
                     </div>
-                    
+
+                    {/* Preferred Block */}
+                    <div className="form-group">
+                      <label htmlFor="preferredBlock" style={{fontWeight: '600', marginBottom: '8px', color: '#333'}}>
+                        Preferred Block (Optional)
+                      </label>
+                      <select 
+                        name="preferredBlock"
+                        id="preferredBlock"
+                        value={roomChangeForm.preferredBlock}
+                        onChange={(e) => setRoomChangeForm(prev => ({...prev, preferredBlock: e.target.value}))}
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          borderRadius: '5px',
+                          border: '1px solid #ddd',
+                          marginTop: '8px'
+                        }}
+                      >
+                        <option value="">No preference</option>
+                        <option value="Phase 1">Phase 1 (Boys)</option>
+                        <option value="Phase 1 E-Wing">Phase 1 E-Wing (Boys)</option>
+                        <option value="Phase 2">Phase 2 (Boys)</option>
+                        <option value="Phase 2 Part 5">Phase 2 Part 5 (Boys)</option>
+                        <option value="Phase 4A">Phase 4A (Boys)</option>
+                        <option value="Phase 4B">Phase 4B (Boys)</option>
+                        <option value="Phase 3 North Wing">Phase 3 North Wing (Girls)</option>
+                        <option value="Phase 3 South Wing">Phase 3 South Wing (Girls)</option>
+                        <option value="Aravali">Aravali (Girls)</option>
+                        <option value="Himalaya">Himalaya (Girls)</option>
+                        <option value="Ajanta">Ajanta (Girls)</option>
+                        <option value="Shivalik">Shivalik (Girls)</option>
+                        <option value="Vindya">Vindya (Girls)</option>
+                        <option value="Niligiri">Niligiri (Girls)</option>
+                        <option value="Satpura">Satpura (Girls)</option>
+                        <option value="Kailash">Kailash (Girls)</option>
+                      </select>
+                      
+                      {/* Warning for designated blocks */}
+                      <div style={{
+                        marginTop: '8px',
+                        padding: '10px',
+                        backgroundColor: '#fff3e0',
+                        borderRadius: '5px',
+                        border: '1px solid #ffcc80',
+                        fontSize: '14px',
+                        color: '#e65100'
+                      }}>
+                        <strong>Important:</strong> Please choose designated blocks only based on your gender. Boys should select boys' hostels and girls should select girls' hostels.
+                      </div>
+                    </div>
+
+                    {/* Important Notice */}
+                    <div className="notice-section" style={{
+                      backgroundColor: '#fff3cd',
+                      padding: '15px',
+                      borderRadius: '8px',
+                      border: '1px solid #ffeaa7',
+                      marginTop: '10px'
+                    }}>
+                      <h4 style={{margin: '0 0 10px 0', color: '#856404', fontSize: '16px'}}>Important Notice:</h4>
+                      <ul style={{margin: '0', paddingLeft: '20px', color: '#856404', fontSize: '14px'}}>
+                        <li>Room change requests are subject to availability and approval</li>
+                        <li>Processing time may take 5-7 business days</li>
+                      </ul>
+                    </div>
+
+                    {/* Submit Button */}
                     <button 
                       type="submit"
                       style={{
                         backgroundColor: '#c23535',
                         color: 'white',
-                        padding: '10px 20px',
                         border: 'none',
                         borderRadius: '5px',
+                        padding: '12px 24px',
+                        fontSize: '14px',
+                        fontWeight: '600',
                         cursor: 'pointer',
-                        fontSize: '16px'
+                        width: 'auto',
+                        alignSelf: 'center',
+                        marginTop: '10px',
+                        transition: 'background-color 0.3s'
                       }}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        alert('Thank you for your feedback! We will review it shortly.');
-                        // Reset form
-                        const form = e.target as HTMLFormElement;
-                        form.reset();
-                      }}
+                      onMouseOver={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#a12525'}
+                      onMouseOut={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#c23535'}
                     >
-                      Submit Feedback
+                      Submit Room Change Request
                     </button>
                   </form>
+                ) : (
+                  <div style={{
+                    textAlign: 'center',
+                    padding: '40px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    color: '#6c757d'
+                  }}>
+                    <h3 style={{color: '#dc3545', marginBottom: '15px'}}>No Active Booking Found</h3>
+                    <p>You need to have an active room booking before you can request a room change.</p>
+                    <p>Please complete your hostel booking first.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}          {/* Room Change Request - Old */}
+          {selectedSection === "Room-Change-Old" && (
+            <div className="room-change-old-section">
+              <h2>Room Change Request History</h2>
+              
+              <div className="room-change-history-container" style={{
+                maxWidth: '1200px',
+                margin: '20px auto',
+                padding: '25px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+              }}>
+                {studentRoomRequests.length > 0 ? (
+                  <div className="requests-table-container" style={{
+                    overflowX: 'auto',
+                    marginTop: '20px'
+                  }}>
+                    <table style={{
+                      width: '100%',
+                      borderCollapse: 'collapse',
+                      backgroundColor: 'white',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                    }}>
+                      <thead>
+                        <tr style={{
+                          backgroundColor: '#c23535',
+                          color: 'white'
+                        }}>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            #
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Date Submitted
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Current Room
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Preferred Block
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Reason
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'center',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            borderRight: '1px solid rgba(255,255,255,0.2)'
+                          }}>
+                            Status
+                          </th>
+                          <th style={{
+                            padding: '15px 12px',
+                            textAlign: 'left',
+                            fontWeight: '600',
+                            fontSize: '14px'
+                          }}>
+                            Admin Comments
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {studentRoomRequests.map((request, index) => (
+                          <tr key={index} style={{
+                            borderBottom: '1px solid #e9ecef',
+                            backgroundColor: index % 2 === 0 ? '#f8f9fa' : 'white'
+                          }}>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              color: '#495057'
+                            }}>
+                              {index + 1}
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#6c757d'
+                            }}>
+                              {new Date(request.dateSubmitted).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              })}
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#495057'
+                            }}>
+                              <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '2px'
+                              }}>
+                                <span style={{fontWeight: '500'}}>{request.currentRoom?.block}</span>
+                                <span style={{fontSize: '12px', color: '#6c757d'}}>
+                                  Floor {request.currentRoom?.floor} - Room {request.currentRoom?.roomNumber} - Bed {request.currentRoom?.bed}
+                                </span>
+                              </div>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#6c757d'
+                            }}>
+                              {request.preferredBlock || 'No preference'}
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#495057',
+                              maxWidth: '200px'
+                            }}>
+                              <div style={{
+                                maxHeight: '60px',
+                                overflowY: 'auto',
+                                lineHeight: '1.4'
+                              }}>
+                                {request.reason}
+                              </div>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              textAlign: 'center'
+                            }}>
+                              <span style={{
+                                padding: '6px 12px',
+                                borderRadius: '20px',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                backgroundColor: 
+                                  request.status === 'Approved' ? '#d4edda' :
+                                  request.status === 'Rejected' ? '#f8d7da' : '#fff3cd',
+                                color: 
+                                  request.status === 'Approved' ? '#155724' :
+                                  request.status === 'Rejected' ? '#721c24' : '#856404',
+                                border: `1px solid ${
+                                  request.status === 'Approved' ? '#c3e6cb' :
+                                  request.status === 'Rejected' ? '#f5c6cb' : '#ffeaa7'
+                                }`,
+                                display: 'inline-block'
+                              }}>
+                                {request.status}
+                              </span>
+                            </td>
+                            <td style={{
+                              padding: '15px 12px',
+                              fontSize: '14px',
+                              color: '#6c757d',
+                              maxWidth: '200px'
+                            }}>
+                              {request.adminComments ? (
+                                <div style={{
+                                  maxHeight: '60px',
+                                  overflowY: 'auto',
+                                  lineHeight: '1.4',
+                                  fontStyle: 'italic'
+                                }}>
+                                  {request.adminComments}
+                                </div>
+                              ) : (
+                                <span style={{color: '#adb5bd', fontStyle: 'italic'}}>
+                                  No comments
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div style={{
+                    textAlign: 'center',
+                    padding: '40px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    color: '#6c757d'
+                  }}>
+                    <h3 style={{color: '#6c757d', marginBottom: '15px'}}>No Room Change Requests Found</h3>
+                    <p>You haven't submitted any room change requests yet.</p>
+                    <p>Click on "New Requests" to submit your first room change request.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}{/* Feedback Section */}
+          {selectedSection === "Feedback" && (
+            <div className="feedback-section">
+              <h2>Feedback</h2>
+              
+              <div className="feedback-container" style={{
+                maxWidth: '800px',
+                margin: '20px auto',
+                padding: '25px',
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+              }}>
+                <div className="feedback-intro" style={{marginBottom: '30px'}}>
+                  <p style={{fontSize: '16px', lineHeight: '1.6', color: '#555'}}>
+                    We value your feedback! Your suggestions and comments help us improve the Hostel Management System 
+                    and provide better services to all students. Please share your thoughts below.
+                  </p>
+                </div>                <form className="feedback-form" style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '20px'
+                }}>
+                  <div className="form-group">
+                    <label style={{fontWeight: '600', marginBottom: '8px', color: '#333', display: 'block'}}>
+                      Feedback Category *
+                    </label>
+                    <select 
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        borderRadius: '5px',
+                        border: '1px solid #c23535',
+                        fontSize: '16px'
+                      }}
+                    >
+                      <option value="">Select a category</option>
+                      <option value="system-functionality">System Functionality</option>
+                      <option value="user-interface">User Interface/Experience</option>
+                      <option value="booking-process">Booking Process</option>
+                      <option value="payment-system">Payment System</option>
+                      <option value="general-suggestion">General Suggestion</option>
+                      <option value="bug-report">Bug Report</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label style={{fontWeight: '600', marginBottom: '8px', color: '#333', display: 'block'}}>
+                      Your Feedback *
+                    </label>
+                    <textarea 
+                      placeholder="Please provide your detailed feedback, suggestions, or describe any issues you've encountered..."
+                      rows={6}
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        borderRadius: '5px',
+                        border: '1px solid #c23535',
+                        fontSize: '16px',
+                        resize: 'vertical'
+                      }}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label style={{fontWeight: '600', marginBottom: '8px', color: '#333', display: 'block'}}>
+                      Rating (Optional)
+                    </label>
+                    <select 
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        borderRadius: '5px',
+                        border: '1px solid #ddd',
+                        fontSize: '16px'
+                      }}
+                    >
+                      <option value="">Rate your overall experience</option>
+                      <option value="5">Excellent</option>
+                      <option value="4">Very Good</option>
+                      <option value="3">Good</option>
+                      <option value="2">Fair</option>
+                      <option value="1">Poor</option>
+                    </select>
+                  </div>                  <button 
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      alert('Thank you for your feedback! Your suggestions have been submitted and will be reviewed by our development team.');
+                    }}
+                    style={{
+                      backgroundColor: '#2c5282',
+                      color: 'white',
+                      border: '1px solid #2c5282',
+                      borderRadius: '6px',
+                      padding: '14px 32px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      alignSelf: 'center',
+                      minWidth: '180px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Submit Feedback
+                  </button>
+                </form>
+
+                <div className="feedback-note" style={{
+                  marginTop: '30px',
+                  padding: '15px',
+                  backgroundColor: '#e8f5e8',
+                  borderRadius: '8px',
+                  border: '1px solid #c3e6c3'
+                }}>
+                  <h4 style={{margin: '0 0 10px 0', color: '#2d5a2d'}}>📝 Note:</h4>
+                  <p style={{margin: '0', fontSize: '14px', color: '#2d5a2d', lineHeight: '1.5'}}>
+                    Your feedback is important to us and helps improve the system for all users. 
+                    For urgent technical issues, please contact the support team directly at{' '}
+                    <a href="mailto:hostelcom@mahindrauniversity.edu.in" style={{color: '#c23535'}}>
+                      hostelcom@mahindrauniversity.edu.in
+                    </a>
+                  </p>
                 </div>
               </div>
             </div>
@@ -2300,7 +3158,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 </p>
               </div>
             </div>
-          )}        </div>
+          )}
+        </div>
       </div>
 
       {/* Welcome Popup */}
@@ -2331,8 +3190,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               <div className="popup-step">
                 <div className="step-number">3</div>
                 <div className="step-content">
-                  <div className="step-title">Book Your Room</div>
-                  <div className="step-description">Select your preferred hostel block, floor, room, and bed.</div>
+                  <div className="step-title">Book Your Hostel Room</div>
+                  <div className="step-description">Choose your preferred room from available options using our interactive floor plan.</div>
                 </div>
               </div>
             </div>
@@ -2349,10 +3208,11 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
         <div className="popup-overlay">
           <div className="popup-content">
             <span className="popup-close" onClick={() => setShowHostelInfoPopup(false)}>×</span>
-            <h2 className="popup-title">Available Hostel Blocks</h2>
-            <p>Please review the hostel blocks before proceeding to book your room:</p>
+            <h2 className="popup-title">Hostel Information</h2>
+            <p style={{marginBottom: '20px'}}>Please review the hostel blocks available based on your gender before proceeding to room selection.</p>
             
-            <div className="hostel-info-grid">              <div className="hostel-block boys">
+            <div className="hostel-blocks-info" style={{display: 'flex', gap: '20px', marginBottom: '25px'}}>
+              <div className="hostel-block boys">
                 <h3>Boys Hostel</h3>
                 <p><strong>Blocks:</strong> Phase 1, Phase 1 E-Wing, Phase 2, Phase 2 Part 5, Phase 4A, Phase 4B</p>
               </div>
@@ -2371,15 +3231,38 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
           </div>
         </div>
-      )}
-
-      {/* FOOTER */}
+      )}      {/* FOOTER */}
       <footer className="footer">
-        <p>&copy; {new Date().getFullYear()} Hostel Management System. All rights reserved.</p>
-        <p>
-          <a href="/about" onClick={(e) => {e.preventDefault(); setSelectedSection("About")}}>About</a> | 
-          <a href="/contact" onClick={(e) => {e.preventDefault(); setSelectedSection("Contact")}}>Contact</a>
-        </p>
+        <div style={{marginBottom: '15px'}}>
+          <p>&copy; {new Date().getFullYear()} Mahindra University Hostel Management System. All rights reserved.</p>
+        </div>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '30px',
+          flexWrap: 'wrap',
+          alignItems: 'center'
+        }}>
+          <a href="#" onClick={(e) => {e.preventDefault(); setSelectedSection("Feedback");}}>Feedback</a>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+          }}>
+            <span style={{fontSize: '14px'}}></span>
+            <a href="mailto:hostelcom@mahindrauniversity.edu.in" style={{color: '#fff'}}>
+              hostelcom@mahindrauniversity.edu.in
+            </a>
+          </div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+          }}>
+            <span style={{fontSize: '14px'}}>📞</span>
+            <span style={{color: '#fff'}}>+91 40 6722 9000</span>
+        </div>
+        </div>
       </footer>
     </>
   );

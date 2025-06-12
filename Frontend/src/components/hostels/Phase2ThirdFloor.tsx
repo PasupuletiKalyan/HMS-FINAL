@@ -39,15 +39,8 @@ const Phase2ThirdFloorPlan: React.FC<FloorPlanProps> = ({
   const getY = (baseY: number, rowNum: number): number => baseY - (rowNum * (roomH + vGap));
   
   // Calculate positions for the Top Horizontal Section - Left Part
-  const wsTopLStartX = 10 + 5*(roomW + hGap) + hGap*2;
-  const wsTopLEndX = wsTopLStartX + roomW * 1.5 + hGap; // End X of first top WS
-  const liftsTopMEndX = wsTopLEndX + hGap + roomW + hGap + roomW; // End X of first top Lifts
   
   // Calculate positions for the Top Horizontal Section - Right Part
-  const startBottomRightX = liftsTopMEndX + hGap; // Start X for second horizontal group
-  const g342EndX = startBottomRightX + 3*(roomW + hGap) + roomW; // End X of room 342
-  const wsTopREndX = g342EndX + hGap * 3 + roomW * 1.5 + hGap; // End X of second top WS
-  const g341StartX = wsTopREndX + hGap + 2*(roomW + hGap) + hGap; // Start X for room 341
 
   // Corridor widths and positions
   const corridorWidth = 15;

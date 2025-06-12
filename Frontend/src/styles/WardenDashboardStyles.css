@@ -1349,6 +1349,32 @@ textarea.no-resize {
   color: #166534;
 }
 
+.status-badge.in-progress {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.closed {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+/* Room Change Request Status Badges */
+.status-badge.approved {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+.status-badge.rejected {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+.status-badge.completed {
+  background-color: #2196f3 !important;
+  color: white !important;
+}
+
 .resolve-btn {
   background-color: #4caf50;
   color: white;

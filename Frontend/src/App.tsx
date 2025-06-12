@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { buildApiUrl } from "./config/api";
 import LoginPage from "./pages/LoginPage";
 import StudentDashboard from "./pages/StudentDashboard";
 import WardenDashboard from "./pages/WardenDashboard";
@@ -28,7 +29,7 @@ const LocationAwareApp: React.FC = () => {
   // Track the current application number to detect user changes
   const [currentApplicationNo, setCurrentApplicationNo] = useState<string | null>(null);
   // Add state to track completed steps
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [, setCompletedSteps] = useState<number[]>([]);
 
   // Load booking information when the app initializes or location changes
   useEffect(() => {
@@ -67,13 +68,6 @@ const LocationAwareApp: React.FC = () => {
             if (data.success) {
               // Load completed steps from backend
               const backendCompletedSteps = data.progress.completedSteps || [];
-              
-              // If form exists according to first check but not reflected in completedSteps, add it
-              if (localStorage.getItem("formCompleted") === "true" && !backendCompletedSteps.includes(1)) {
-                backendCompletedSteps.push(1);
-                console.log("Adding form step to completed steps based on form existence");
-              }
-              
               setCompletedSteps(backendCompletedSteps);
               
               // Update backend progress if needed
@@ -97,13 +91,17 @@ const LocationAwareApp: React.FC = () => {
               // Store in localStorage for persistence
               localStorage.setItem("completedSteps", JSON.stringify(backendCompletedSteps));
               
-              // Set form and payment completion flags in localStorage
+              // Set form and payment completion flags in localStorage based on backend data
               if (data.progress.formCompleted) {
                 localStorage.setItem("formCompleted", "true");
+              } else {
+                localStorage.removeItem("formCompleted");
               }
               
               if (data.progress.paymentCompleted) {
                 localStorage.setItem("paymentCompleted", "true");
+              } else {
+                localStorage.removeItem("paymentCompleted");
               }
               
               if (data.progress.roomBooked && data.progress.bookingDetails) {
@@ -153,8 +151,6 @@ const LocationAwareApp: React.FC = () => {
       <Route path="/student-dashboard" element={<StudentDashboard      
         currentUserBooking={currentUserBooking}
         setCurrentUserBooking={setCurrentUserBooking}
-        occupiedBeds={occupiedBeds}
-        setOccupiedBeds={setOccupiedBeds}
       />} />
       <Route path="/warden-dashboard" element={<WardenDashboard />} /> 
       <Route path="/admin-dashboard" element={<AdminDashboard />} />   

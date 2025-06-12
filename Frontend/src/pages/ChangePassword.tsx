@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { buildApiUrl } from "../config/api";
 import "../styles/AuthStyles.css";
 import collegeLogo from "../assets/college-logo.jpg";
 import defaultProfilePic from "../assets/default-profile-pic.jpg";
@@ -51,7 +52,7 @@ const ChangePassword: React.FC = () => {
     try {
       setIsLoading(true);
       
-      const response = await fetch("http://localhost:5000/api/users/change-password", {
+      const response = await fetch(buildApiUrl("/api/users/change-password"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
