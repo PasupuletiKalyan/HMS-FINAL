@@ -593,6 +593,18 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
         </div>
 
+        {/* Banner Section */}
+        <div className="banner-section">
+          <div className="banner-image-container">
+            <img src="/Pics/MU_CAMPUS_NV.jpg" alt="Campus View 1" className="banner-image" />
+            <img src="/Pics/MU_CAMPUS_NV_2.jpg" alt="Campus View 2" className="banner-image" />
+          </div>
+          <div className="banner-overlay">
+            <h1>Welcome to MU Hostels</h1>
+            <p>Your Home Away From Home</p>
+          </div>
+        </div>
+
         {/* MAIN CONTENT */}
         <div className="dashboard-content">
           {/* Render heading based on the current state */}
@@ -648,6 +660,28 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       backgroundColor: "transparent"
                     }}
                   ></iframe>
+                </div>
+              </div>
+
+              {/* Campus Photo Showcase */}
+              <div className="campus-showcase">
+                <h3 className="showcase-title">
+                  <i className="fas fa-university"></i>
+                  MU Hostels
+                </h3>
+                <div className="showcase-grid">
+                  <div className="showcase-item">
+                    <img src="/Pics/hostel_4.JPG" alt="Campus View" className="showcase-image" />
+                    <div className="showcase-overlay">
+                      <p>Girls Hostels</p>
+                    </div>
+                  </div>
+                  <div className="showcase-item">
+                    <img src="/Pics/hostel_1.JPG" alt="Hostel Building" className="showcase-image" />
+                    <div className="showcase-overlay">
+                      <p>Boys Hostels</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -871,7 +905,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         <option value="+1">+1 (USA)</option>
                         <option value="+91" selected>+91 (India)</option>
                         <option value="+44">+44 (UK)</option>
-                        <option value="+61">+61 (Australia)</option>
+                        <option value="+61">+61 (Australia)"</option>
                         <option value="+81">+81 (Japan)</option>
                         {/* Add more country codes as needed */}
                       </select>
@@ -899,7 +933,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         <option value="+91" selected>+91 (India)</option>
                         <option value="+44">+44 (UK)</option>
                         <option value="+61">+61 (Australia)</option>
-                        <option value="+81">+81 (Japan)</option>
+                        <option value="+81">+81 (Japan)"</option>
                         {/* Add more country codes as needed */}
                       </select>
                       <input
@@ -1907,8 +1941,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   <h3 style={{textAlign: 'center', marginBottom: '20px'}}>Project Team</h3>
                   <div className="team-members" style={{
                     display: 'flex',
-                    justifyContent: 'center',
-                    flexWrap: 'wrap',
+                    justifyContent: 'center',                    flexWrap: 'wrap',
                     gap: '20px'
                   }}>
                     <div className="team-member" style={{textAlign: 'center'}}>

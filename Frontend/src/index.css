@@ -15,6 +15,7 @@ body {
     color: #333;
     overflow-y: auto; /* Only allow vertical scrollbar on body */
     overflow-x: hidden; /* Hide horizontal scrollbar on body */
+    
 }
 
 /* Use this class on containers that need horizontal scrolling */

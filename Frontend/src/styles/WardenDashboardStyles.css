@@ -23,11 +23,11 @@ html {
 
 /* 🔹 Top Navigation Bar */
 .dashboard-top-nav {
+  padding: 1rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background-color: white;
-  padding: 0.8rem 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: fixed;
   top: 0;
@@ -42,8 +42,9 @@ html {
 }
 
 .college-logo-top {
-  height: 4.5rem;
+  height: 3rem;
   margin-right: 1rem;
+  transition: transform 0.3s ease;
 }
 
 .profile-image-top {
@@ -63,23 +64,30 @@ html {
 .top-menu {
   list-style: none;
   display: flex;
-  gap: 1.5rem;
+  gap: 2rem;
   margin: 0;
   padding: 0;
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
 .top-menu li {
   position: relative;
   cursor: pointer;
   font-weight: 600;
-  transition: color 0.3s, transform 0.2s ease, box-shadow 0.3s ease;
+  transition: color 0.3s;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
 }
 
 .top-menu li:hover {
   color: var(--primary-color);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: rgba(194, 53, 53, 0.05);
+}
+
+/* Active menu item styling */
+.active {
+  border-bottom: 3px solid var(--primary-color);
+  background-color: rgba(194, 53, 53, 0.1);
 }
 
 /* 🔹 Dropdown */
@@ -111,16 +119,12 @@ html {
   background: #8b2626;
 }
 
-/* 🔹 Active Menu Item */
-.active {
-  border-bottom: 2px solid var(--primary-color);
-}
-
 /* 🔹 Dashboard Content */
 .dashboard-content {
   padding: 6rem 4%;
   background-color: var(--secondary-color);
   margin: 1.5rem auto;
+  margin-top: 3rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   min-height: 65vh;
@@ -213,7 +217,7 @@ html {
   }
 
   .dashboard-content {
-    padding: 5.5rem 3%;
+    padding: 2rem 3%;
   }
 
   .personal-details-form {
@@ -737,10 +741,10 @@ textarea.no-resize {
   display: block; /* This forces some browsers (like Firefox) to behave */
 }
 .profile-circle-button {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background-color: #e74c3c; /* red color to match your theme */
+  background-color: #e74c3c;/* red color to match your theme */
   color: white;
   font-size: 18px;
   border: none;
@@ -1566,8 +1570,8 @@ textarea.no-resize {
 
 /* Profile Circle Image */
 .profile-circle-image {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #fff;
@@ -1580,8 +1584,8 @@ textarea.no-resize {
 }
 
 .profile-circle {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   background-color: #c23535;
   color: #fff;
   border-radius: 50%;
