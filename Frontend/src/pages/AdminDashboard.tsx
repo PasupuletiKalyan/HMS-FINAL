@@ -1392,8 +1392,37 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* FOOTER */}
-      <footer className="dashboard-footer">
-        <p>&copy; {new Date().getFullYear()} Hostel Management System. All rights reserved.</p>
+      <footer className="footer">
+        <div style={{marginBottom: '15px'}}>
+          <p>&copy; {new Date().getFullYear()} Mahindra University Hostel Management System. All rights reserved.</p>
+        </div>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '30px',
+          flexWrap: 'wrap',
+          alignItems: 'center'
+        }}>
+          <a href="#" onClick={(e) => {e.preventDefault(); setSelectedMenu("Feedback");}}>Feedback</a>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+          }}>
+            <span style={{fontSize: '14px'}}></span>
+            <a href="mailto:hostelcom@mahindrauniversity.edu.in" style={{color: '#fff'}}>
+              hostelcom@mahindrauniversity.edu.in
+            </a>
+          </div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+          }}>
+            <span style={{fontSize: '14px'}}>📞</span>
+            <span style={{color: '#fff'}}>+91 40 6722 9000</span>
+        </div>
+        </div>
       </footer>
     </>
   );

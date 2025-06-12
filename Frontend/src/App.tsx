@@ -120,8 +120,6 @@ const LocationAwareApp: React.FC = () => {
       <Route path="/student-dashboard" element={<StudentDashboard      
         currentUserBooking={currentUserBooking}
         setCurrentUserBooking={setCurrentUserBooking}
-        occupiedBeds={occupiedBeds}
-        setOccupiedBeds={setOccupiedBeds}
       />} />
       <Route path="/warden-dashboard" element={<WardenDashboard />} /> 
       <Route path="/admin-dashboard" element={<AdminDashboard />} />   
