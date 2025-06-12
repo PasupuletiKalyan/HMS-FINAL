@@ -590,20 +590,21 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 </ul>
               </div>
             )}
-          </div>
-        </div>
+          </div>        </div>
 
-        {/* Banner Section */}
-        <div className="banner-section">
-          <div className="banner-image-container">
-            <img src="/Pics/MU_CAMPUS_NV.jpg" alt="Campus View 1" className="banner-image" />
-            <img src="/Pics/MU_CAMPUS_NV_2.jpg" alt="Campus View 2" className="banner-image" />
+        {/* Banner Section - Only show on Dashboard */}
+        {selectedSection === "Dashboard" && (
+          <div className="banner-section">
+            <div className="banner-image-container">
+              <img src="/Pics/MU_CAMPUS_NV.jpg" alt="Campus View 1" className="banner-image" />
+              <img src="/Pics/MU_CAMPUS_NV_2.jpg" alt="Campus View 2" className="banner-image" />
+            </div>
+            <div className="banner-overlay">
+              <h1>Welcome to MU Hostels</h1>
+              <p>Your Home Away From Home</p>
+            </div>
           </div>
-          <div className="banner-overlay">
-            <h1>Welcome to MU Hostels</h1>
-            <p>Your Home Away From Home</p>
-          </div>
-        </div>
+        )}
 
         {/* MAIN CONTENT */}
         <div className="dashboard-content">
@@ -611,9 +612,9 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           {selectedSection === "Dashboard" && (
             <>
               <div className="welcome-section">
-                <p className="welcome-message">Hi, {userName}! Welcome to your dashboard.</p>
+                <p className="welcome-message"style={{fontSize: "28px" , fontWeight: "bolder"}} >Hi, {userName}! Welcome to your dashboard.</p>
                 <p className="salutation" style={{ 
-                  fontSize: "18px", 
+                  fontSize: "28px", 
                   color: "#555", 
                   marginTop: "10px",
                   fontWeight: "bold" 
@@ -628,7 +629,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               {/* Announcements Section */}
               <div className="announcements-section">
                 <h3 style={{ 
-                  marginBottom: "15px", 
+                  margin: "20px", 
                   color: "#007bff", 
                   display: "flex", 
                   alignItems: "center", 
@@ -640,7 +641,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 </h3>
                 <div className="slidin-container" style={{ 
                   margin: "0 auto",
-                  maxWidth: "800px",
+                  maxWidth: "1000px",
                   background: "linear-gradient(to right, #f8f9fa, #ffffff, #f8f9fa)",
                   padding: "20px",
                   borderRadius: "15px",

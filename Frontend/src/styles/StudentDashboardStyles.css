@@ -292,11 +292,11 @@ html {
 
 /* 🔹 Dashboard Content */
 .dashboard-content {
-  padding: 6rem 4%;
+  padding: 3rem 4%;
   padding-top: 3rem;
   background-color: var(--secondary-color);
   margin: 1.5rem auto;
-  margin-top: 3rem;
+  margin-top: 9rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   min-height: 65vh;
