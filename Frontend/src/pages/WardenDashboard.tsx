@@ -1789,6 +1789,287 @@ ${request.processedDate ? `Processed Date: ${new Date(request.processedDate).toL
     }, 100);
   };
 
+  const [selectedBlock, setSelectedBlock] = useState<string>("");
+  const [roomNumber, setRoomNumber] = useState<string>("");
+  const [roomOccupants, setRoomOccupants] = useState<any[]>([]);
+  const [isSearchingRoom, setIsSearchingRoom] = useState(false);
+
+  const searchRoom = async () => {
+    if (!selectedBlock || !roomNumber) {
+      alert("Please select a block and enter a room number");
+      return;
+    }
+
+    setIsSearchingRoom(true);
+    try {
+      const response = await fetch(`http://localhost:5000/api/hostel/room-occupants?block=${selectedBlock}&roomNumber=${roomNumber}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch room occupants');
+      }
+      const data = await response.json();
+      setRoomOccupants(data.occupants || []);
+    } catch (error) {
+      console.error('Error fetching room occupants:', error);
+      alert('Failed to fetch room occupants');
+    } finally {
+      setIsSearchingRoom(false);
+    }
+  };
+
+  // Render Room Search Content
+  const renderRoomSearchContent = () => {
+    const occupantRowStyle = {
+      padding: '20px 25px',
+      borderBottom: '1px solid #eee',
+      display: 'grid',
+      gridTemplateColumns: 'auto 1fr auto',
+      gap: '20px',
+      alignItems: 'center',
+      backgroundColor: '#fff',
+      transition: 'background-color 0.3s ease',
+    };
+
+    const searchButtonStyle = {
+      padding: '12px 30px',
+      backgroundColor: '#c23535',
+      color: 'white',
+      border: 'none',
+      borderRadius: '8px',
+      cursor: 'pointer',
+      fontSize: '15px',
+      fontWeight: '500',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      transition: 'background-color 0.3s ease',
+      height: '45px',
+    };
+
+    const handleSearchButtonHover = (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.currentTarget.style.backgroundColor = '#a62e2e';
+    };
+
+    const handleSearchButtonLeave = (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.currentTarget.style.backgroundColor = '#c23535';
+    };
+
+    const handleOccupantRowHover = (e: React.MouseEvent<HTMLDivElement>) => {
+      e.currentTarget.style.backgroundColor = '#f8f9fa';
+    };
+
+    const handleOccupantRowLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+      e.currentTarget.style.backgroundColor = '#fff';
+    };
+
+    return (
+      <div className="room-search-section" style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '30px',
+        backgroundColor: '#f8f9fa'
+      }}>
+        {/* Search Header - Same as before */}
+        <div className="search-header" style={{
+          marginBottom: '30px',
+          textAlign: 'center'
+        }}>
+          <h2 style={{
+            color: '#2c3e50',
+            marginBottom: '15px',
+            fontSize: '28px',
+            fontWeight: '600'
+          }}>Room Occupancy Search</h2>
+          <p style={{
+            color: '#666',
+            fontSize: '16px'
+          }}>Search for room occupants by block and room number</p>
+        </div>
+
+        {/* Search Controls - Updated button with hover handlers */}
+        <div className="search-controls" style={{
+          display: 'flex',
+          gap: '20px',
+          marginBottom: '30px',
+          backgroundColor: '#fff',
+          padding: '25px',
+          borderRadius: '12px',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+          alignItems: 'flex-end'
+        }}>
+          <div style={{ flex: '100%' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              color: '#2c3e50',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}>Select Block</label>
+            <select
+              value={selectedBlock}
+              onChange={(e) => setSelectedBlock(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '8px',
+                border: '1px solid #e1e1e1',
+                fontSize: '15px',
+                backgroundColor: '#fff',
+                color: '#2c3e50',
+                transition: 'border-color 0.3s ease',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="">Select Block</option>
+              <option value="Phase 1">Phase 1</option>
+              <option value="Phase 1 E Block">Phase 1 E Block</option>
+              <option value="Phase 2">Phase 2</option>
+              <option value="Phase 2 Part 5">Phase 2 Part 5</option>
+              <option value="Phase 3 North Wing">Phase 3 North Wing</option>
+              <option value="Phase 3 South Wing">Phase 3 South Wing</option>
+              <option value="Phase 4A">Phase 4A</option>
+              <option value="Phase 4B">Phase 4B</option>
+              <option value="Aravali">Aravali</option>
+              <option value="Ajanta">Ajanta</option>
+              <option value="Himalaya">Himalaya</option>
+              <option value="Shivalik">Shivalik</option>
+              <option value="Vindya">Vindya</option>
+              <option value="Nilgiri">Nilgiri</option>
+              <option value="Satpura">Satpura</option>
+              <option value="Kailash">Kailash</option>
+            </select>
+          </div>
+          
+          <div style={{ flex: '100%' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              color: '#2c3e50',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}>Room Number</label>
+            <input
+              type="text"
+              value={roomNumber}
+              onChange={(e) => setRoomNumber(e.target.value)}
+              placeholder="Enter Room Number"
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '8px',
+                border: '1px solid #e1e1e1',
+                fontSize: '15px',
+                backgroundColor: '#fff',
+                color: '#2c3e50',
+                transition: 'border-color 0.3s ease'
+              }}
+            />
+          </div>
+          
+          <button
+            onClick={searchRoom}
+            disabled={isSearchingRoom}
+            style={searchButtonStyle}
+            onMouseEnter={handleSearchButtonHover}
+            onMouseLeave={handleSearchButtonLeave}
+          >
+            {isSearchingRoom ? 'Searching...' : 'Search Room'}
+          </button>
+        </div>
+
+        {/* Results Section */}
+        {roomOccupants.length > 0 ? (
+          <div className="occupants-list" style={{
+            backgroundColor: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              backgroundColor: '#f8f9fa',
+              padding: '20px 25px',
+              borderBottom: '1px solid #eee'
+            }}>
+              <h3 style={{
+                margin: 0,
+                color: '#2c3e50',
+                fontSize: '18px',
+                fontWeight: '600'
+              }}>Room Occupants</h3>
+            </div>
+            
+            {roomOccupants.map((occupant, index) => (
+              <div
+                key={occupant.applicationNo}
+                style={{
+                  ...occupantRowStyle,
+                  borderBottom: index < roomOccupants.length - 1 ? '1px solid #eee' : 'none'
+                }}
+                onMouseEnter={handleOccupantRowHover}
+                onMouseLeave={handleOccupantRowLeave}
+              >
+                <div style={{
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '50%',
+                  backgroundColor: '#f0f0f0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '20px',
+                  color: '#666'
+                }}>
+                  {occupant.name ? occupant.name[0].toUpperCase() : 'S'}
+                </div>
+                <div>
+                  <h4 style={{
+                    margin: '0 0 5px 0',
+                    color: '#2c3e50',
+                    fontSize: '16px',
+                    fontWeight: '500'
+                  }}>{occupant.name}</h4>
+                  <p style={{
+                    margin: 0,
+                    color: '#666',
+                    fontSize: '14px'
+                  }}>Application No: {occupant.applicationNo}</p>
+                </div>
+                <div style={{
+                  padding: '6px 12px',
+                  backgroundColor: '#e8f5e9',
+                  color: '#2e7d32',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}>
+                  Active
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : roomNumber && !isSearchingRoom ? (
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            backgroundColor: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
+          }}>
+            <div style={{
+              color: '#666',
+              fontSize: '16px',
+              marginBottom: '10px'
+            }}>No occupants found for this room</div>
+            <p style={{
+              color: '#999',
+              fontSize: '14px',
+              margin: 0
+            }}>Try searching with a different room number or block</p>
+          </div>
+        ) : null}
+      </div>
+    );
+  };
+
   return (
     <div className="dashboard-container">
       {/* TOP NAVIGATION BAR */}
@@ -1810,8 +2091,7 @@ ${request.processedDate ? `Processed Date: ${new Date(request.processedDate).toL
             Room Allotment
           </li>
           <li
-            className={`top-menu-item ${selectedMenu === "Student Search" ? "active" : ""}`}
-            onClick={() => setSelectedMenu("Student Search")}
+            className={`top-menu-item ${selectedMenu === "Student Search" ? "active" : ""}`}            onClick={() => setSelectedMenu("Student Search")}
           >
             Student Search
           </li>          <li
@@ -1948,8 +2228,8 @@ ${request.processedDate ? `Processed Date: ${new Date(request.processedDate).toL
                       width: '16px',
                       height: '16px',
                       border: '2px solid rgba(255,255,255,0.3)',
+                      borderTop: '2px solid #fff',
                       borderRadius: '50%',
-                      borderTopColor: '#fff',
                       animation: 'spin 1s linear infinite'
                     }}></span>
                     Searching...
@@ -2114,6 +2394,7 @@ ${request.processedDate ? `Processed Date: ${new Date(request.processedDate).toL
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
+                    gap: '10px',
                     minWidth: '200px',
                     marginRight: '30px'
                   }}>
@@ -2133,7 +2414,6 @@ ${request.processedDate ? `Processed Date: ${new Date(request.processedDate).toL
                           style={{
                             width: '100%',
                             height: '100%',
-                            objectFit: 'cover'
                           }}
                         />
                       ) : (
@@ -2148,6 +2428,7 @@ ${request.processedDate ? `Processed Date: ${new Date(request.processedDate).toL
                           <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>                            <path d="M16 3.13C16.8604 3.3503 17.623 3.8507 18.1676 4.55231C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89317 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         </div>
                       )}
@@ -2283,7 +2564,7 @@ ${request.processedDate ? `Processed Date: ${new Date(request.processedDate).toL
                             justifyContent: 'center'
                           }}>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M22 16.92V19.92C22 20.4704 21.7893 20.9996 21.4142 21.3746C21.0391 21.7497 20.5099 21.9604 19.96 21.96C16.4289 21.6533 13.0343 20.3971 10.07 18.32C7.31353 16.4208 5.06218 13.9658 3.5 11C1.42 7.93 0.170038 4.41 0 0.75C-0.000331979 0.204195 0.208058 -0.320209 0.58026 -0.692573C0.952462 -1.06494 1.47989 -1.27311 2.026 -1.27H5.026C5.90343 -1.28437 6.68872 -0.648376 6.9 0.2C7.06261 1.02008 7.3163 1.82546 7.66 2.6C7.91734 3.16497 7.8793 3.81326 7.554 4.347L6.554 5.96C7.97472 8.97284 10.4772 11.4753 13.49 12.898L15.103 11.898C15.6367 11.5727 16.285 11.5347 16.85 11.792C17.6245 12.1357 18.4299 12.3894 19.25 12.552C20.1251 12.7676 20.7735 13.5823 20.75 14.482L22 16.92Z" stroke="#1976d2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M22 10V6C22 4.89543 21.1046 4 20 4H4C2.89543 4 2 4.89543 2 6V10M22 10V18C22 19.1046 21.1046 20 20 20H4C2.89543 20 2 19.1046 2 18V10M22 10H2M8 15H16" stroke="#1565c0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                           </div>
                           <div>
@@ -2337,8 +2618,7 @@ ${request.processedDate ? `Processed Date: ${new Date(request.processedDate).toL
                           }}>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                               <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="#2e7d32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                              <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="#2e7d32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
+                          </svg>
                           </div>
                           <div>
                             <div style={{fontSize: '15px', fontWeight: '600', color: '#333'}}>Parent Information</div>
@@ -2635,8 +2915,7 @@ ${request.processedDate ? `Processed Date: ${new Date(request.processedDate).toL
                       display: 'flex',
                       alignItems: 'center',
                       gap: '15px'
-                    }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    }}>                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#f57c00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         <path d="M12 8V12" stroke="#f57c00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         <path d="M12 16H12.01" stroke="#f57c00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -2812,7 +3091,7 @@ ${request.processedDate ? `Processed Date: ${new Date(request.processedDate).toL
               </div>
             )}
           </div>
-        )}
+        )}        {selectedMenu === "Room Search" && renderRoomSearchContent()}
         {selectedMenu === "Maintenance Complaints" && renderComplaintsContent()}
         {selectedMenu === "Room Change Requests" && renderRoomChangeRequestsContent()}
         

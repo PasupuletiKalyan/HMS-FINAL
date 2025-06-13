@@ -223,8 +223,8 @@ html {
 }
 
 .profile-image-top {
-  height: 2.5rem;
-  width: 2.5rem;
+  height: 3.5rem;
+  width: 3.5rem;
   border-radius: 50%;
   margin-right: 0.8rem;
   border: 2px solid var(--secondary-color);
@@ -299,6 +299,7 @@ html {
   padding: 5rem 4%; /* Reduced from 6rem to 5rem to adjust for smaller nav height */
   background-color: var(--secondary-color);
   margin: 1.5rem auto;
+  margin-top: 9rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   min-height: 65vh;
@@ -694,8 +695,8 @@ html {
 .profile-initials {
   background-color: #c23535;
   color: #fff;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   font-weight: bold;
   font-size: 16px;
   border-radius: 50%;
@@ -1216,10 +1217,10 @@ textarea.no-resize {
   display: block; /* This forces some browsers (like Firefox) to behave */
 }
 .profile-circle-button {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background-color: #e74c3c; /* red color to match your theme */
+  background-color: #e74c3c;/* red color to match your theme */
   color: white;
   font-size: 18px;
   border: none;
@@ -1290,8 +1291,8 @@ textarea.no-resize {
 /* Profile Circle Button */
 /* Profile Circle Button */
 .profile-circle-button {
-  width: 60px; /* Ensure it's a perfect circle */
-  height: 60px;
+  width: 100px; /* Ensure it's a perfect circle */
+  height: 100px;
   border-radius: 50%;
   overflow: hidden;
   border: 20px solid #ccc; /* Optional: Add a border for better visibility */
@@ -1309,10 +1310,10 @@ textarea.no-resize {
 
 /* Profile Circle Image */
 .profile-circle-image {
-  width: 60px; /* Set a fixed width */
-  height: 60px; /* Set a fixed height to match the width */
+  width: 100px; /* Set a fixed width */
+  height: 100px; /* Set a fixed height to match the width */
   object-fit: cover; /* Ensure the image fits within the circle */
-  border-radius: 50%; /* Make the image circular */
+  border-radius: 70%; /* Make the image circular */
   border: 2px solid #ccc; /* Optional: Add a border for better visibility */
 }
 .profile-name {
@@ -1340,8 +1341,8 @@ textarea.no-resize {
   background-color: transparent; /* Remove red hover effect */
 }
 .profile-circle-image {
-  width: 60px; /* Set a fixed width */
-  height: 60px; /* Set a fixed height to match the width */
+  width: 100px; /* Set a fixed width */
+  height: 100px; /* Set a fixed height to match the width */
   object-fit: cover; /* Ensure the image fits within the circle */
   border-radius: 50%; /* Make the image circular */
   border: 2px solid #ccc; /* Optional: Add a border for better visibility */

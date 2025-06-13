@@ -639,8 +639,21 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 </ul>
               </div>
             )}
+          </div>        </div>
+
+        {/* Banner Section - Only show on Dashboard */}
+        {selectedSection === "Dashboard" && (
+          <div className="banner-section">
+            <div className="banner-image-container">
+              <img src="/Pics/MU_CAMPUS_NV.jpg" alt="Campus View 1" className="banner-image" />
+              <img src="/Pics/MU_CAMPUS_NV_2.jpg" alt="Campus View 2" className="banner-image" />
+            </div>
+            <div className="banner-overlay">
+              <h1>Welcome to MU Hostels</h1>
+              <p>Your Home Away From Home</p>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* MAIN CONTENT */}
         <div className="dashboard-content">
@@ -648,9 +661,9 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           {selectedSection === "Dashboard" && (
             <>
               <div className="welcome-section">
-                <p className="welcome-message">Hi, {userName}! Welcome to your dashboard.</p>
+                <p className="welcome-message"style={{fontSize: "28px" , fontWeight: "bolder"}} >Hi, {userName}! Welcome to your dashboard.</p>
                 <p className="salutation" style={{ 
-                  fontSize: "18px", 
+                  fontSize: "28px", 
                   color: "#555", 
                   marginTop: "10px",
                   fontWeight: "bold" 
@@ -665,7 +678,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
               {/* Announcements Section */}
               <div className="announcements-section">
                 <h3 style={{ 
-                  marginBottom: "15px", 
+                  margin: "20px", 
                   color: "#007bff", 
                   display: "flex", 
                   alignItems: "center", 
@@ -677,7 +690,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 </h3>
                 <div className="slidin-container" style={{ 
                   margin: "0 auto",
-                  maxWidth: "800px",
+                  maxWidth: "1000px",
                   background: "linear-gradient(to right, #f8f9fa, #ffffff, #f8f9fa)",
                   padding: "20px",
                   borderRadius: "15px",
@@ -697,6 +710,28 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       backgroundColor: "transparent"
                     }}
                   ></iframe>
+                </div>
+              </div>
+
+              {/* Campus Photo Showcase */}
+              <div className="campus-showcase">
+                <h3 className="showcase-title">
+                  <i className="fas fa-university"></i>
+                  MU Hostels
+                </h3>
+                <div className="showcase-grid">
+                  <div className="showcase-item">
+                    <img src="/Pics/hostel_4.JPG" alt="Campus View" className="showcase-image" />
+                    <div className="showcase-overlay">
+                      <p>Girls Hostels</p>
+                    </div>
+                  </div>
+                  <div className="showcase-item">
+                    <img src="/Pics/hostel_1.JPG" alt="Hostel Building" className="showcase-image" />
+                    <div className="showcase-overlay">
+                      <p>Boys Hostels</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -2055,372 +2090,167 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
           )}
 
           {/* About Section */}
-          {selectedSection === "About" && (
-            <div className="about-section">
-              <h2>About Hostel Management System</h2>
-              
-              <div className="about-container" style={{
-                maxWidth: '800px',
-                margin: '20px auto',
-                padding: '25px',
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
-              }}>
-                <div className="about-content">
-                  <h3 style={{color: '#d32f2f', marginBottom: '20px', fontSize: '1.5rem', borderBottom: '2px solid #d32f2f', paddingBottom: '10px'}}>About Mahindra University Hostel Management System</h3>
-                  
-                  <section className="about-section" style={{marginBottom: '30px'}}>
-                    <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '15px'}}>Enterprise Solution</h4>
-                    <p style={{lineHeight: '1.8', fontSize: '1rem'}}>
-                      The Mahindra University Hostel Management System is an enterprise-grade solution built to transform 
-                      residential facility management in higher education. Developed in collaboration with industry experts 
-                      and institutional stakeholders, our system delivers a comprehensive platform that addresses the complex 
-                      needs of modern university accommodations while maintaining the highest standards of security and performance.
-                    </p>
-                  </section>
-                  
-                  <section className="vision-mission" style={{marginBottom: '30px'}}>
-                    <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '15px'}}>Our Vision</h4>
-                    <p style={{lineHeight: '1.8', fontSize: '1rem', marginBottom: '15px', fontStyle: 'italic', color: '#444'}}>
-                      "To create the industry's leading residential management platform that transforms the higher education
-                      housing experience through innovative technology, enhanced security, and exceptional user satisfaction."
-                    </p>
-                  </section>
-                  
-                  <section className="project-overview" style={{marginBottom: '30px', backgroundColor: '#f7f7f7', padding: '20px', borderRadius: '8px'}}>
-                    <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '15px'}}>Enterprise Solution Overview</h4>
-                    <p style={{lineHeight: '1.6', fontSize: '1rem', marginBottom: '15px'}}>
-                      Our system delivers an enterprise-grade solution tailored precisely for the demanding requirements of Mahindra University's 
-                      residential ecosystem. Through seamless integration of advanced technologies and human-centered design principles, 
-                      we've developed a comprehensive platform that optimizes all facets of hostel operations and management:
-                    </p>
-                    
-                    <div className="features-grid" style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                      gap: '20px',
-                      marginTop: '20px'
-                    }}>
-                      <div className="feature-card" style={{
-                        backgroundColor: 'white',
-                        padding: '15px',
-                        borderRadius: '8px',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-                        border: '1px solid #eee'
-                      }}>
-                        <h5 style={{color: '#d32f2f', marginBottom: '10px'}}>Student Information Management</h5>
-                        <p>Comprehensive digital student records with photo ID verification and secure storage of personal information</p>
-                      </div>
-                      
-                      <div className="feature-card" style={{
-                        backgroundColor: 'white',
-                        padding: '15px',
-                        borderRadius: '8px',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-                        border: '1px solid #eee'
-                      }}>
-                        <h5 style={{color: '#d32f2f', marginBottom: '10px'}}>Room Allocation System</h5>
-                        <p>Interactive floor plans with real-time availability updates and intelligent room assignment algorithms</p>
-                      </div>
-                      
-                      <div className="feature-card" style={{
-                        backgroundColor: 'white',
-                        padding: '15px',
-                        borderRadius: '8px',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-                        border: '1px solid #eee'
-                      }}>
-                        <h5 style={{color: '#d32f2f', marginBottom: '10px'}}>Fee Management</h5>
-                        <p>Secure online payment processing with multiple payment options and automated receipt generation</p>
-                      </div>
-                      
-                      <div className="feature-card" style={{
-                        backgroundColor: 'white',
-                        padding: '15px',
-                        borderRadius: '8px',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-                        border: '1px solid #eee'
-                      }}>
-                        <h5 style={{color: '#d32f2f', marginBottom: '10px'}}>Complaint Management</h5>
-                        <p>Streamlined submission, tracking, and resolution system for maintenance requests and student concerns</p>
-                      </div>
-                      
-                      <div className="feature-card" style={{
-                        backgroundColor: 'white',
-                        padding: '15px',
-                        borderRadius: '8px',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-                        border: '1px solid #eee'
-                      }}>
-                        <h5 style={{color: '#d32f2f', marginBottom: '10px'}}>Room Change Management</h5>
-                        <p>Formal request and approval workflow for room changes with justification and documentation</p>
-                      </div>
-                      
-                      <div className="feature-card" style={{
-                        backgroundColor: 'white',
-                        padding: '15px',
-                        borderRadius: '8px',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-                        border: '1px solid #eee'
-                      }}>
-                        <h5 style={{color: '#d32f2f', marginBottom: '10px'}}>Administrative Dashboards</h5>
-                        <p>Role-specific interfaces for wardens and administrators with real-time analytics and reporting</p>
-                      </div>
-                    </div>
-                  </section>
-                  
-                  <section className="tech-section" style={{marginBottom: '40px'}}>
-                    <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '15px'}}>Enterprise Architecture</h4>
-                    <p style={{lineHeight: '1.8', fontSize: '1rem', marginBottom: '20px'}}>
-                      Built on a robust technological foundation utilizing React.js for dynamic frontend interfaces, Node.js for scalable backend services, 
-                      and MongoDB for high-performance data management. Our architecture ensures optimal performance, security, and scalability to meet 
-                      the evolving needs of a growing university community.
-                    </p>
-                    
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                      gap: '15px',
-                      marginTop: '20px'
-                    }}>
-                      {[
-                        {title: 'Frontend', tech: 'React.js + TypeScript', desc: 'Modern, responsive user interfaces'},
-                        {title: 'Backend', tech: 'Node.js + Express', desc: 'Scalable server-side architecture'},
-                        {title: 'Database', tech: 'MongoDB Atlas', desc: 'Cloud-based document database'},
-                        {title: 'Deployment', tech: 'Production Ready', desc: 'Optimized for enterprise deployment'}
-                      ].map((item, index) => (
-                        <div key={index} style={{
-                          backgroundColor: '#f8f9fa',
-                          padding: '15px',
-                          borderRadius: '8px',
-                          textAlign: 'center',
-                          border: '1px solid #e9ecef'
-                        }}>
-                          <h6 style={{color: '#d32f2f', margin: '0 0 8px 0'}}>{item.title}</h6>
-                          <p style={{fontWeight: 'bold', margin: '0 0 5px 0', fontSize: '0.9rem'}}>{item.tech}</p>
-                          <p style={{margin: 0, fontSize: '0.8rem', color: '#666'}}>{item.desc}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                  
-                  <section className="implementation-section" style={{marginBottom: '40px'}}>
-                    <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '15px'}}>Implementation & Deployment</h4>
-                    <p style={{lineHeight: '1.8', fontSize: '1rem'}}>
-                      Our solution follows industry best practices throughout the software development lifecycle. From initial requirements 
-                      gathering to continuous deployment, we've implemented rigorous quality assurance processes to ensure a robust, 
-                      secure, and user-friendly system. The platform undergoes regular security audits and performance optimizations to 
-                      maintain optimal operation even during peak usage periods.
-                    </p>
-                    
-                    <div style={{marginTop: '25px', backgroundColor: '#f7f7f7', padding: '15px', borderRadius: '8px', border: '1px solid #eee'}}>
-                      <h5 style={{color: '#d32f2f', marginBottom: '12px', fontSize: '1rem'}}>Key Implementation Highlights</h5>
-                      <ul style={{marginLeft: '20px', lineHeight: '1.8'}}>
-                        <li>Comprehensive security measures including data encryption and access controls</li>
-                        <li>Responsive design ensuring seamless experience across all devices and screen sizes</li>
-                        <li>Real-time data synchronization for instant updates across all user interfaces</li>
-                        <li>Automated backup and disaster recovery systems for data protection</li>
-                        <li>Performance optimization for handling high concurrent user loads</li>
-                      </ul>
-                    </div>
-                  </section>
-                  
-                  <section className="team-section" style={{marginBottom: '30px'}}>
-                    <h4 style={{fontSize: '1.2rem', color: '#333', marginBottom: '20px'}}>Development Team</h4>
-                    <p style={{marginBottom: '20px', lineHeight: '1.6'}}>
-                      This enterprise solution was developed by a dedicated team of software engineers from Mahindra University, 
-                      combining expertise across multiple domains to deliver a world-class hostel management platform.
-                    </p>
-                    
-                    <div className="team-grid" style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                      gap: '20px',
-                      marginTop: '25px'
-                    }}>
-                      <div className="team-member-card" style={{
-                        backgroundColor: 'white',
-                        borderRadius: '8px',
-                        boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
-                        overflow: 'hidden',
-                        transition: 'transform 0.3s',
-                        border: '1px solid #eee'
-                      }}>
-                        <div className="member-photo" style={{
-                          height: '150px',
-                          backgroundColor: '#e0e0e0',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}>
-                          <div style={{
-                            width: '80px',
-                            height: '80px',
-                            borderRadius: '50%',
-                            backgroundColor: '#c23535',
-                            color: 'white',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '1.8rem'
-                          }}>OV</div>
-                        </div>
-                        <div className="member-info" style={{padding: '15px'}}>
-                          <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Om Sai Vikranth</h4>
-                          <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>Project Lead & Full Stack Developer</p>
-                          <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE154@mahindrauniversity.edu.in</p>
-                        </div>
-                      </div>
-                      
-                      <div className="team-member-card" style={{
-                        backgroundColor: 'white',
-                        borderRadius: '8px',
-                        boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
-                        overflow: 'hidden',
-                        transition: 'transform 0.3s',
-                        border: '1px solid #eee'
-                      }}>
-                        <div className="member-photo" style={{
-                          height: '150px',
-                          backgroundColor: '#e0e0e0',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}>
-                          <div style={{
-                            width: '80px',
-                            height: '80px',
-                            borderRadius: '50%',
-                            backgroundColor: '#3f51b5',
-                            color: 'white',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '1.8rem'
-                          }}>SM</div>
-                        </div>
-                        <div className="member-info" style={{padding: '15px'}}>
-                          <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Srujan Madduri</h4>
-                          <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>Backend Developer & Database Architect</p>
-                          <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE009@mahindrauniversity.edu.in</p>
-                        </div>
-                      </div>
-                      
-                      <div className="team-member-card" style={{
-                        backgroundColor: 'white',
-                        borderRadius: '8px',
-                        boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
-                        overflow: 'hidden',
-                        transition: 'transform 0.3s',
-                        border: '1px solid #eee'
-                      }}>
-                        <div className="member-photo" style={{
-                          height: '150px',
-                          backgroundColor: '#e0e0e0',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}>
-                          <div style={{
-                            width: '80px',
-                            height: '80px',
-                            borderRadius: '50%',
-                            backgroundColor: '#009688',
-                            color: 'white',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '1.8rem'
-                          }}>PS</div>
-                        </div>
-                        <div className="member-info" style={{padding: '15px'}}>
-                          <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Sriroop Palacharla</h4>
-                          <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>Frontend Developer & UI/UX Designer</p>
-                          <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE005@mahindrauniversity.edu.in</p>
-                        </div>
-                      </div>
-                      
-                      <div className="team-member-card" style={{
-                        backgroundColor: 'white',
-                        borderRadius: '8px',
-                        boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
-                        overflow: 'hidden',
-                        transition: 'transform 0.3s',
-                        border: '1px solid #eee'
-                      }}>
-                        <div className="member-photo" style={{
-                          height: '150px',
-                          backgroundColor: '#e0e0e0',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}>
-                          <div style={{
-                            width: '80px',
-                            height: '80px',
-                            borderRadius: '50%',
-                            backgroundColor: '#607d8b',
-                            color: 'white',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '1.8rem'
-                          }}>P</div>
-                        </div>
-                        <div className="member-info" style={{padding: '15px'}}>
-                          <h4 style={{margin: '0 0 5px 0', color: '#333'}}>Punith</h4>
-                          <p style={{margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem'}}>QA & Testing Lead</p>
-                          <p style={{margin: '0', fontSize: '0.8rem', color: '#888'}}>SE22UCSE789@mahindrauniversity.edu.in</p>                        </div>
-                      </div>
-                    </div>
-                  </section>
-                  
-                  <div style={{
-                    textAlign: 'center',
-                    marginTop: '30px',
-                    padding: '15px',
-                    backgroundColor: '#efefef',
-                    borderRadius: '8px'
-                  }}>
-                    <p style={{
-                      fontSize: '0.9rem',
-                      color: '#555',
-                      fontStyle: 'italic',
-                      margin: '0'
-                    }}>
-                      This enterprise-grade hostel management system was developed by a cross-functional team of software engineers 
-                      from Mahindra University's School of Computing, combining expertise in frontend and backend development, 
-                      database design, UI/UX principles, and quality assurance.
-                    </p>
-                  </div>
-                  
-                  <div style={{
-                    marginTop: '30px',
-                    padding: '20px',
-                    backgroundColor: '#fff',
-                    borderRadius: '8px',
-                    border: '1px solid #e0e0e0',
-                    textAlign: 'center'
-                  }}>
-                    <h4 style={{color: '#333', marginBottom: '15px', fontSize: '1.1rem'}}>System Support</h4>
-                    <p style={{margin: '0 0 15px 0', fontSize: '0.95rem'}}>For technical support or inquiries about the Hostel Management System, please contact:</p>
-                    <div style={{
-                      backgroundColor: '#f9f9f9',
-                      padding: '15px',
-                      display: 'inline-block',
-                      borderRadius: '8px',
-                      border: '1px solid #eee'
-                    }}>
-                      <p style={{margin: '0 0 5px 0', fontWeight: 'bold'}}>Technical Support Team</p>
-                      <p style={{margin: '0 0 5px 0'}}>Email: <a href="mailto:hostel.support@mahindrauniversity.edu.in" style={{color: '#d32f2f'}}>hostel.support@mahindrauniversity.edu.in</a></p>
-                      <p style={{margin: '0'}}>Phone: +91 40 6722 9000</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+{selectedSection === "About" && (
+  <section className="about-section" style={{ backgroundColor: '#f9f9f9', padding: '80px 20px' }}>
+    <div style={{ position: 'relative', marginBottom: '40px' }}>
+      <div
+        className="banner-image"
+        style={{
+          width: '100%',
+          height: '400px',
+          backgroundImage: 'url("Pics/Campus22-scaled.jpg")',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    borderRadius: '12px',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+    position: 'relative',
+    overflow: 'hidden',
+    transition: 'transform 0.8s ease-in-out',
+  }}
+  onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.03)')}
+  onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+>
+  <div
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'linear-gradient(to bottom right, rgba(0,0,0,0.2), rgba(0,0,0,0.6))',
+      borderRadius: '12px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <h1
+      style={{
+        textAlign: 'center',
+        color: '#ffffff',
+        fontSize: '3rem',
+        fontWeight: 600,
+        fontFamily: 'Segoe UI, sans-serif',
+        textShadow: '2px 2px 6px rgba(0,0,0,0.6)',
+        animation: 'floatText 3s ease-in-out infinite',
+      }}
+    >
+      Hostel Management System
+    </h1>  </div>
+
+  <style>
+    {`
+      @keyframes floatText {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+        100% { transform: translateY(0); }
+      }
+    `}
+  </style>
+</div>
+</div>
+
+    <div
+      className="about-container"
+      style={{
+        maxWidth: "1140px",
+        margin: "0 auto",
+        backgroundColor: "#ffffff",
+        padding: "50px 40px",
+        borderRadius: "12px",
+        boxShadow: "0 12px 40px rgba(0,0,0,0.08)",
+        fontFamily: 'Segoe UI, sans-serif'
+      }}
+    >
+
+      <hr style={{ height: "2px", borderWidth: 0, color: '#d32f2f', backgroundColor: '#d32f2f' }} />
+
+      <p style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 2.5rem', fontSize: '1.1rem', color: '#555', lineHeight: '1.8' }}>
+        Digitally transforming the room allocation process at Mahindra University to enhance student life and operational efficiency.
+      </p>
+
+      <div className="about-content" style={{ color: '#444', fontSize: '1.05rem', lineHeight: '1.9' }}>
+        <p style={{ marginBottom: '1.5rem' }}>
+          Our Hostel Management System (HMS) is a robust web platform built using <strong>React</strong>, <strong>TypeScript</strong>, <strong>Node.js</strong>, and <strong>MongoDB</strong>. It replaces traditional paper-based allocation methods with a centralized, intuitive, and secure online solution.
+        </p>
+
+        <p style={{ marginBottom: '1.5rem' }}>
+          The project originated from a common pain point — the chaotic and inefficient manual hostel booking experience. HMS resolves this with intelligent room assignments, real-time floor plans, role-based dashboards, and more.
+        </p>
+
+        <ul style={{ marginBottom: '2rem', paddingLeft: '1.5rem' , listStyleType:'none'}}>
+          <li style={{ marginBottom: '0.75rem' }}>Interactive SVG-based hostel floor plans</li>
+          <li style={{ marginBottom: '0.75rem' }}>User-friendly forms with validation and smart inputs</li>
+          <li style={{ marginBottom: '0.75rem' }}>Automated room booking and allocation workflows</li>
+          <li style={{ marginBottom: '0.75rem' }}>Secure payment and complaint modules</li>
+        </ul>
+
+        <p style={{ marginBottom: '1.5rem' }}>
+          Designed in consultation with university wardens, and refined through real-user testing, HMS prioritizes ease of use, transparency, and mobile responsiveness — all while maintaining alignment with Mahindra University’s digital brand aesthetics.
+        </p>
+
+        <p style={{ marginBottom: '2.5rem' }}>
+          The system is not only functional but future-proof — built with a scalable backend and elegant UI, ensuring seamless management for years to come.
+        </p>
+
+        <h2 style={{ color: '#B10D1E', fontSize: '1.8rem', borderBottom: '2px solid #B10D1E', paddingBottom: '10px', marginBottom: '1.5rem' }}>Development Team</h2>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: '30px',
+          marginBottom: '3rem'
+        }}>
+          {[
+            { name: 'Abhinav Pulluri', role: 'Deployment, Testing, Documentation', email: 'abhinav@gmail.com' },
+            { name: 'Sriroop Palacharla', role: 'Frontend Developer', email: 'sriroop.palacharla@gmail.com' },
+            { name: 'M Abhilash Reddy', role: 'Frontend Developer', email: 'abhilashreddymar@gmail.com' },
+            { name: 'Kalyan Krishna', role: 'UI/UX, Floor Plan Design', email: 'kalyan@gmail.com' },
+            { name: 'Om Sai Vikranth', role: 'Backend Developer', email: 'omsaivikrantha@gmail.com' },
+            { name: 'Punith Chavan', role: 'Backend Developer', email: 'punith@gmail.com' }
+          ].map((member, idx) => (
+            <div key={idx} style={{
+              backgroundColor: '#fafafa',
+              border: '1px solid #ddd',
+              borderRadius: '10px',
+              padding: '20px',
+              boxShadow: '0 3px 8px rgba(0,0,0,0.03)'
+            }}>
+              <h4 style={{ margin: '0 0 10px 0', color: '#00274D', fontSize: '1.1rem' }}>{member.name}</h4>
+              <p style={{ margin: '0 0 5px 0', color: '#555' }}>{member.role}</p>
+              <a href={`mailto:${member.email}`} style={{ color: '#B10D1E', fontSize: '0.95rem' }}>{member.email}</a>
             </div>
-          )}          {/* Room Change Request - New */}
+          ))}
+        </div>
+
+        <div style={{
+          backgroundColor: '#f0f3f7',
+          padding: '30px',
+          borderRadius: '10px',
+          border: '1px solid #d6dbe0',
+          textAlign: 'center'
+        }}>
+          <h4 style={{ color: '#00274D', fontSize: '1.2rem', marginBottom: '15px' }}>System Support</h4>
+          <p style={{ fontSize: '1rem', color: '#333', marginBottom: '10px' }}>
+            For technical assistance or queries related to the Hostel Management System, contact our support team:
+          </p>
+          <div style={{
+            backgroundColor: '#ffffff',
+            padding: '20px',
+            display: 'inline-block',
+            borderRadius: '8px',
+            border: '1px solid #ccc',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
+          }}>
+            <p style={{ fontWeight: 'bold', fontSize: '1rem', color: '#555', marginBottom: '5px' }}>Technical Support Team</p>
+            <p style={{ margin: '0 0 5px 0', fontSize: '0.95rem' }}> Email: <a href="mailto:hostel.support@mahindrauniversity.edu.in" style={{ color: '#B10D1E' }}>hostel.support@mahindrauniversity.edu.in</a></p>
+            <p style={{ margin: 0, fontSize: '0.95rem' }}> Phone: +91 40 6722 9000</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+)}         {/* Room Change Request - New */}
           {selectedSection === "Room-Change-New" && (
             <div className="room-change-section">
               <h2>Submit New Room Change Request</h2>
