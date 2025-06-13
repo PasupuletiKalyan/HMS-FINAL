@@ -415,8 +415,33 @@ exports.updateHostelStatistics = async (booking) => {
   try {
     const { block, floor } = booking;
     
-    // No need to update database as we'll calculate stats on the fly
+    // For now, we don't need to update any stats in the database,
+    // but we should notify that this was called and record the booking
     console.log(`Updated statistics for block: ${block}, floor: ${floor}`);
+    
+    // Find if there's a block availability record to update
+    const blockAvail = await BlockAvailability.findOne();
+    if (blockAvail) {
+      // Find the block and increment occupied beds count if found
+      const blockData = blockAvail.blocks.find(b => b.name === block);
+      if (blockData) {
+        // Find the floor if it exists
+        const floorData = blockData.floors.find(f => f.floorNumber === floor);
+        if (floorData) {
+          // Increment the occupied beds count (if it exists)
+          if (typeof floorData.occupiedBedsCount === 'number') {
+            floorData.occupiedBedsCount += 1;
+          } else {
+            floorData.occupiedBedsCount = 1;
+          }
+          
+          // Save the updated block availability data
+          await blockAvail.save();
+          console.log(`Updated block ${block}, floor ${floor} occupancy count in database`);
+        }
+      }
+    }
+    
     return true;
   } catch (error) {
     console.error('Error updating hostel statistics:', error);

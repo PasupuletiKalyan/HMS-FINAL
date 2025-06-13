@@ -80,15 +80,15 @@ const AdminOverview: React.FC = () => {
         availableBeds: 0,
         overallOccupancyRate: 0,
         blocks: []
-      };
-
-      // Get occupied beds data
+      };      // Get occupied beds data
       let occupiedBedsData: any[] = [];
       if (occupiedBedsResponse.ok) {
         const bedsData = await occupiedBedsResponse.json();
-        if (bedsData.success && Array.isArray(bedsData.occupiedBeds)) {
-          occupiedBedsData = bedsData.occupiedBeds;
+        if (bedsData.success) {
+          // Use the array of bed objects directly from the API response
+          occupiedBedsData = bedsData.occupiedBedsArray || bedsData.bedDetails || [];
           stats.occupiedBeds = occupiedBedsData.length;
+          console.log(`Found ${stats.occupiedBeds} occupied beds`);
         }
       }
 

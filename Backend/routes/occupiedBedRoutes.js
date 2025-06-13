@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
   try {
     const occupiedBeds = await OccupiedBed.find({});
     
-    // Convert to a format that's easy to use in the frontend
+    // Convert to a format that's easy to use in the frontend (for HostelFloorPlanViewer)
     const bedsMap = {};
     occupiedBeds.forEach(bed => {
       bedsMap[bed.bedKey] = true;
@@ -18,8 +18,9 @@ router.get("/", async (req, res) => {
     
     res.status(200).json({ 
       success: true, 
-      occupiedBeds: bedsMap,
-      bedDetails: occupiedBeds
+      occupiedBeds: bedsMap,       // For HostelFloorPlanViewer (object format)
+      occupiedBedsArray: occupiedBeds, // For AdminOverview (array format)
+      bedDetails: occupiedBeds     // Full details
     });
   } catch (error) {
     console.error("Error getting occupied beds:", error);
