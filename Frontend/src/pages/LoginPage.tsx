@@ -107,7 +107,7 @@ const LoginPage: React.FC = () => {
 
           <div className="input-group">
             <label>Password</label>
-            <div className="password-input-container" style={{ position: 'relative', width: '100%' }}>
+            <div className="password-input-container" style={{ position: 'relative', width: '100%'}}>
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
